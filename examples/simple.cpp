@@ -12,21 +12,6 @@ namespace idl_definition {
     };
 }
 
-/*
-template<typename InterfaceDelegate = boost::idl::mirror_interface >
-class InterfaceName 
-{
-    public:
-       struct __idl_area : public InterfaceDelegate::template calculate_type<&idl_definition::InterfaceName::area>::type 
-       {
-            template<typename T> 
-            static BOOST_TYPEOF(&T::area) get_member_on_type() 
-            {
-               return &T::area; 
-            }
-       } area;
-};
-*/
 BOOST_IDL_INTERFACE( BaseShape, BOOST_PP_NIL, (name) )
 BOOST_IDL_INTERFACE( Shape, (BaseShape, BOOST_PP_NIL), (area) )
 
