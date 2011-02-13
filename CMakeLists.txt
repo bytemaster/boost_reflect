@@ -14,7 +14,7 @@ boost_add_headers(${headers})
 if( ENABLE_EXAMPLES )
     option( ENABLE_IDL_EXAMPLES "Build Boost.IDL Examples" ON )
     if( ENABLE_IDL_EXAMPLES )
-        boost_add_executable( simple  SOURCES examples/simple.cpp  LINK_BOOST_LIBRARIES )
+        boost_add_executable( idl_simple  SOURCES examples/simple.cpp  LINK_BOOST_LIBRARIES )
     endif( ENABLE_IDL_EXAMPLES )
 endif( ENABLE_EXAMPLES )
 

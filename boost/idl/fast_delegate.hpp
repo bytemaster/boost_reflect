@@ -28,7 +28,7 @@
 //					 now have compile-time checks to make them safer.
 //				  * implicit_cast used instead of static_cast in many cases.
 //				  * If calling a const member function, a const class pointer can be used.
-//				  * make_delegate() global helper function added to simplify pass-by-value.
+//				  * make_fast_delegate() global helper function added to simplify pass-by-value.
 //				  * Added fastdelegate.clear()
 // 16-Jul-04 1.2.1* Workaround for gcc bug (const member function pointers in templates)
 // 30-Oct-04 1.3  * Support for (non-void) return values.
@@ -2033,15 +2033,15 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 //						Fast Delegates, part 5:
 //
-//				make_delegate() helper function
+//				make_fast_delegate() helper function
 //
-//			make_delegate(&x, &X::func) returns a fastdelegate of the type
+//			make_fast_delegate(&x, &X::func) returns a fastdelegate of the type
 //			necessary for calling x.func() with the correct number of arguments.
 //			This makes it possible to eliminate many typedefs from user code.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-// Also declare overloads of a make_delegate() global function to 
+// Also declare overloads of a make_fast_delegate() global function to 
 // reduce the need for typedefs.
 // We need seperate overloads for const and non-const member functions.
 // Also, because of the weird rule about the class of derived member function pointers,
@@ -2062,104 +2062,104 @@ public:
 
 //N=0
 template <class X, class Y, class RetType>
-fast_delegate<FASTDLGT_RETTYPE()> make_delegate(Y* x, RetType (X::*func)()) { 
+fast_delegate<FASTDLGT_RETTYPE()> make_fast_delegate(Y* x, RetType (X::*func)()) { 
 	return fast_delegate<FASTDLGT_RETTYPE()>(x, func);
 }
 
 template <class X, class Y, class RetType>
-fast_delegate<FASTDLGT_RETTYPE()> make_delegate(Y* x, RetType (X::*func)() const) { 
+fast_delegate<FASTDLGT_RETTYPE()> make_fast_delegate(Y* x, RetType (X::*func)() const) { 
 	return fast_delegate<FASTDLGT_RETTYPE()>(x, func);
 }
 
 //N=1
 template <class X, class Y, class Param1, class RetType>
-fast_delegate<FASTDLGT_RETTYPE(Param1)> make_delegate(Y* x, RetType (X::*func)(Param1 p1)) { 
+fast_delegate<FASTDLGT_RETTYPE(Param1)> make_fast_delegate(Y* x, RetType (X::*func)(Param1 p1)) { 
 	return fast_delegate<FASTDLGT_RETTYPE(Param1)>(x, func);
 }
 
 template <class X, class Y, class Param1, class RetType>
-fast_delegate1<FASTDLGT_RETTYPE(Param1)> make_delegate(Y* x, RetType (X::*func)(Param1 p1) const) { 
+fast_delegate1<FASTDLGT_RETTYPE(Param1)> make_fast_delegate(Y* x, RetType (X::*func)(Param1 p1) const) { 
 	return fast_delegate<FASTDLGT_RETTYPE(Param1)>(x, func);
 }
 
 //N=2
 template <class X, class Y, class Param1, class Param2, class RetType>
-fast_delegate<FASTDLGT_RETTYPE(Param1, Param2)> make_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2)) { 
+fast_delegate<FASTDLGT_RETTYPE(Param1, Param2)> make_fast_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2)) { 
 	return fast_delegate<FASTDLGT_RETTYPE(Param1, Param2)>(x, func);
 }
 
 template <class X, class Y, class Param1, class Param2, class RetType>
-fast_delegate<FASTDLGT_RETTYPE(Param1, Param2)> make_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2) const) { 
+fast_delegate<FASTDLGT_RETTYPE(Param1, Param2)> make_fast_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2) const) { 
 	return fast_delegate<FASTDLGT_RETTYPE(Param1, Param2)>(x, func);
 }
 
 //N=3
 //template <class X, class Y, class Param1, class Param2, class Param3, class RetType>
-//fast_delegate3<Param1, Param2, Param3, FASTDLGT_RETTYPE> make_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3)) { 
+//fast_delegate3<Param1, Param2, Param3, FASTDLGT_RETTYPE> make_fast_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3)) { 
 //	return fast_delegate3<Param1, Param2, Param3, FASTDLGT_RETTYPE>(x, func);
 //}
 template <class X, class Y, class Param1, class Param2, class Param3, class RetType>
-fast_delegate<FASTDLGT_RETTYPE (Param1, Param2, Param3)> make_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3)) { 
+fast_delegate<FASTDLGT_RETTYPE (Param1, Param2, Param3)> make_fast_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3)) { 
 	return fast_delegate<FASTDLGT_RETTYPE(Param1, Param2, Param3)>(x, func);
 }
 
 template <class X, class Y, class Param1, class Param2, class Param3, class RetType>
-fast_delegate3<Param1, Param2, Param3, FASTDLGT_RETTYPE> make_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3) const) { 
+fast_delegate3<Param1, Param2, Param3, FASTDLGT_RETTYPE> make_fast_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3) const) { 
 	return fast_delegate3<Param1, Param2, Param3, FASTDLGT_RETTYPE>(x, func);
 }
 
 //N=4
 template <class X, class Y, class Param1, class Param2, class Param3, class Param4, class RetType>
-fast_delegate4<Param1, Param2, Param3, Param4, FASTDLGT_RETTYPE> make_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4)) { 
+fast_delegate4<Param1, Param2, Param3, Param4, FASTDLGT_RETTYPE> make_fast_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4)) { 
 	return fast_delegate4<Param1, Param2, Param3, Param4, FASTDLGT_RETTYPE>(x, func);
 }
 
 template <class X, class Y, class Param1, class Param2, class Param3, class Param4, class RetType>
-fast_delegate4<Param1, Param2, Param3, Param4, FASTDLGT_RETTYPE> make_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4) const) { 
+fast_delegate4<Param1, Param2, Param3, Param4, FASTDLGT_RETTYPE> make_fast_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4) const) { 
 	return fast_delegate4<Param1, Param2, Param3, Param4, FASTDLGT_RETTYPE>(x, func);
 }
 
 //N=5
 template <class X, class Y, class Param1, class Param2, class Param3, class Param4, class Param5, class RetType>
-fast_delegate5<Param1, Param2, Param3, Param4, Param5, FASTDLGT_RETTYPE> make_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5)) { 
+fast_delegate5<Param1, Param2, Param3, Param4, Param5, FASTDLGT_RETTYPE> make_fast_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5)) { 
 	return fast_delegate5<Param1, Param2, Param3, Param4, Param5, FASTDLGT_RETTYPE>(x, func);
 }
 
 template <class X, class Y, class Param1, class Param2, class Param3, class Param4, class Param5, class RetType>
-fast_delegate5<Param1, Param2, Param3, Param4, Param5, FASTDLGT_RETTYPE> make_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) const) { 
+fast_delegate5<Param1, Param2, Param3, Param4, Param5, FASTDLGT_RETTYPE> make_fast_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) const) { 
 	return fast_delegate5<Param1, Param2, Param3, Param4, Param5, FASTDLGT_RETTYPE>(x, func);
 }
 
 //N=6
 template <class X, class Y, class Param1, class Param2, class Param3, class Param4, class Param5, class Param6, class RetType>
-fast_delegate6<Param1, Param2, Param3, Param4, Param5, Param6, FASTDLGT_RETTYPE> make_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6)) { 
+fast_delegate6<Param1, Param2, Param3, Param4, Param5, Param6, FASTDLGT_RETTYPE> make_fast_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6)) { 
 	return fast_delegate6<Param1, Param2, Param3, Param4, Param5, Param6, FASTDLGT_RETTYPE>(x, func);
 }
 
 template <class X, class Y, class Param1, class Param2, class Param3, class Param4, class Param5, class Param6, class RetType>
-fast_delegate6<Param1, Param2, Param3, Param4, Param5, Param6, FASTDLGT_RETTYPE> make_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6) const) { 
+fast_delegate6<Param1, Param2, Param3, Param4, Param5, Param6, FASTDLGT_RETTYPE> make_fast_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6) const) { 
 	return fast_delegate6<Param1, Param2, Param3, Param4, Param5, Param6, FASTDLGT_RETTYPE>(x, func);
 }
 
 //N=7
 template <class X, class Y, class Param1, class Param2, class Param3, class Param4, class Param5, class Param6, class Param7, class RetType>
-fast_delegate7<Param1, Param2, Param3, Param4, Param5, Param6, Param7, FASTDLGT_RETTYPE> make_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7)) { 
+fast_delegate7<Param1, Param2, Param3, Param4, Param5, Param6, Param7, FASTDLGT_RETTYPE> make_fast_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7)) { 
 	return fast_delegate7<Param1, Param2, Param3, Param4, Param5, Param6, Param7, FASTDLGT_RETTYPE>(x, func);
 }
 
 template <class X, class Y, class Param1, class Param2, class Param3, class Param4, class Param5, class Param6, class Param7, class RetType>
-fast_delegate7<Param1, Param2, Param3, Param4, Param5, Param6, Param7, FASTDLGT_RETTYPE> make_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7) const) { 
+fast_delegate7<Param1, Param2, Param3, Param4, Param5, Param6, Param7, FASTDLGT_RETTYPE> make_fast_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7) const) { 
 	return fast_delegate7<Param1, Param2, Param3, Param4, Param5, Param6, Param7, FASTDLGT_RETTYPE>(x, func);
 }
 
 //N=8
 template <class X, class Y, class Param1, class Param2, class Param3, class Param4, class Param5, class Param6, class Param7, class Param8, class RetType>
-fast_delegate8<Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8, FASTDLGT_RETTYPE> make_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7, Param8 p8)) { 
+fast_delegate8<Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8, FASTDLGT_RETTYPE> make_fast_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7, Param8 p8)) { 
 	return fast_delegate8<Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8, FASTDLGT_RETTYPE>(x, func);
 }
 
 template <class X, class Y, class Param1, class Param2, class Param3, class Param4, class Param5, class Param6, class Param7, class Param8, class RetType>
-fast_delegate8<Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8, FASTDLGT_RETTYPE> make_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7, Param8 p8) const) { 
+fast_delegate8<Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8, FASTDLGT_RETTYPE> make_fast_delegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7, Param8 p8) const) { 
 	return fast_delegate8<Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8, FASTDLGT_RETTYPE>(x, func);
 }
 
