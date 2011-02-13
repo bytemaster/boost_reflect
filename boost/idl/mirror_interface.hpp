@@ -4,17 +4,14 @@
     #include <boost/idl/member_from_signature.hpp>
     #include <boost/idl/fast_delegate.hpp>
     #include <boost/fusion/container/vector.hpp>
-    #include <boost/fusion/functional/invocation/invoke.hpp>
+    #include <boost/fusion/container/generation/make_vector.hpp>
+    #include <boost/fusion/functional/generation/make_fused_function_object.hpp>
 
     namespace boost { namespace idl {
         
         template<typename MemberPtr>
         struct mirror_member
         {
-       //     typedef Signature  signature;
-       //     static const bool  is_const;
-           // RESULT operator( PARAMS ) IsConst
-       //    BOOST_STATIC_ASSERT(false);
         };
 
         namespace detail {
@@ -124,11 +121,11 @@
         static const bool                                                 is_const = true;
         R operator()( PARAM_ARGS )const
         {
-            return m_delegate( PARAM_NAMES );
+            return m_delegate( boost::fusion::make_vector(PARAM_NAMES) );
         }
-        R operator() ( fused_params& fp )const
+        R operator() ( const fused_params& fp )const
         {
-            return boost::fusion::invoke( m_delegate, fp );
+            return m_delegate( fp );
         }
         mirror_member& operator=( const  boost::function<R(PARAM_TYPES)>& d )  
         {
@@ -138,9 +135,9 @@
         template<typename C, typename M>
         void set_delegate(  C*& s, M m )
         {
-            m_delegate = make_fast_delegate(s,m); 
+            m_delegate = boost::fusion::make_fused_function_object( make_fast_delegate(s,m) ); 
         }
-        boost::function<R(PARAM_TYPES)> m_delegate; 
+        boost::function<R(const fused_params&)> m_delegate; 
     };
 
     template<typename R, typename Class  BOOST_PP_COMMA_IF(n) PARAM_TYPE_NAMES>
@@ -155,11 +152,11 @@
         static const bool                                                 is_const = false;
         R operator()( PARAM_ARGS )
         {
-            return m_delegate( PARAM_NAMES );
+            return m_delegate( boost::fusion::make_vector(PARAM_NAMES) );
         }
-        R operator() ( fused_params& fp )
+        R operator() ( const fused_params& fp )
         {
-            return boost::fusion::invoke( m_delegate, fp );
+            return m_delegate( fp );
         }
         mirror_member& operator=( const  boost::function<R(PARAM_TYPES)>& d )  
         {
@@ -169,9 +166,9 @@
         template<typename C, typename M>
         void set_delegate(  C*& s, M m )
         {
-            m_delegate = make_fast_delegate(s,m); 
+            m_delegate = boost::fusion::make_fused_function_object( make_fast_delegate(s,m) ); 
         }
-        boost::function<R(PARAM_TYPES)> m_delegate; 
+        boost::function<R(const fused_params&)> m_delegate; 
     };
 
 
