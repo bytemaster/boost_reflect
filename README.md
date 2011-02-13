@@ -6,12 +6,12 @@ of a class or struct to provide compile-time and run-time reflection.
 
 Some of the useful features provided by the IDL library include:
 
-    * boost::idl::any<Interface>  - a class that can contain any object
-        that implements Interface.
-    * Use visitors to create dynamic interfaces.
-        - RPC client/server stubs
-        - Command Line Interface
-        - Scripting Interfaces
+* boost::idl::any<Interface>  - a class that can contain any object
+    that implements Interface.
+* Use visitors to create dynamic interfaces.
+    - RPC client/server stubs
+    - Command Line Interface
+    - Scripting Interfaces
 
 
 Example: Simple Command Line Calculator
