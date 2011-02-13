@@ -57,8 +57,11 @@ namespace boost { namespace idl {
         {  \
             typedef typename InterfaceDelegate::template calculate_type<BOOST_TYPEOF(&idl_definition_class::elem)>::type base_type;  \
             using base_type::operator=;\
+            template<typename Type, typename AssignType> \
+            static void get_member_on_type( Type* t, AssignType& v ) {  v = t->elem; } \
             template<typename T> \
-            static typename boost::idl::detail::member_from_signature<T,typename base_type::signature,base_type::is_const>::type get_member_on_type() { return &T::elem; }  \
+            static typename boost::idl::detail::member_from_signature<T,typename base_type::signature,base_type::is_const>::type get_member_on_type()\
+                { return &T::elem; }  \
         } elem;
 
 #define VISIT_BASE( r, data, elem ) any<elem,InterfaceDelegate>::__idl__visit(data);

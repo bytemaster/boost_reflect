@@ -73,7 +73,6 @@
             template<typename MemberPointer>
             struct calculate_type
             {
-                //typedef mirror_member<typename detail::get_member_type<MemberPointer>::type, detail::get_member_type<MemberPointer>::is_const >  type; 
                 typedef mirror_member<MemberPointer>  type; 
             };
         };

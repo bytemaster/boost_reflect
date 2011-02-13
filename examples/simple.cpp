@@ -1,9 +1,5 @@
 #include <boost/idl/mirror_interface.hpp>
 #include <boost/idl/idl.hpp>
-#include <boost/fusion/sequence/io.hpp>
-#include <sstream>
-#include <iomanip>
-#include <iostream>
 
 #include "cli.hpp"
 

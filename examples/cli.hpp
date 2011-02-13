@@ -1,5 +1,10 @@
 #ifndef _BOOST_IDL_CLI_HPP_
 #define _BOOST_IDL_CLI_HPP_
+#include <sstream>
+#include <iomanip>
+#include <iostream>
+
+#include <boost/fusion/sequence/io.hpp>
 #include <boost/idl/mirror_interface.hpp>
 #include <boost/idl/idl.hpp>
 
