@@ -1,5 +1,5 @@
 Boost.IDL - Interface Description Language 
-==========================================
+---------------------------------------
 
 The Boost IDL library provides a means to describe the interface
 of a class or struct to provide compile-time and run-time reflection.
@@ -12,6 +12,7 @@ Some of the useful features provided by the IDL library include:
     - RPC client/server stubs
     - Command Line Interface
     - Scripting Interfaces
+    - Asynchronous Actors
 
 
 Example: Simple Command Line Calculator
@@ -57,4 +58,17 @@ of how to create a command line calculator can be found in the examples director
 
         return 0;
     }
+
+### Output ###
+
+    add        double(double)
+    sub        double(double)
+    result     double()const
+
+    Enter Method: add(5)
+    5
+    Enter Method: sub(3)
+    2
+    Enter Method: result()
+    2
 
