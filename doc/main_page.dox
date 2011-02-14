@@ -1,0 +1,411 @@
+/**
+    @mainpage  
+
+    The Boost IDL library provides a means to quickly describe the interface of
+    a class or struct and then use that description to provide compile-time and
+    run-time reflection on the interface.  The library was motivated by the 
+    desire to eliminate the amount of boiler plate code required to create 
+    variations on an interface for different pruposes.
+    
+    @note This library is not part of the official Boost C++ libraries.  It was developed
+    with the intention of being submitted for review by the Boost community and therefore
+    everything is coded accoding to the Boost C++ Coding Guidleines.
+
+    @section toc Table of Contents
+        
+        - @ref introduction
+            - @ref motivation
+            - @ref reflection
+            - @ref type_erasure
+        - @ref tutorial 
+            - @ref type_erasure_def
+            - @ref type_erasure_any
+            - @ref implementation_detail  
+            - @ref adapting_an_interface
+        - @ref rpc_case_study
+        - @ref rationale
+        - @ref future_dev
+        - @ref acknowledgements
+
+    @section introduction Introduction
+       There have been many libraries that attempt to provide Reflection tools for
+       C++ programs.  The most robust solution is the 
+       <a href="http://kifri.fri.uniza.sk/~chochlik/mirror-lib/html/">Boost Mirror library</a>.  
+        Despite its ability to reflect just about every c++ construct, the Boost Mirror library
+        requires the developer to enter more text to describe the interface than it took to
+        write the interface in the first place.  
+
+       Boost.Idl attempts to find a middle ground with a focus on providing the most useful
+       features while minimizing the amount of work a developer must do to reflect
+       those properties.   Boost.Idl goes one step further and provides a generic Type Erasure
+       construct, boost::idl::any<Interface>.   
+
+        @subsection motivation   Motivation
+
+        It is not uncommon for developers to write some code that needs to interface 
+        with many different systems in slightly different ways.  The result is ususally
+        the creation of many different "wrappers" each exposing the core function of
+        an object in a slightly different way.
+
+            - Remote Procedure Client / Server Stubs
+            - Scripting Language Hooks
+            - Command Line Arguments
+            - Actor Paradigmn
+            - Configuration 
+
+        All of these tasks represent the creation of code that is derived from
+        the core interface in a well defined manner.  Each wrapper is tightly
+        coupled to the core interface, such that if the core interface changes then
+        all the wrappers must make a similar change.  Coding these wrappers is the
+        type of task that makes your hands ache just thinking about all of the
+        mindless typing involved.
+
+        @subsection reflection   Reflection
+
+        The reflection provided by Boost.Idl focuses on exposing typenames, inheritance,
+        return values, method names, parameter types, constness, and public
+        member variables.  All reflection is non-invasive and may be added to any
+        class or struct.
+
+        @subsection type_erasure Type Erasure
+
+        In the world of generic programming, type information tends to propogate as
+        template parameters.  <i>"Type Erasure is the process of turning a wide variety of
+        types with a common interface into one type with that same interface."</i>
+
+            - <a href="http://www.boostpro.com/mplbook/">C++ Template Metaprogramming</a> by Dave Abrahams & Aleksy Curtovoy
+
+        More than that, you can adapt interfaces, morph inheritance based interfaces
+        into value semantics, or perform other transformations on an interface in the
+        process of 'erasing' its type.
+
+        Common uses of type erasure include boost::any and boost::function.  Boost.Any 
+        erases all type information except its name and copy semantics.  Boost.Function
+        erases everything about a type except the calling signature.  Algorithms written
+        with Boost.Any and Boost.Function can be agnostic to the huge amount of type
+        variation possible for functors, function pointers, member function pointers,
+        or storage.
+
+        This article on <a href="http://www.artima.com/cppsource/type_erasure.html">type erasure</a>
+        shows how Generic Programming (Templates) often conflicts with good Object Oriented design 
+        because generic programing exposes the internal implementation details that good
+        Object Oriented design goes to great lengths to hide.
+
+
+        <center><table width="75%"><tr><td>
+        Good engineering involves compromise at every turn. A good, working, 
+        finished product is never pure by the standards of any one idiom or 
+        methodology. The art of good engineering is not the art of 
+        discovering and applying the one right idiom over all others. The 
+        art of good engineering is to know what your options are, and then 
+        to choose your trade-offs wisely rather than letting others choose 
+        them for you.
+        <td></tr></table></center>
+
+        I found the following quote from the article really helps put the debate between
+        'fast' generic programing and 'slow' object oriented programming.
+
+        <center><table width="75%"><tr><td>
+        Optimization whose effect no user ever notices is the root of many evils, among them the failure of software projects and the subsequent failure of businesses.
+        <td></tr></table></center>
+
+        Boost.IDL focuses on being as efficeint as possible without sacraficing 
+        development speed and proper Object Oriented abstraction.  If you don't
+        use boost::idl::any<Interface> in your inner loops, then your users will
+        never notice one extra layer of indirection or an extra couple of bytes of 
+        RAM.  Your company, managers, and customers will notice the cost savings in
+        reducing your development time, decouping components, and added resiliance
+        to change that developing with Boost.IDL can provide through type erasure.
+
+    @section tutorial Tutorial
+
+    Boost.IDL makes the process of creating type erasures relatively easy via the
+    idl::any<InterfaceType> class.  
+
+    @subsection type_erasure_def Define your Interface
+
+    This is all it takes to define an interface hierarchy using IDL. After defining
+    this interface you can create a boost::idl::any<Calculator> or a boost::idl::any<Service> which can
+    hold any object that provides these methods.
+
+    @code
+    struct Service
+    {
+        std::string name()const;
+        int         exit();
+    };
+    struct Calculator : Service
+    {
+        double add( double v );           
+        double sub( double v );           
+        double mult( double v );           
+        double div( double v );           
+        double result()const;
+    };
+
+    BOOST_IDL_INTERFACE( Service, BOOST_IDL_BASE, (name)(exit) )
+    BOOST_IDL_INTERFACE( Calculator, (Service, BOOST_IDL_BASE), (add)(sub)(mult)(div)(result) )
+    @endcode
+
+    @note When you define an interface, you need not provide implementations of the methods; however,
+        it you want you may also use an interace like any other class without limititations.  
+
+
+    @subsection type_erasure_any Using idl::any<InterfaceType>
+
+    @code
+    class CalculatorService
+    {
+        public:
+            CalculatorService():m_result(0){}
+
+            std::string name()const            { return "CalculatorService"; }
+            int   exit()                       { ::exit(0);                  }
+            double add( double v )             { return m_result += v;       }
+            double sub( double v )             { return m_result -= v;       }
+            double mult( double v )            { return m_result *= v;       }
+            double div( double v )             { return m_result /= v;       }
+            double result()const               { return m_result;            }
+
+        private:
+            double m_result;
+    };
+
+    void try_it() {
+        idl::any<Calculator> calc( CalculatorService() );
+        calc.add(5);
+        calc.add(6);
+        assert( calc.result() == 11 );
+    }
+    @endcode
+
+    Some things to note, CalculatorService did not inherit either Calculator or Service,
+    it simply exposed all of the methods defined by the interface.  If it looks like a
+    Duck, quacks like a Duck, then it is a Duck.  
+
+    The interface of idl::any<Calculator> is 'identical' to the Calculator defined above.
+
+
+    @subsection implementation_detail  BOOST_IDL_INTERFACE() Implementation Details
+    Before this tutorial can continue to the section on @ref adapting_an_interface, 
+    it is important to understand a bit about what the BOOST_IDL_INTERFACE( ) macro is doing.
+
+    Below is a simplified version of what the macro generates intended to communicate the design,
+    without getting into the implementation details.
+
+    @code
+namespace boost {
+namespace idl {
+template<typename InterfaceDelegate > 
+class any<Calculator,InterfaceDelegate> : public boost::idl::any<Service,InterfaceDelegate>, 
+                                          virtual protected boost::any 
+{
+public:
+     template<typename T> 
+     any( T v ) :boost::any(v) {
+          boost::idl::set_delegate_visitor<T> sd(boost::any_cast<T>( (boost::any*)(this) ) );
+          sd.start_visit(*this);
+     } 
+     
+     struct __idl__add : 
+        public InterfaceDelegate::calculate_type<typeof(&Calculator::add)>::type 
+     {
+         template<typename Type, typename AssignType>
+         static void get_member_on_type( Type* t, AssignType& v ) { v = t->add; }
+
+         template<typename T> 
+         static typeof(&T::add) get_member_on_type() { return &T::add; }
+     } add;
+
+
+     struct __idl__sub : 
+        public InterfaceDelegate::calculate_type<typeof(&Calculator::sub)>::type 
+     {
+         template<typename Type, typename AssignType>
+         static void get_member_on_type( Type* t, AssignType& v ) { v = t->sub; }
+
+         template<typename T> 
+         static typeof(&T::sub) get_member_on_type() { return &T::sub; }
+
+     } sub;
+
+     /**
+        Implemented as a friend function to avoid poluting the interface.
+     */
+     template<typename Vi> 
+     friend inline void visit( any& i, Vi& v ) {
+          i.__idl__visit(v);
+     } 
+
+protected:
+     template<typename T> void __idl__visit( T& t ) {
+          any<Service,InterfaceDelegate>::__idl__visit(t);
+          t.template accept<Calculator>( add, "add" );
+          t.template accept<Calculator>( sub, "sub" );
+     }
+};
+} } // namespace boost::idl
+
+    @endcode
+
+As you can see from the code above, BOOST_IDL_INTERFACE( ... ) performs a partial specialization
+of boost::idl::any<Interface,InterfaceDelegate> **within the boost::idl namespace**.  
+
+Each method listed in the macro becomes a public function object of a type determined by the
+InterfaceDelegate.  Through proper definition of the InterfaceDelegate it is possible to change
+the return types, parameter types, and any other charistic of the interface.  
+
+The visit function passes a reference to each member function object along with 
+its 'name' to the visitor's accept method.  The visitor then has the power to inspect and/or
+modify the type of each member.  
+
+This approach is very flexible, but does have some down sides which will be addressed in the
+@ref rationale.
+
+    @subsection adapting_an_interface Adapting an Interface
+
+    The real power of Boost.IDL is its ability to dynamically adapt an interface.  Suppose
+    we want to expose our calculator to the user via a command line interface.  Traditionally,
+    this would require creating a loop that reads a method name, performs a giant if/else if/else
+    block and then converts strings into the parameters appropriate for each method.  This is not
+    so bad for one-of solutions, but it becomes unmaintaible if there is a large number of interfaces
+    that you want to expose in this manner *or* if the interface you are exposing is changing 
+    frequently.
+
+    Because Boost.IDL alows us to describe an interface, we can use this information to create a 
+    generic command line interpreter that can work with any interface where standard ostream/istream
+    operators are defined for all of the parameters.
+
+    Boost.IDL uses the visitor design pattern to expose the type information.  So to create our
+    command line interpreter, we must define a visitor that converts each method into a function
+    object that knows how to convert the parameters from strings, invoke the call, and then convert
+    the return value back into a string.  The methods must also be indexed by name so that we can
+    dynamically dispatch them.
+
+
+    @code
+class cli : public boost::idl::visitor< cli >
+{
+    public:
+       template<typename InterfaceName, typename M>
+       bool accept( M& m, const char* name )
+       {
+            // print the method name, signature, and constness
+            std::cerr << std::setw(10) << std::setiosflags(std::ios::left) << name 
+                      << " " << boost::idl::get_typestring<typename M::signature>::str()
+                      << (M::is_const ? "const" : "") <<std::endl;
+
+            // create a function object and place it in our index, the parameter types
+            // are available as a boost::fusion::vector<> typedef on the 
+            // member function object type
+            methods[name] = cli_functor<typename M::fused_params, M&>(m);
+            return true;
+       }
+       boost::function<std::string(const std::string&)>& operator[]( const std::string& name ) 
+       { return methods[name]; }
+
+   private:
+       // Seq is boost::fusion::vector<PARAM_TYPES>
+       // Functor is a reference to the member function object.
+       template<typename Seq, typename Functor>
+       struct cli_functor
+       {
+           cli_functor( Functor f )
+           :m_func(f){}
+
+           std::string operator()( const std::string& cli )
+           {
+                std::stringstream ss(cli);
+                Seq s; ss >> boost::fusion::tuple_delimiter(',') >> s;
+                std::stringstream rtn;
+                rtn << m_func( s );
+                return rtn.str();
+           }
+           Functor m_func;
+       };
+       std::map<std::string, boost::function<std::string(const std::string)> > methods;
+};
+    @endcode
+
+    Once the visitor has been defined, it can be used with any interface defined by BOOST_IDL_INTERFACE().
+
+    @code
+    template<typename InterfaceType,typename InterfaceDelegate>
+    void start_cli( boost::idl::any<InterfaceType,InterfaceDelegate>& a )
+    {
+        cli  m_cli;
+        m_cli.start_visit(a);
+
+        std::string line;
+        std::string cmd;
+        std::string args;
+
+        while( true )
+        {
+            std::cerr << "Enter Method: ";
+            std::getline( std::cin, line );
+            cmd = line.substr( 0, line.find('(') );
+            args = line.substr( cmd.size(), line.size() );
+            std::cerr << m_cli[cmd](args) << std::endl;
+        }
+    }
+    @endcode
+
+    @section rationale Design Rationale
+
+    There has been discussion on the Boost mailing list regarding how the type erasure should be implemented.  
+    The obvious, "ideal", would be something where the 'weight' of the any<> is no more than boost::any.  This
+    approach would 'convert' any type passed into the constructor into a polymorphic type implementing the
+    interface.  Then the cost of a call is one virtual method invocation (assuming proper inlining).
+
+    This solution has already been implemented via <a href="http://www.cdiggins.com/bil.html">Boost.Interfaces</a>.
+
+    The interface declaration used by Boost.Interfaces is:
+
+    @code
+        BOOST_INTERFACE_BEGIN(IShape)
+            BOOST_INTERFACE_CONST_FUNCTION0(GetX, int)
+            BOOST_INTERFACE_CONST_FUNCTION0(GetY, int)
+            BOOST_INTERFACE_CONST_FUNCTION0(GetArea, double)
+            BOOST_INTERFACE_FUNCTION2(SetXY, void, (int, x), (int, y))
+            BOOST_INTERFACE_FUNCTION2(OffSetXY, void, (int, x), (int, y))
+            BOOST_INTERFACE_CONST_FUNCTION0(GetName, const char*)
+        BOOST_INTERFACE_END(IShape)
+    @endcode
+
+    Unfortunately, there is no clear way to define a macro based solution that achieves what Boost.Interfaces 
+    achieves without specifying your entire interface with the messy syntax above.  A downside to the approach above
+    is that any types that happen to contain a ',' would require special handling.  A benefit to the above approach
+    is that there is potential for knowng the parameter names in addition to the types.
+
+    I opted for a simpler syntax that can apply to pre-existing types along with the potential 
+    for more dynamic interface implementations rather than going for maximum possible performance
+    or the minimum possible memory usage.  With the proper "InterfaceDelegate", there is the potential
+    that each method turns into a Don Clugston fast delegate.  Thus you can get the 'fastest possible delegation' 
+    at the price of 16 bytes per method (on 64 bit machines) and a little extra one-time initialization cost.  
+
+    @section future_dev Future Development
+
+    At the moment the line is blurred between pointer semantics and value semantics on boost::idl::any<> such 
+    that the holder of the any does not know if they 'own' it or if they are simply 'pointing' to it.  Ideally
+    you would get something like:
+
+    - boost::idl::ptr<InterfaceType>         holds a raw pointer 
+    - boost::idl::shared_ptr<InterfaceType>  holds a boost::shared_ptr
+    - boost::idl::any<InterfaceType>         holds a value that is owned by the object
+
+    The trick is to achieve this separation without incurring the cost of 'trippling' amount of code
+    generated by the BOOST_IDL_INTERFACE() macro to handle each of these cases.
+
+    @section acknowledgements Acknowledgements
+    
+        Ideas, inspiration, and code were borrowed from:
+         - <a href="http://www.cdiggins.com/bil.html">Boost.Interfaces</a> - Jonathan Turkanis & Christopher Diggins.
+         - <a href="http://kifri.fri.uniza.sk/~chochlik/mirror-lib/html/">Boost.Mirror</a> - Matus Chochlik.  
+         - <a href="http://www.codeproject.com/cpp/fast_delegate.asp">Fast Delegate</a> - Don Clugston. 
+         - <a href="http://www.boostpro.com/mplbook/">C++ Template Metaprogramming</a> by Dave Abrahams & Aleksy Curtovoy
+         - <a href="http://www.artima.com/cppsource/type_erasure.html">On the Tension Between Object-Oriented and Generic Programming in C++
+         and What Type Erasure Can Do About It</a> by Thomas Becker
+        
+
+*/
