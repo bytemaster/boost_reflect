@@ -23,7 +23,7 @@ class cli : public boost::idl::visitor< cli >
             methods[name] = cli_functor<typename M::fused_params, M&>(m);
             return true;
        }
-       boost::function<std::string(const std::string)>& operator[]( const std::string& name ) 
+       boost::function<std::string(const std::string&)>& operator[]( const std::string& name ) 
        { return methods[name]; }
 
    private:
