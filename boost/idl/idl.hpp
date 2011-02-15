@@ -10,7 +10,7 @@
 #include <boost/preprocessor/list/for_each.hpp>
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/stringize.hpp>
-#include <boost/idl/get_typestring.hpp>
+#include <boost/idl/reflect.hpp>
 #include <boost/any.hpp>
 #include <boost/idl/mirror_interface.hpp>
 
@@ -123,6 +123,6 @@ class any<NAME,InterfaceDelegate> :BOOST_PP_LIST_FOR_EACH( PUBLIC_BASE, Interfac
         } \
 }; \
 } } \
-BOOST_IDL_TYPESTRING(NAME) 
+BOOST_IDL_DEFINE_TYPEINFO(NAME) 
 
 #endif

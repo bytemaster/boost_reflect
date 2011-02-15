@@ -1,0 +1,155 @@
+#ifndef _BOOST_IDL_REFLECT_HPP_
+#define _BOOST_IDL_REFLECT_HPP_
+
+#include <boost/preprocessor/seq/for_each.hpp>
+#include <boost/preprocessor/stringize.hpp>
+#include <boost/preprocessor/tuple/elem.hpp>
+#include <boost/preprocessor/facilities/empty.hpp>
+#include <boost/type_traits/remove_const.hpp>
+#include <boost/type_traits/remove_reference.hpp>
+#include <boost/type_traits/remove_pointer.hpp>
+#include <string>
+#include <typeinfo>
+#include <vector>
+#include <list>
+#include <set>
+#include <map>
+
+namespace boost { namespace idl {
+
+template<typename T>
+struct get_typeinfo { 
+    enum is_defined_enum{ is_defined = 0 };
+    static const char* name() { return typeid(T).name(); }
+};
+
+/**
+ *  Removes all decorations and returns the typename.
+ */
+template<typename T>
+inline const char* get_typename() 
+{ 
+    return get_typeinfo<typename boost::remove_const<typename boost::remove_reference<typename boost::remove_pointer<T>::type>::type>::type>::name();
+}
+
+// used to specify templay get_typeinfo
+struct dummy_arg{};
+
+template<typename TP, template<typename> class C> 
+struct get_typeinfo< C<TP> > { 
+    enum is_defined_enum{ is_defined = get_typeinfo<TP>::is_defined }; 
+    static const char* name() 
+    {  
+        static std::string n = std::string( get_typename<C<dummy_arg> >() ) + std::string("<") + std::string(get_typename<TP>()) +  ">"; 
+        return n.c_str(); 
+    } 
+}; 
+
+template<typename TP, typename TP2, template<typename, typename> class C> 
+struct get_typeinfo< C<TP,TP2> > { 
+    enum is_defined_enum{ is_defined = get_typeinfo<TP>::is_defined && get_typeinfo<TP2>::is_defined }; 
+    static const char* name() 
+    {  
+        static std::string n = std::string( get_typename< C<dummy_arg,dummy_arg> >() ) + "<" + std::string(get_typename<TP>()) +  "," + 
+                               std::string( get_typename<TP>() ) + ">"; 
+        return n.c_str(); 
+    } 
+};
+
+enum protocol_buffer_field_types
+{
+    optional = 0,
+    required = 1,
+    repeated = 2,
+    packed   = 4
+};
+
+#define BOOST_IDL_DEFINE_TYPEINFO( NAME ) \
+namespace boost { namespace idl { \
+template<> \
+struct get_typeinfo<NAME> { \
+    enum is_defined_enum{ is_defined = 1 }; \
+    static const char* name() { return BOOST_PP_STRINGIZE(NAME); } \
+}; } }
+
+
+#define BOOST_IDL_DEFINE_TEMPLATE_TYPEINFO( NAME ) \
+namespace boost { namespace idl {\
+template<>\
+struct get_typeinfo<NAME<dummy_arg> > { \
+    enum is_defined_enum{ is_defined = 1 }; \
+    static const char* name() { return BOOST_PP_STRINGIZE(NAME); } \
+}; } }
+
+#define BOOST_IDL_DEFINE_TEMPLATE2_TYPEINFO( NAME ) \
+namespace boost { namespace idl {\
+template<>\
+struct get_typeinfo<NAME<dummy_arg,dummy_arg> > { \
+    enum is_defined_enum{ is_defined = 1 }; \
+    static const char* name() { return BOOST_PP_STRINGIZE(NAME); } \
+}; } }
+
+
+
+#define MEMBER_CASES(r, data, elem)\
+case BOOST_PP_TUPLE_ELEM( 3, 1, elem ):\
+   v.accept_member( name, &data::BOOST_PP_TUPLE_ELEM(3, 0, elem), BOOST_PP_STRINGIZE( BOOST_PP_TUPLE_ELEM(3,0,elem) ), BOOST_PP_TUPLE_ELEM(3, 2,elem) );\
+   break;
+
+#define MEMBER_ALL(r, data, elem)\
+   v.accept_member( name, &data::BOOST_PP_TUPLE_ELEM(3, 0, elem), BOOST_PP_STRINGIZE( BOOST_PP_TUPLE_ELEM(3,0,elem) ), BOOST_PP_TUPLE_ELEM(3, 2,elem) );
+
+#define INHERITS (baseA)(baseB)
+
+#define ACCEPT_BASE(r, data, elem) \
+    v.accept_base( *static_cast<elem*>(&name), BOOST_PP_STRINGIZE( elem ), field );
+
+
+#define BOOST_IDL_REFLECT_IMPL( CONST,TYPE, INHERITS, MEMBERS ) \
+template<typename Visitor>\
+inline void visit( CONST TYPE& name, Visitor& v, uint32_t field = -1 ) { \
+    using namespace boost::idl; \
+    BOOST_PP_SEQ_FOR_EACH( ACCEPT_BASE, TYPE, INHERITS ) \
+    switch( field ) { \
+        case -1: \
+            BOOST_PP_SEQ_FOR_EACH( MEMBER_ALL, TYPE, MEMBERS ) \
+            break; \
+        BOOST_PP_SEQ_FOR_EACH( MEMBER_CASES, TYPE, MEMBERS ) \
+        default: \
+            v.not_found( name, field );\
+    }\
+}
+
+#define BOOST_IDL_EMPTY
+#define BOOST_IDL_REFLECT( TYPE, INHERITS, MEMBERS ) \
+    BOOST_IDL_DEFINE_TYPEINFO(TYPE) \
+    BOOST_IDL_REFLECT_IMPL( const, TYPE, INHERITS, MEMBERS ) \
+    BOOST_IDL_REFLECT_IMPL( BOOST_IDL_EMPTY, TYPE, INHERITS, MEMBERS ) \
+
+
+
+} } // namespace boost::idl
+
+// these macros specify namespace boost::idl 
+BOOST_IDL_DEFINE_TYPEINFO( void )
+BOOST_IDL_DEFINE_TYPEINFO( bool )
+BOOST_IDL_DEFINE_TYPEINFO( uint8_t )
+BOOST_IDL_DEFINE_TYPEINFO( uint16_t )
+BOOST_IDL_DEFINE_TYPEINFO( uint32_t )
+BOOST_IDL_DEFINE_TYPEINFO( uint64_t )
+BOOST_IDL_DEFINE_TYPEINFO( int8_t )
+BOOST_IDL_DEFINE_TYPEINFO( int16_t )
+BOOST_IDL_DEFINE_TYPEINFO( int32_t )
+BOOST_IDL_DEFINE_TYPEINFO( int64_t )
+BOOST_IDL_DEFINE_TYPEINFO( double )
+BOOST_IDL_DEFINE_TYPEINFO( float )
+BOOST_IDL_DEFINE_TYPEINFO( std::string )
+BOOST_IDL_DEFINE_TEMPLATE_TYPEINFO( std::vector )
+BOOST_IDL_DEFINE_TEMPLATE_TYPEINFO( std::set )
+BOOST_IDL_DEFINE_TEMPLATE_TYPEINFO( std::list )
+BOOST_IDL_DEFINE_TEMPLATE2_TYPEINFO( std::map )
+BOOST_IDL_DEFINE_TEMPLATE2_TYPEINFO( std::pair )
+
+#include <boost/idl/reflect_function_signature.hpp>
+
+#endif

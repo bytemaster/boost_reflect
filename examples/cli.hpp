@@ -18,7 +18,7 @@ class cli : public boost::idl::visitor< cli >
        bool accept( M& m, const char* name )
        {
             std::cerr << std::setw(10) << std::setiosflags(std::ios::left) << name 
-                      << " " << boost::idl::get_typestring<typename M::signature>::str()
+                      << " " << boost::idl::get_typename<typename M::signature>()
                       << (M::is_const ? "const" : "") <<std::endl;
             methods[name] = cli_functor<typename M::fused_params, M&>(m);
             return true;
@@ -43,7 +43,7 @@ class cli : public boost::idl::visitor< cli >
            }
            Functor m_func;
        };
-       std::map<std::string, boost::function<std::string(const std::string)> > methods;
+       std::map<std::string, boost::function<std::string(const std::string&)> > methods;
 };
 
 
