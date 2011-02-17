@@ -1,7 +1,13 @@
+/**
+ * @file boost/idl/reflect.hpp
+ *
+ * @brief Defines types and macros used to provide reflection.
+ *
+ */
 #ifndef _BOOST_IDL_REFLECT_HPP_
 #define _BOOST_IDL_REFLECT_HPP_
 
-#include <boost/preprocessor/seq/for_each.hpp>
+#include <boost/preprocessor/seq/for_each_i.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/preprocessor/tuple/elem.hpp>
 #include <boost/preprocessor/facilities/empty.hpp>
@@ -56,14 +62,6 @@ struct get_typeinfo< C<TP,TP2> > {
     } 
 };
 
-enum protocol_buffer_field_types
-{
-    optional = 0,
-    required = 1,
-    repeated = 2,
-    packed   = 4
-};
-
 #define BOOST_IDL_DEFINE_TYPEINFO( NAME ) \
 namespace boost { namespace idl { \
 template<> \
@@ -90,18 +88,25 @@ struct get_typeinfo<NAME<dummy_arg,dummy_arg> > { \
 }; } }
 
 
-
-#define MEMBER_CASES(r, data, elem)\
+#define CUSTOM_MEMBER_CASES(r, data, i, elem)\
 case BOOST_PP_TUPLE_ELEM( 3, 1, elem ):\
    v.accept_member( name, &data::BOOST_PP_TUPLE_ELEM(3, 0, elem), BOOST_PP_STRINGIZE( BOOST_PP_TUPLE_ELEM(3,0,elem) ), BOOST_PP_TUPLE_ELEM(3, 2,elem) );\
    break;
 
-#define MEMBER_ALL(r, data, elem)\
-   v.accept_member( name, &data::BOOST_PP_TUPLE_ELEM(3, 0, elem), BOOST_PP_STRINGIZE( BOOST_PP_TUPLE_ELEM(3,0,elem) ), BOOST_PP_TUPLE_ELEM(3, 2,elem) );
+#define CUSTOM_MEMBER_ALL(r, data, i, elem)\
+   v.accept_member( name, &data::BOOST_PP_TUPLE_ELEM(3, 0, elem), BOOST_PP_STRINGIZE( BOOST_PP_TUPLE_ELEM(3,0,elem) ), BOOST_PP_TUPLE_ELEM(3, 2,elem) );\
+
+#define MEMBER_CASES(r, data, i, elem)\
+case i:\
+   v.accept_member( name, &data::elem, BOOST_PP_STRINGIZE( elem ), i ); \
+   break;
+
+#define MEMBER_ALL(r, data, i, elem)\
+   v.accept_member( name, &data::elem, BOOST_PP_STRINGIZE( elem ), i );
 
 #define INHERITS (baseA)(baseB)
 
-#define ACCEPT_BASE(r, data, elem) \
+#define ACCEPT_BASE(r, data, i, elem) \
     v.accept_base( *static_cast<elem*>(&name), BOOST_PP_STRINGIZE( elem ), field );
 
 
@@ -109,22 +114,59 @@ case BOOST_PP_TUPLE_ELEM( 3, 1, elem ):\
 template<typename Visitor>\
 inline void visit( CONST TYPE& name, Visitor& v, uint32_t field = -1 ) { \
     using namespace boost::idl; \
-    BOOST_PP_SEQ_FOR_EACH( ACCEPT_BASE, TYPE, INHERITS ) \
+    v.start(name, BOOST_PP_STRINGIZE(TYPE) );\
+    BOOST_PP_SEQ_FOR_EACH_I( ACCEPT_BASE, TYPE, INHERITS ) \
     switch( field ) { \
         case -1: \
-            BOOST_PP_SEQ_FOR_EACH( MEMBER_ALL, TYPE, MEMBERS ) \
+            BOOST_PP_SEQ_FOR_EACH_I( MEMBER_ALL, TYPE, MEMBERS ) \
             break; \
-        BOOST_PP_SEQ_FOR_EACH( MEMBER_CASES, TYPE, MEMBERS ) \
+        BOOST_PP_SEQ_FOR_EACH_I( MEMBER_CASES, TYPE, MEMBERS ) \
         default: \
             v.not_found( name, field );\
     }\
+    v.end(name, BOOST_PP_STRINGIZE(TYPE) );\
+}
+
+#define BOOST_IDL_CUSTOM_REFLECT_IMPL( CONST,TYPE, INHERITS, MEMBERS ) \
+template<typename Visitor>\
+inline void visit( CONST TYPE& name, Visitor& v, uint32_t field = -1 ) { \
+    using namespace boost::idl; \
+    v.start(name, BOOST_PP_STRINGIZE(TYPE) );\
+    BOOST_PP_SEQ_FOR_EACH_I( ACCEPT_BASE, TYPE, INHERITS ) \
+    switch( field ) { \
+        case -1: \
+            BOOST_PP_SEQ_FOR_EACH_I( CUSTOM_MEMBER_ALL, TYPE, MEMBERS ) \
+            break; \
+        BOOST_PP_SEQ_FOR_EACH_I( CUSTOM_MEMBER_CASES, TYPE, MEMBERS ) \
+        default: \
+            v.not_found( name, field );\
+    }\
+    v.end(name, BOOST_PP_STRINGIZE(TYPE) );\
 }
 
 #define BOOST_IDL_EMPTY
+
+/**
+ *  @param MEMBERS - a sequence of member names.  (field1)(field2)(field3)
+ */
 #define BOOST_IDL_REFLECT( TYPE, INHERITS, MEMBERS ) \
     BOOST_IDL_DEFINE_TYPEINFO(TYPE) \
     BOOST_IDL_REFLECT_IMPL( const, TYPE, INHERITS, MEMBERS ) \
     BOOST_IDL_REFLECT_IMPL( BOOST_IDL_EMPTY, TYPE, INHERITS, MEMBERS ) \
+
+
+/**
+ *   This macro is identical to BOOST_IDL_REFLECT, except that it gives you
+ *   the ability to customize field numbers and flags.
+ *
+ *   @param MEMBERS  - a sequence of 3 param tuples.
+ *                    ((field_name, NUMBER, FLAGS))((field_name1, NUMBER, FLAGS))
+ *
+ */
+#define BOOST_IDL_CUSTOM_REFLECT( TYPE, INHERITS, MEMBERS ) \
+    BOOST_IDL_DEFINE_TYPEINFO(TYPE) \
+    BOOST_IDL_CUSTOM_REFLECT_IMPL( const, TYPE, INHERITS, MEMBERS ) \
+    BOOST_IDL_CUSTOM_REFLECT_IMPL( BOOST_IDL_EMPTY, TYPE, INHERITS, MEMBERS ) \
 
 
 

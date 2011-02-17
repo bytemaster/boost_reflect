@@ -150,7 +150,7 @@ namespace boost { namespace idl {
     BOOST_IDL_STRUCTURE( Name,
         (field, id, required)
         (field, id, optional)
-        (field, id )
+        (field, id, deprecated)
     )
 
     struct Nested
@@ -172,25 +172,25 @@ namespace boost { namespace idl {
     {
         switch( field )
         {
-            case flags_field: v.accept( tc.value, "value", flags ); break;
-            case flags_field: v.accept( tc.value, "value", flags ); break;
-            case flags_field: v.accept( tc.value, "value", flags ); break;
-            case flags_field: v.accept( tc.value, "value", flags ); break;
-            default:
-                v.accept( tc.value, "value", flags ); break;
+            case -1:
+                v.accept( tc.value, "value", flags );
                 v.accept( tc.dup, "dub", flags );
                 v.accept( tc.str, "str", flags );
                 v.accept( tc.n, "n", flags );
+                break;
+            case 1: v.accept( &tc, &TestCase::value, "value", flags ); break;
+            case 2: v.accept( &tc, &TestCasetc.value, "value", flags ); break;
         }
     }
 
     template<typename Visitor>
     inline void visit( TestCase& tc, Visitor& v, uint32_t field = -1)
     {
-        v.accept( tc.value, "value", flags );
-        v.accept( tc.dup, "dub", flags );
-        v.accept( tc.str, "str", flags );
-        v.accept( tc.n, "n", flags );
+        visit( *(BaseClass*(&tc)), v, field );
+        v.accept_member( tc.value, "value", flags );
+        v.accept_member( tc.dup, "dub", flags );
+        v.accept_member( tc.str, "str", flags );
+        v.accept_member( tc.n, "n", flags );
     }
 
 
@@ -203,7 +203,6 @@ namespace boost { namespace idl {
             visit( v, *this ); 
             // end nested value
         }
-
         template<typename T, typename Flags>
         inline void accept( const std::vector<T>& v, const char* name, Flags f )
         {
