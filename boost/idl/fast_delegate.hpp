@@ -2015,6 +2015,7 @@ public:
 
   // Allow users access to the specific type of this delegate.
   typedef fast_delegate SelfType;
+  typedef R result_type;
 
   // Mimic the base class constructors.
   fast_delegate() : BaseType() { }
