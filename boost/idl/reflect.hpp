@@ -7,6 +7,7 @@
 #ifndef _BOOST_IDL_REFLECT_HPP_
 #define _BOOST_IDL_REFLECT_HPP_
 
+#include <boost/static_assert.hpp>
 #include <boost/preprocessor/seq/for_each_i.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/preprocessor/tuple/elem.hpp>
@@ -62,6 +63,7 @@ struct get_typeinfo< C<TP,TP2> > {
     } 
 };
 
+
 #define BOOST_IDL_DEFINE_TYPEINFO( NAME ) \
 namespace boost { namespace idl { \
 template<> \
@@ -112,8 +114,7 @@ case i:\
 
 #define BOOST_IDL_REFLECT_IMPL( CONST,TYPE, INHERITS, MEMBERS ) \
 template<typename Visitor>\
-inline void visit( CONST TYPE& name, Visitor& v, uint32_t field = -1 ) { \
-    using namespace boost::idl; \
+static inline void visit( CONST TYPE& name, Visitor& v, uint32_t field = -1 ) { \
     v.start(name, BOOST_PP_STRINGIZE(TYPE) );\
     BOOST_PP_SEQ_FOR_EACH_I( ACCEPT_BASE, TYPE, INHERITS ) \
     switch( field ) { \
@@ -125,12 +126,11 @@ inline void visit( CONST TYPE& name, Visitor& v, uint32_t field = -1 ) { \
             v.not_found( name, field );\
     }\
     v.end(name, BOOST_PP_STRINGIZE(TYPE) );\
-}
+} \
 
 #define BOOST_IDL_CUSTOM_REFLECT_IMPL( CONST,TYPE, INHERITS, MEMBERS ) \
 template<typename Visitor>\
-inline void visit( CONST TYPE& name, Visitor& v, uint32_t field = -1 ) { \
-    using namespace boost::idl; \
+static inline void visit( CONST TYPE& name, Visitor& v, uint32_t field = -1 ) { \
     v.start(name, BOOST_PP_STRINGIZE(TYPE) );\
     BOOST_PP_SEQ_FOR_EACH_I( ACCEPT_BASE, TYPE, INHERITS ) \
     switch( field ) { \
@@ -142,7 +142,7 @@ inline void visit( CONST TYPE& name, Visitor& v, uint32_t field = -1 ) { \
             v.not_found( name, field );\
     }\
     v.end(name, BOOST_PP_STRINGIZE(TYPE) );\
-}
+} \
 
 #define BOOST_IDL_EMPTY
 
@@ -151,8 +151,16 @@ inline void visit( CONST TYPE& name, Visitor& v, uint32_t field = -1 ) { \
  */
 #define BOOST_IDL_REFLECT( TYPE, INHERITS, MEMBERS ) \
     BOOST_IDL_DEFINE_TYPEINFO(TYPE) \
+namespace boost { namespace idl { \
+template<> struct reflector<TYPE> {\
     BOOST_IDL_REFLECT_IMPL( const, TYPE, INHERITS, MEMBERS ) \
     BOOST_IDL_REFLECT_IMPL( BOOST_IDL_EMPTY, TYPE, INHERITS, MEMBERS ) \
+}; } }
+
+/*
+template<> struct reflector<TYPE> { \
+} } }
+*/
 
 
 /**
@@ -165,10 +173,18 @@ inline void visit( CONST TYPE& name, Visitor& v, uint32_t field = -1 ) { \
  */
 #define BOOST_IDL_CUSTOM_REFLECT( TYPE, INHERITS, MEMBERS ) \
     BOOST_IDL_DEFINE_TYPEINFO(TYPE) \
+namespace boost { namespace idl { \
+template<> struct reflector<TYPE> { \
     BOOST_IDL_CUSTOM_REFLECT_IMPL( const, TYPE, INHERITS, MEMBERS ) \
     BOOST_IDL_CUSTOM_REFLECT_IMPL( BOOST_IDL_EMPTY, TYPE, INHERITS, MEMBERS ) \
+} } }
 
 
+template<typename T>
+struct reflector
+{
+//    BOOST_STATIC_ASSERT( !"BOOST_IDL_REFLECT not defined for type" );
+};
 
 } } // namespace boost::idl
 
