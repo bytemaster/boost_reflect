@@ -180,10 +180,16 @@ template<> struct reflector<TYPE> { \
 } } }
 
 
+
+/**
+ *  Unless this is specialized, visit() will not be defined for T.
+ *
+ *  Boost.Fusion sequences have special handling because we can provide
+ *  automatic "reflection" on fusion sequences.
+ */
 template<typename T>
-struct reflector
+struct reflector 
 {
-//    BOOST_STATIC_ASSERT( !"BOOST_IDL_REFLECT not defined for type" );
 };
 
 } } // namespace boost::idl
