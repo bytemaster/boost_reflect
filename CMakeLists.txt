@@ -8,8 +8,8 @@ boost_project("Reflect"
     "Light-weight General Purpose Reflection Utilities"
   )
 
-file(GLOB_RECURSE headers boost/*.* )
-boost_add_headers(${headers})
+add_subdirectory(doc)
+add_subdirectory(include)
 
 if( ENABLE_EXAMPLES )
     option( ENABLE_IDL_EXAMPLES "Build Boost.IDL Examples" ON )
@@ -20,4 +20,3 @@ if( ENABLE_EXAMPLES )
     endif( ENABLE_IDL_EXAMPLES )
 endif( ENABLE_EXAMPLES )
 
-add_subdirectory(doc)
