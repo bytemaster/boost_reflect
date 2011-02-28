@@ -1,5 +1,5 @@
-#include <boost/idl/mirror_interface.hpp>
-#include <boost/idl/idl.hpp>
+#include <boost/reflect/mirror_interface.hpp>
+#include <boost/reflect/any.hpp>
 
 #include "cli.hpp"
 
@@ -18,8 +18,8 @@ struct Calculator : Service
     double result()const;
 };
 
-BOOST_IDL_INTERFACE( Service, BOOST_PP_NIL, (name)(exit) )
-BOOST_IDL_INTERFACE( Calculator, (Service, BOOST_PP_NIL), (add)(add2)(sub)(mult)(div)(result) )
+BOOST_REFLECT_ANY( Service, BOOST_PP_SEQ_NIL, (name)(exit) )
+BOOST_REFLECT_ANY( Calculator, (Service), (add)(add2)(sub)(mult)(div)(result) )
 
 class CalculatorService
 {
@@ -43,7 +43,7 @@ class CalculatorService
 
 int main( int argc, char** argv )
 {
-    boost::idl::any<Calculator> s = CalculatorService();
+    boost::reflect::any<Calculator> s = CalculatorService();
 
     printf( "Result: %f\n", s.result() );
 

@@ -1,7 +1,7 @@
 #ifndef _BOOST_IDL_RPC_HPP_
 #define _BOOST_IDL_RPC_HPP_
-#include <boost/idl/mirror_interface.hpp>
-#include <boost/idl/idl.hpp>
+#include <boost/reflect/mirror_interface.hpp>
+#include <boost/reflect/reflect.hpp>
 
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
 #include <boost/fusion/include/for_each.hpp>
@@ -20,7 +20,7 @@
 #include <boost/system/system_error.hpp>
 #include <boost/asio.hpp>
 
-namespace boost { namespace idl {
+namespace boost { namespace reflect {
 
 template<typename Archive>
 struct item_serializer 
@@ -67,7 +67,7 @@ Archive& deserialize_fusion_vector(Archive& ar, V& v)
  *  methods parameters, seralize them, and send them out the socket.
  */
 template<typename InterfaceType>
-class rpc_client : public boost::idl::visitor< rpc_client<InterfaceType> >, public idl::any<InterfaceType>
+class rpc_client : public boost::reflect::visitor< rpc_client<InterfaceType> >, public reflect::any<InterfaceType>
 {
     public:
        rpc_client()
@@ -139,7 +139,7 @@ class rpc_client : public boost::idl::visitor< rpc_client<InterfaceType> >, publ
 
     template<typename T>
     class set_delegate_visitor< rpc_client<T> > : 
-        public boost::idl::visitor< set_delegate_visitor< rpc_client<T> >  >
+        public boost::reflect::visitor< set_delegate_visitor< rpc_client<T> >  >
     {
         public:
            set_delegate_visitor( rpc_client<T>* self = 0)
@@ -161,12 +161,12 @@ class rpc_client : public boost::idl::visitor< rpc_client<InterfaceType> >, publ
  *  unpacks the parameters and then invokes them on the object.
  */
 template<typename InterfaceType>
-class rpc_server : public boost::idl::visitor< rpc_server<InterfaceType> >, public idl::any<InterfaceType>
+class rpc_server : public boost::reflect::visitor< rpc_server<InterfaceType> >, public reflect::any<InterfaceType>
 {
     public:
        template<typename T>
        rpc_server( T v )
-       :idl::any<InterfaceType>(v)
+       :reflect::any<InterfaceType>(v)
        {
             start_visit(*this); 
        }
@@ -239,6 +239,6 @@ class rpc_server : public boost::idl::visitor< rpc_server<InterfaceType> >, publ
        std::map<std::string, boost::function<std::string(const std::string)> > methods;
 };
 
-} } // namespace boost::idl
+} } // namespace boost::reflect
 
 #endif

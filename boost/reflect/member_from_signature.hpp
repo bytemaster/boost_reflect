@@ -6,8 +6,8 @@
  *
  */
 #ifndef BOOST_PP_IS_ITERATING
-    #ifndef _BOOST_IDL_MEMBER_FROM_SIGNATURE_HPP_
-    #define _BOOST_IDL_MEMBER_FROM_SIGNATURE_HPP_
+    #ifndef _BOOST_REFLECT_MEMBER_FROM_SIGNATURE_HPP_
+    #define _BOOST_REFLECT_MEMBER_FROM_SIGNATURE_HPP_
     #include <boost/typeof/typeof.hpp>
     #include <boost/function.hpp>
     #include <boost/bind.hpp>
@@ -20,7 +20,7 @@
     #define PARAM_TYPE(z,n,type)    BOOST_PP_CAT(BOOST_PP_CAT(typename traits::arg,BOOST_PP_ADD(n,1)),_type)
     #define PARAM_ARG(z,n,type)     PARAM_TYPE(z,n,type) PARAM_NAME(z,n,type)
 
-    namespace boost { namespace idl { namespace detail {
+    namespace boost { namespace reflect { namespace detail {
 
         template<typename Class, typename Signature, bool is_const = false>
         struct member_from_signature 
@@ -38,22 +38,22 @@
             static const bool is_const   = false;
         };
 
-#        ifndef BOOST_IDL_MEMBER_FROM_SIGNATURE_IMPL_SIZE
-#           define BOOST_IDL_MEMBER_FROM_SIGNATURE_IMPL_SIZE 8
+#        ifndef BOOST_REFLECT_MEMBER_FROM_SIGNATURE_IMPL_SIZE
+#           define BOOST_REFLECT_MEMBER_FROM_SIGNATURE_IMPL_SIZE 8
 #        endif
 
 #       include <boost/preprocessor/iteration/iterate.hpp>
-#       define BOOST_PP_ITERATION_LIMITS (0, BOOST_IDL_MEMBER_FROM_SIGNATURE_IMPL_SIZE -1 )
-#       define BOOST_PP_FILENAME_1 <boost/idl/member_from_signature.hpp>
+#       define BOOST_PP_ITERATION_LIMITS (0, BOOST_REFLECT_MEMBER_FROM_SIGNATURE_IMPL_SIZE -1 )
+#       define BOOST_PP_FILENAME_1 <boost/reflect/member_from_signature.hpp>
 #       include BOOST_PP_ITERATE()
 
     #undef PARAM_NAME
     #undef PARAM_TYPE
     #undef PARAM_ARG
 
-    } } } // namespace boost::idl::detail
+    } } } // namespace boost::reflect::detail
 
-    #endif // _BOOST_IDL_MEMBER_FROM_SIGNATURE_HPP_
+    #endif // _BOOST_REFLECT_MEMBER_FROM_SIGNATURE_HPP_
 #else // BOOST_PP_IS_ITERATING
 
 #define n BOOST_PP_ITERATION()

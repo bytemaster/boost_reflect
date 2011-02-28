@@ -1,13 +1,13 @@
 #ifndef BOOST_PP_IS_ITERATING
-    #ifndef BOOST_IDL_MIRROR_INTERFACE_HPP
-    #define BOOST_IDL_MIRROR_INTERFACE_HPP
-    #include <boost/idl/member_from_signature.hpp>
-    #include <boost/idl/fast_delegate.hpp>
+    #ifndef BOOST_REFLECT_MIRROR_INTERFACE_HPP
+    #define BOOST_REFLECT_MIRROR_INTERFACE_HPP
+    #include <boost/reflect/member_from_signature.hpp>
+    #include <boost/reflect/fast_delegate.hpp>
     #include <boost/fusion/container/vector.hpp>
     #include <boost/fusion/container/generation/make_vector.hpp>
     #include <boost/fusion/functional/generation/make_fused_function_object.hpp>
 
-    namespace boost { namespace idl {
+    namespace boost { namespace reflect {
         
         template<typename MemberPtr>
         struct mirror_member
@@ -84,21 +84,21 @@
 //    #define PARAM_TYPE(z,n,type)    BOOST_PP_CAT(BOOST_PP_CAT(typename traits::arg,BOOST_PP_ADD(n,1)),_type)
     #define PARAM_ARG(z,n,type)     PARAM_TYPE(z,n,type) PARAM_NAME(z,n,type)
 
-#        ifndef BOOST_IDL_MIRROR_IMPL_SIZE
-#           define BOOST_IDL_MIRROR_IMPL_SIZE 5
+#        ifndef BOOST_REFLECT_MIRROR_IMPL_SIZE
+#           define BOOST_REFLECT_MIRROR_IMPL_SIZE 5
 #        endif
 
 #       include <boost/preprocessor/iteration/iterate.hpp>
-#       define BOOST_PP_ITERATION_LIMITS (0, BOOST_IDL_MIRROR_IMPL_SIZE -1 )
-#       define BOOST_PP_FILENAME_1 <boost/idl/mirror_interface.hpp>
+#       define BOOST_PP_ITERATION_LIMITS (0, BOOST_REFLECT_MIRROR_IMPL_SIZE -1 )
+#       define BOOST_PP_FILENAME_1 <boost/reflect/mirror_interface.hpp>
 #       include BOOST_PP_ITERATE()
 
     #undef PARAM_NAME
     #undef PARAM_TYPE
     #undef PARAM_ARG
 
-    } } // namespace boost::idl
-    #endif // BOOST_IDL_MIRROR_INTERFACE_HPP
+    } } // namespace boost::reflect
+    #endif // BOOST_REFLECT_MIRROR_INTERFACE_HPP
 
 #else // BOOST_PP_IS_ITERATING
 

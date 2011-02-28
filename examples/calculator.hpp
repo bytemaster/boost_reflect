@@ -18,7 +18,7 @@ struct Calculator : Service
     double result()const;
 };
 
-BOOST_IDL_INTERFACE( Service, BOOST_PP_NIL, (name)(exit) )
-BOOST_IDL_INTERFACE( Calculator, (Service, BOOST_PP_NIL), (add)(add2)(sub)(mult)(div)(result) )
+BOOST_IDL_INTERFACE( Service, BOOST_PP_SEQ_NIL, (name)(exit) )
+BOOST_IDL_INTERFACE( Calculator, (Service), (add)(add2)(sub)(mult)(div)(result) )
 
 #endif // _BOOST_IDL_CALCULATOR_HPP

@@ -28,10 +28,10 @@ int main( int argc, char** argv )
     }
     using namespace boost;
     try {
-        boost::shared_ptr<idl::rpc_client<Calculator> > calc(new idl::rpc_client<Calculator>());
+        boost::shared_ptr<reflect::rpc_client<Calculator> > calc(new reflect::rpc_client<Calculator>());
         calc->connect_to( argv[1], boost::lexical_cast<uint16_t>(argv[2]) );
         
-        idl::any<Calculator> s = calc;
+        reflect::any<Calculator> s = calc;
 
         cli  m_cli;
         m_cli.start_visit(s);

@@ -32,7 +32,7 @@ int main( int argc, char** argv )
     using namespace boost;
     try {
         boost::shared_ptr<CalculatorServer> calc(new CalculatorServer());
-        idl::rpc_server<Calculator> server( calc );
+        reflect::rpc_server<Calculator> server( calc );
         server.listen( lexical_cast<uint16_t>(argv[1]) );
     } catch ( const boost::exception& e )
     {

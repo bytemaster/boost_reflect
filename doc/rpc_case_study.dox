@@ -1,9 +1,9 @@
 /**
   @defgroup  rpc_case_study Remote Procedure Call Case Study
 
-  This case study is designed to demonstrate the general usefulness of Boost.IDL by implementing 
+  This case study is designed to demonstrate the general usefulness of Boost.Reflect by implementing 
   a simple generic RPC system based upon Boost.Serialization.  This example shows what is possible, and
-  how Boost.IDL can serve as the foundation of a more general Boost RPC library.
+  how Boost.Reflect can serve as the foundation of a more general Boost RPC library.
 
   @section rpc_design RPC Design Approach
 
@@ -51,7 +51,7 @@
 
     While this only shows a simple example, it should communicate approximately what the API is.
 
-    Now lets compare what the target Boost.IDL based API would be:
+    Now lets compare what the target Boost.Reflect based API would be:
 
     Server:
     @code
@@ -59,11 +59,11 @@
     {
         std::string echo(const std::string &s) { return s; }
     };
-    BOOST_IDL_INTERFACE( Echo, BOOST_IDL_BASE, (echo) )
+    BOOST_Reflect_INTERFACE( Echo, BOOST_Reflect_BASE, (echo) )
         
     int main()
     {
-        boost::idl::rpc_server<Echo> server( Echo() );
+        boost::reflect::rpc_server<Echo> server( Echo() );
         server.listen( 50001 );
         return 0;
     }
@@ -77,19 +77,19 @@
     {
         std::string echo(const std::string &s); // implementation not needed
     };
-    BOOST_IDL_INTERFACE( Echo, BOOST_IDL_BASE, (echo) )
+    BOOST_Reflect_INTERFACE( Echo, BOOST_Reflect_BASE, (echo) )
         
     int main()
     {
-        boost::idl::rpc_client<Echo> client; 
+        boost::reflect::rpc_client<Echo> client; 
         client.connect_to( "localhost", 50001 );
         std::string s = client.echo( "what's up" );
         return 0;
     }
     @endcode
 
-    Some improvements offered by Boost.IDL is that the return value and parameter types are only
-    specified once.  But the real power of Boost.IDL is that it allows type erasure to apply to
+    Some improvements offered by Boost.Reflect is that the return value and parameter types are only
+    specified once.  But the real power of Boost.Reflect is that it allows type erasure to apply to
     the rpc_client<> and thus we can turn this client in to a fully functional command line interface
     to a remote server with the following change:
 
@@ -99,7 +99,7 @@
 
     // erase the details of the rpc_client, by storing
     // it in a generic Echo interface.
-    boost::idl::any<Echo> any_echo = client;
+    boost::reflect::any<Echo> any_echo = client;
 
     std::string line;
     std::string cmd;
@@ -117,21 +117,21 @@
 
     @section implement_rpc_server Implementing RPC Server
 
-    The server is a boost::idl::any<InterfaceType> that also implements
+    The server is a boost::reflect::any<InterfaceType> that also implements
     the visitor pattern.  It creates a map from method name to a geneirc
     function that takes a serialized string for arguments and returns a
     serialized string as return value.
 
     @code
-namespace boost { namespace idl {
+namespace boost { namespace reflect {
 template<typename InterfaceType>
-class rpc_server : public boost::idl::visitor< rpc_server<InterfaceType> >, 
-                   public idl::any<InterfaceType>
+class rpc_server : public boost::reflect::visitor< rpc_server<InterfaceType> >, 
+                   public reflect::any<InterfaceType>
 {
     public:
        template<typename T>
        rpc_server( T v )
-       :idl::any<InterfaceType>(v)
+       :reflect::any<InterfaceType>(v)
        {
             // initialize ourself
             start_visit(*this); 
@@ -219,7 +219,7 @@ class rpc_server : public boost::idl::visitor< rpc_server<InterfaceType> >,
        std::map<std::string, boost::function<std::string(const std::string)> > methods;
 };
 
-} } // namespace boost::idl
+} } // namespace boost::reflect
     @endcode
 
     @section implement_rpc_client Implementing RPC Client
@@ -230,7 +230,7 @@ class rpc_server : public boost::idl::visitor< rpc_server<InterfaceType> >,
 
     @code
 template<typename InterfaceType>
-class rpc_client : public boost::idl::visitor< rpc_client<InterfaceType> >, public idl::any<InterfaceType>
+class rpc_client : public boost::reflect::visitor< rpc_client<InterfaceType> >, public reflect::any<InterfaceType>
 {
     public:
        rpc_client()

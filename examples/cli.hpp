@@ -5,20 +5,20 @@
 #include <iostream>
 
 #include <boost/fusion/sequence/io.hpp>
-#include <boost/idl/mirror_interface.hpp>
-#include <boost/idl/idl.hpp>
+#include <boost/reflect/mirror_interface.hpp>
+#include <boost/reflect/any.hpp>
 
 /**
  *  Takes any interface object and provides a command line interface for it.
  */
-class cli : public boost::idl::visitor< cli >
+class cli : public boost::reflect::visitor< cli >
 {
     public:
        template<typename InterfaceName, typename M>
        bool accept( M& m, const char* name )
        {
             std::cerr << std::setw(10) << std::setiosflags(std::ios::left) << name 
-                      << " " << boost::idl::get_typename<typename M::signature>()
+                      << " " << boost::reflect::get_typename<typename M::signature>()
                       << (M::is_const ? "const" : "") <<std::endl;
             methods[name] = cli_functor<typename M::fused_params, M&>(m);
             return true;

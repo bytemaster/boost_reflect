@@ -1,7 +1,7 @@
 /**
     @mainpage  
 
-    The Boost IDL library provides a means to quickly describe the interface of
+    The Boost Reflect library provides a means to quickly describe the interface of
     a class or struct and then use that description to provide compile-time and
     run-time reflection on the interface.  The library was motivated by the 
     desire to eliminate the amount of boiler plate code required to create 
@@ -9,7 +9,7 @@
     
     @note This library is not part of the official Boost C++ libraries.  It was developed
     with the intention of being submitted for review by the Boost community and therefore
-    everything is coded accoding to the Boost C++ Coding Guidleines.
+    everything is coded accoding to the Boost C++ Coding Gureflecteines.
 
     @section toc Table of Contents
         
@@ -35,10 +35,10 @@
         requires the developer to enter more text to describe the interface than it took to
         write the interface in the first place.  
 
-       Boost.Idl attempts to find a middle ground with a focus on providing the most useful
+       Boost.Reflect attempts to find a middle ground with a focus on providing the most useful
        features while minimizing the amount of work a developer must do to reflect
-       those properties.   Boost.Idl goes one step further and provides a generic Type Erasure
-       construct, boost::idl::any<Interface>.   
+       those properties.   Boost.Reflect goes one step further and provides a generic Type Erasure
+       construct, boost::reflect::any<Interface>.   
 
         @subsection motivation   Motivation
 
@@ -62,7 +62,7 @@
 
         @subsection reflection   Reflection
 
-        The reflection provided by Boost.Idl focuses on exposing typenames, inheritance,
+        The reflection provided by Boost.Reflect focuses on exposing typenames, inheritance,
         return values, method names, parameter types, constness, and public
         member variables.  All reflection is non-invasive and may be added to any
         class or struct.
@@ -109,23 +109,23 @@
         Optimization whose effect no user ever notices is the root of many evils, among them the failure of software projects and the subsequent failure of businesses.
         <td></tr></table></center>
 
-        Boost.IDL focuses on being as efficeint as possible without sacraficing 
+        Boost.Reflect focuses on being as efficeint as possible without sacraficing 
         development speed and proper Object Oriented abstraction.  If you don't
-        use boost::idl::any<Interface> in your inner loops, then your users will
+        use boost::reflect::any<Interface> in your inner loops, then your users will
         never notice one extra layer of indirection or an extra couple of bytes of 
         RAM.  Your company, managers, and customers will notice the cost savings in
         reducing your development time, decouping components, and added resiliance
-        to change that developing with Boost.IDL can provide through type erasure.
+        to change that developing with Boost.Reflect can provide through type erasure.
 
     @section tutorial Tutorial
 
-    Boost.IDL makes the process of creating type erasures relatively easy via the
-    idl::any<InterfaceType> class.  
+    Boost.Reflect makes the process of creating type erasures relatively easy via the
+    reflect::any<InterfaceType> class.  
 
     @subsection type_erasure_def Define your Interface
 
-    This is all it takes to define an interface hierarchy using IDL. After defining
-    this interface you can create a boost::idl::any<Calculator> or a boost::idl::any<Service> which can
+    This is all it takes to define an interface hierarchy using Reflect. After defining
+    this interface you can create a boost::reflect::any<Calculator> or a boost::reflect::any<Service> which can
     hold any object that provides these methods.
 
     @code
@@ -143,15 +143,15 @@
         double result()const;
     };
 
-    BOOST_IDL_INTERFACE( Service, BOOST_IDL_BASE, (name)(exit) )
-    BOOST_IDL_INTERFACE( Calculator, (Service, BOOST_IDL_BASE), (add)(sub)(mult)(div)(result) )
+    BOOST_Reflect_INTERFACE( Service, BOOST_Reflect_BASE, (name)(exit) )
+    BOOST_Reflect_INTERFACE( Calculator, (Service, BOOST_Reflect_BASE), (add)(sub)(mult)(div)(result) )
     @endcode
 
     @note When you define an interface, you need not provide implementations of the methods; however,
         it you want you may also use an interace like any other class without limititations.  
 
 
-    @subsection type_erasure_any Using idl::any<InterfaceType>
+    @subsection type_erasure_any Using reflect::any<InterfaceType>
 
     @code
     class CalculatorService
@@ -172,7 +172,7 @@
     };
 
     void try_it() {
-        idl::any<Calculator> calc( CalculatorService() );
+        reflect::any<Calculator> calc( CalculatorService() );
         calc.add(5);
         calc.add(6);
         assert( calc.result() == 11 );
@@ -183,31 +183,31 @@
     it simply exposed all of the methods defined by the interface.  If it looks like a
     Duck, quacks like a Duck, then it is a Duck.  
 
-    The interface of idl::any<Calculator> is 'identical' to the Calculator defined above.
+    The interface of reflect::any<Calculator> is 'identical' to the Calculator defined above.
 
 
-    @subsection implementation_detail  BOOST_IDL_INTERFACE() Implementation Details
+    @subsection implementation_detail  BOOST_Reflect_INTERFACE() Implementation Details
     Before this tutorial can continue to the section on @ref adapting_an_interface, 
-    it is important to understand a bit about what the BOOST_IDL_INTERFACE( ) macro is doing.
+    it is important to understand a bit about what the BOOST_Reflect_INTERFACE( ) macro is doing.
 
     Below is a simplified version of what the macro generates intended to communicate the design,
     without getting into the implementation details.
 
     @code
 namespace boost {
-namespace idl {
+namespace reflect {
 template<typename InterfaceDelegate > 
-class any<Calculator,InterfaceDelegate> : public boost::idl::any<Service,InterfaceDelegate>, 
+class any<Calculator,InterfaceDelegate> : public boost::reflect::any<Service,InterfaceDelegate>, 
                                           virtual protected boost::any 
 {
 public:
      template<typename T> 
      any( T v ) :boost::any(v) {
-          boost::idl::set_delegate_visitor<T> sd(boost::any_cast<T>( (boost::any*)(this) ) );
+          boost::reflect::set_delegate_visitor<T> sd(boost::any_cast<T>( (boost::any*)(this) ) );
           sd.start_visit(*this);
      } 
      
-     struct __idl__add : 
+     struct __reflect__add : 
         public InterfaceDelegate::calculate_type<typeof(&Calculator::add)>::type 
      {
          template<typename Type, typename AssignType>
@@ -218,7 +218,7 @@ public:
      } add;
 
 
-     struct __idl__sub : 
+     struct __reflect__sub : 
         public InterfaceDelegate::calculate_type<typeof(&Calculator::sub)>::type 
      {
          template<typename Type, typename AssignType>
@@ -234,22 +234,22 @@ public:
      */
      template<typename Vi> 
      friend inline void visit( any& i, Vi& v ) {
-          i.__idl__visit(v);
+          i.__reflect__visit(v);
      } 
 
 protected:
-     template<typename T> void __idl__visit( T& t ) {
-          any<Service,InterfaceDelegate>::__idl__visit(t);
+     template<typename T> void __reflect__visit( T& t ) {
+          any<Service,InterfaceDelegate>::__reflect__visit(t);
           t.template accept<Calculator>( add, "add" );
           t.template accept<Calculator>( sub, "sub" );
      }
 };
-} } // namespace boost::idl
+} } // namespace boost::reflect
 
     @endcode
 
-As you can see from the code above, BOOST_IDL_INTERFACE( ... ) performs a partial specialization
-of boost::idl::any<Interface,InterfaceDelegate> **within the boost::idl namespace**.  
+As you can see from the code above, BOOST_Reflect_INTERFACE( ... ) performs a partial specialization
+of boost::reflect::any<Interface,InterfaceDelegate> **within the boost::reflect namespace**.  
 
 Each method listed in the macro becomes a public function object of a type determined by the
 InterfaceDelegate.  Through proper definition of the InterfaceDelegate it is possible to change
@@ -264,7 +264,7 @@ This approach is very flexible, but does have some down sides which will be addr
 
     @subsection adapting_an_interface Adapting an Interface
 
-    The real power of Boost.IDL is its ability to dynamically adapt an interface.  Suppose
+    The real power of Boost.Reflect is its ability to dynamically adapt an interface.  Suppose
     we want to expose our calculator to the user via a command line interface.  Traditionally,
     this would require creating a loop that reads a method name, performs a giant if/else if/else
     block and then converts strings into the parameters appropriate for each method.  This is not
@@ -272,11 +272,11 @@ This approach is very flexible, but does have some down sides which will be addr
     that you want to expose in this manner *or* if the interface you are exposing is changing 
     frequently.
 
-    Because Boost.IDL alows us to describe an interface, we can use this information to create a 
+    Because Boost.Reflect alows us to describe an interface, we can use this information to create a 
     generic command line interpreter that can work with any interface where standard ostream/istream
     operators are defined for all of the parameters.
 
-    Boost.IDL uses the visitor design pattern to expose the type information.  So to create our
+    Boost.Reflect uses the visitor design pattern to expose the type information.  So to create our
     command line interpreter, we must define a visitor that converts each method into a function
     object that knows how to convert the parameters from strings, invoke the call, and then convert
     the return value back into a string.  The methods must also be indexed by name so that we can
@@ -284,7 +284,7 @@ This approach is very flexible, but does have some down sides which will be addr
 
 
     @code
-class cli : public boost::idl::visitor< cli >
+class cli : public boost::reflect::visitor< cli >
 {
     public:
        template<typename InterfaceName, typename M>
@@ -292,7 +292,7 @@ class cli : public boost::idl::visitor< cli >
        {
             // print the method name, signature, and constness
             std::cerr << std::setw(10) << std::setiosflags(std::ios::left) << name 
-                      << " " << boost::idl::get_typestring<typename M::signature>::str()
+                      << " " << boost::reflect::get_typestring<typename M::signature>::str()
                       << (M::is_const ? "const" : "") <<std::endl;
 
             // create a function object and place it in our index, the parameter types
@@ -327,11 +327,11 @@ class cli : public boost::idl::visitor< cli >
 };
     @endcode
 
-    Once the visitor has been defined, it can be used with any interface defined by BOOST_IDL_INTERFACE().
+    Once the visitor has been defined, it can be used with any interface defined by BOOST_Reflect_INTERFACE().
 
     @code
     template<typename InterfaceType,typename InterfaceDelegate>
-    void start_cli( boost::idl::any<InterfaceType,InterfaceDelegate>& a )
+    void start_cli( boost::reflect::any<InterfaceType,InterfaceDelegate>& a )
     {
         cli  m_cli;
         m_cli.start_visit(a);
@@ -386,16 +386,16 @@ class cli : public boost::idl::visitor< cli >
 
     @section future_dev Future Development
 
-    At the moment the line is blurred between pointer semantics and value semantics on boost::idl::any<> such 
+    At the moment the line is blurred between pointer semantics and value semantics on boost::reflect::any<> such 
     that the holder of the any does not know if they 'own' it or if they are simply 'pointing' to it.  Ideally
     you would get something like:
 
-    - boost::idl::ptr<InterfaceType>         holds a raw pointer 
-    - boost::idl::shared_ptr<InterfaceType>  holds a boost::shared_ptr
-    - boost::idl::any<InterfaceType>         holds a value that is owned by the object
+    - boost::reflect::ptr<InterfaceType>         holds a raw pointer 
+    - boost::reflect::shared_ptr<InterfaceType>  holds a boost::shared_ptr
+    - boost::reflect::any<InterfaceType>         holds a value that is owned by the object
 
     The trick is to achieve this separation without incurring the cost of 'trippling' amount of code
-    generated by the BOOST_IDL_INTERFACE() macro to handle each of these cases.
+    generated by the BOOST_Reflect_INTERFACE() macro to handle each of these cases.
 
     @section acknowledgements Acknowledgements
     

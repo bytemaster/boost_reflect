@@ -1,11 +1,11 @@
 /**
- * @file boost/idl/reflect.hpp
+ * @file boost/reflect/reflect.hpp
  *
  * @brief Defines types and macros used to provide reflection.
  *
  */
-#ifndef _BOOST_IDL_REFLECT_HPP_
-#define _BOOST_IDL_REFLECT_HPP_
+#ifndef _BOOST_REFLECT_HPP_
+#define _BOOST_REFLECT_HPP_
 
 #include <boost/static_assert.hpp>
 #include <boost/preprocessor/seq/for_each_i.hpp>
@@ -22,7 +22,7 @@
 #include <set>
 #include <map>
 
-namespace boost { namespace idl {
+namespace boost { namespace reflect {
 
 template<typename T>
 struct get_typeinfo { 
@@ -64,8 +64,8 @@ struct get_typeinfo< C<TP,TP2> > {
 };
 
 
-#define BOOST_IDL_DEFINE_TYPEINFO( NAME ) \
-namespace boost { namespace idl { \
+#define BOOST_REFLECT_TYPEINFO( NAME ) \
+namespace boost { namespace reflect { \
 template<> \
 struct get_typeinfo<NAME> { \
     enum is_defined_enum{ is_defined = 1 }; \
@@ -73,16 +73,16 @@ struct get_typeinfo<NAME> { \
 }; } }
 
 
-#define BOOST_IDL_DEFINE_TEMPLATE_TYPEINFO( NAME ) \
-namespace boost { namespace idl {\
+#define BOOST_REFLECT_TEMPLATE_TYPEINFO( NAME ) \
+namespace boost { namespace reflect {\
 template<>\
 struct get_typeinfo<NAME<dummy_arg> > { \
     enum is_defined_enum{ is_defined = 1 }; \
     static const char* name() { return BOOST_PP_STRINGIZE(NAME); } \
 }; } }
 
-#define BOOST_IDL_DEFINE_TEMPLATE2_TYPEINFO( NAME ) \
-namespace boost { namespace idl {\
+#define BOOST_REFLECT_TEMPLATE2_TYPEINFO( NAME ) \
+namespace boost { namespace reflect {\
 template<>\
 struct get_typeinfo<NAME<dummy_arg,dummy_arg> > { \
     enum is_defined_enum{ is_defined = 1 }; \
@@ -112,7 +112,7 @@ case i:\
     v.accept_base( *static_cast<elem*>(&name), BOOST_PP_STRINGIZE( elem ), field );
 
 
-#define BOOST_IDL_REFLECT_IMPL( CONST,TYPE, INHERITS, MEMBERS ) \
+#define BOOST_REFLECT_IMPL( CONST,TYPE, INHERITS, MEMBERS ) \
 template<typename Visitor>\
 static inline void visit( CONST TYPE& name, Visitor& v, uint32_t field = -1 ) { \
     v.start(name, BOOST_PP_STRINGIZE(TYPE) );\
@@ -149,12 +149,12 @@ static inline void visit( CONST TYPE& name, Visitor& v, uint32_t field = -1 ) { 
 /**
  *  @param MEMBERS - a sequence of member names.  (field1)(field2)(field3)
  */
-#define BOOST_IDL_REFLECT( TYPE, INHERITS, MEMBERS ) \
-    BOOST_IDL_DEFINE_TYPEINFO(TYPE) \
-namespace boost { namespace idl { \
+#define BOOST_REFLECT( TYPE, INHERITS, MEMBERS ) \
+    BOOST_REFLECT_TYPEINFO(TYPE) \
+namespace boost { namespace reflect { \
 template<> struct reflector<TYPE> {\
-    BOOST_IDL_REFLECT_IMPL( const, TYPE, INHERITS, MEMBERS ) \
-    BOOST_IDL_REFLECT_IMPL( BOOST_IDL_EMPTY, TYPE, INHERITS, MEMBERS ) \
+    BOOST_REFLECT_IMPL( const, TYPE, INHERITS, MEMBERS ) \
+    BOOST_REFLECT_IMPL( BOOST_IDL_EMPTY, TYPE, INHERITS, MEMBERS ) \
 }; } }
 
 /*
@@ -164,7 +164,7 @@ template<> struct reflector<TYPE> { \
 
 
 /**
- *   This macro is identical to BOOST_IDL_REFLECT, except that it gives you
+ *   This macro is identical to BOOST_REFLECT, except that it gives you
  *   the ability to customize field numbers and flags.
  *
  *   @param MEMBERS  - a sequence of 3 param tuples.
@@ -172,8 +172,8 @@ template<> struct reflector<TYPE> { \
  *
  */
 #define BOOST_IDL_CUSTOM_REFLECT( TYPE, INHERITS, MEMBERS ) \
-    BOOST_IDL_DEFINE_TYPEINFO(TYPE) \
-namespace boost { namespace idl { \
+    BOOST_REFLECT_TYPEINFO(TYPE) \
+namespace boost { namespace reflect { \
 template<> struct reflector<TYPE> { \
     BOOST_IDL_CUSTOM_REFLECT_IMPL( const, TYPE, INHERITS, MEMBERS ) \
     BOOST_IDL_CUSTOM_REFLECT_IMPL( BOOST_IDL_EMPTY, TYPE, INHERITS, MEMBERS ) \
@@ -192,28 +192,28 @@ struct reflector
 {
 };
 
-} } // namespace boost::idl
+} } // namespace boost::reflect
 
-// these macros specify namespace boost::idl 
-BOOST_IDL_DEFINE_TYPEINFO( void )
-BOOST_IDL_DEFINE_TYPEINFO( bool )
-BOOST_IDL_DEFINE_TYPEINFO( uint8_t )
-BOOST_IDL_DEFINE_TYPEINFO( uint16_t )
-BOOST_IDL_DEFINE_TYPEINFO( uint32_t )
-BOOST_IDL_DEFINE_TYPEINFO( uint64_t )
-BOOST_IDL_DEFINE_TYPEINFO( int8_t )
-BOOST_IDL_DEFINE_TYPEINFO( int16_t )
-BOOST_IDL_DEFINE_TYPEINFO( int32_t )
-BOOST_IDL_DEFINE_TYPEINFO( int64_t )
-BOOST_IDL_DEFINE_TYPEINFO( double )
-BOOST_IDL_DEFINE_TYPEINFO( float )
-BOOST_IDL_DEFINE_TYPEINFO( std::string )
-BOOST_IDL_DEFINE_TEMPLATE_TYPEINFO( std::vector )
-BOOST_IDL_DEFINE_TEMPLATE_TYPEINFO( std::set )
-BOOST_IDL_DEFINE_TEMPLATE_TYPEINFO( std::list )
-BOOST_IDL_DEFINE_TEMPLATE2_TYPEINFO( std::map )
-BOOST_IDL_DEFINE_TEMPLATE2_TYPEINFO( std::pair )
+// these macros specify namespace boost::reflect 
+BOOST_REFLECT_TYPEINFO( void )
+BOOST_REFLECT_TYPEINFO( bool )
+BOOST_REFLECT_TYPEINFO( uint8_t )
+BOOST_REFLECT_TYPEINFO( uint16_t )
+BOOST_REFLECT_TYPEINFO( uint32_t )
+BOOST_REFLECT_TYPEINFO( uint64_t )
+BOOST_REFLECT_TYPEINFO( int8_t )
+BOOST_REFLECT_TYPEINFO( int16_t )
+BOOST_REFLECT_TYPEINFO( int32_t )
+BOOST_REFLECT_TYPEINFO( int64_t )
+BOOST_REFLECT_TYPEINFO( double )
+BOOST_REFLECT_TYPEINFO( float )
+BOOST_REFLECT_TYPEINFO( std::string )
+BOOST_REFLECT_TEMPLATE_TYPEINFO( std::vector )
+BOOST_REFLECT_TEMPLATE_TYPEINFO( std::set )
+BOOST_REFLECT_TEMPLATE_TYPEINFO( std::list )
+BOOST_REFLECT_TEMPLATE2_TYPEINFO( std::map )
+BOOST_REFLECT_TEMPLATE2_TYPEINFO( std::pair )
 
-#include <boost/idl/reflect_function_signature.hpp>
+#include <boost/reflect/reflect_function_signature.hpp>
 
 #endif
