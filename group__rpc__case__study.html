@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<title>Boost IDL Library: Remote Procedure Call Case Study</title>
+<title>Boost Reflect Library: Remote Procedure Call Case Study</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -13,15 +13,13 @@
     <ul>
       <li><a href="index.html"><span>Main&nbsp;Page</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
 </div>
 <div class="contents">
 <h1>Remote Procedure Call Case Study</h1><table border="0" cellpadding="0" cellspacing="0">
 </table>
-<p>This case study is designed to demonstrate the general usefulness of Boost.IDL by implementing a simple generic RPC system based upon Boost.Serialization. This example shows what is possible, and how Boost.IDL can serve as the foundation of a more general Boost RPC library.</p>
+<p>This case study is designed to demonstrate the general usefulness of Boost.Reflect by implementing a simple generic RPC system based upon Boost.Serialization. This example shows what is possible, and how Boost.Reflect can serve as the foundation of a more general Boost RPC library.</p>
 <h2><a class="anchor" id="rpc_design">
 RPC Design Approach</a></h2>
 <p>The goal is to provide type-safe remote procedure calls. One solution to this problem is the <a href="http://www.codeproject.com/KB/threads/Rcf_Ipc_For_Cpp.aspx">RCF - Interprocess Communication for C++</a> library discussed at <a href="www.codeproject.com">CodeProject</a>.</p>
@@ -56,17 +54,17 @@ RPC Design Approach</a></h2>
         <span class="keywordflow">return</span> 0;
     }
 </pre></div><p>While this only shows a simple example, it should communicate approximately what the API is.</p>
-<p>Now lets compare what the target Boost.IDL based API would be:</p>
+<p>Now lets compare what the target Boost.Reflect based API would be:</p>
 <p>Server: </p>
 <div class="fragment"><pre class="fragment">    <span class="keyword">struct </span>Echo
     {
         std::string echo(<span class="keyword">const</span> std::string &amp;s) { <span class="keywordflow">return</span> s; }
     };
-    <a class="code" href="idl_8hpp.html#ac1a01eaad601dd1bb6d6de763d06f90c">BOOST_IDL_INTERFACE</a>( Echo, <a class="code" href="idl_8hpp.html#a680acad0e78f5cd23c00fa9d8e3891e2">BOOST_IDL_BASE</a>, (echo) )
+    BOOST_Reflect_INTERFACE( Echo, BOOST_Reflect_BASE, (echo) )
         
     int main()
     {
-        boost::idl::rpc_server&lt;Echo&gt; server( Echo() );
+        boost::reflect::rpc_server&lt;Echo&gt; server( Echo() );
         server.listen( 50001 );
         <span class="keywordflow">return</span> 0;
     }
@@ -75,22 +73,22 @@ RPC Design Approach</a></h2>
     {
         std::string echo(<span class="keyword">const</span> std::string &amp;s); <span class="comment">// implementation not needed</span>
     };
-    <a class="code" href="idl_8hpp.html#ac1a01eaad601dd1bb6d6de763d06f90c">BOOST_IDL_INTERFACE</a>( Echo, <a class="code" href="idl_8hpp.html#a680acad0e78f5cd23c00fa9d8e3891e2">BOOST_IDL_BASE</a>, (echo) )
+    BOOST_Reflect_INTERFACE( Echo, BOOST_Reflect_BASE, (echo) )
         
     int main()
     {
-        boost::idl::rpc_client&lt;Echo&gt; client; 
+        boost::reflect::rpc_client&lt;Echo&gt; client; 
         client.connect_to( <span class="stringliteral">&quot;localhost&quot;</span>, 50001 );
         std::string s = client.echo( <span class="stringliteral">&quot;what&#39;s up&quot;</span> );
         <span class="keywordflow">return</span> 0;
     }
-</pre></div><p>Some improvements offered by Boost.IDL is that the return value and parameter types are only specified once. But the real power of Boost.IDL is that it allows type erasure to apply to the rpc_client&lt;&gt; and thus we can turn this client in to a fully functional command line interface to a remote server with the following change:</p>
+</pre></div><p>Some improvements offered by Boost.Reflect is that the return value and parameter types are only specified once. But the real power of Boost.Reflect is that it allows type erasure to apply to the rpc_client&lt;&gt; and thus we can turn this client in to a fully functional command line interface to a remote server with the following change:</p>
 <div class="fragment"><pre class="fragment">    cli  m_cli;
     m_cli.start_visit(client);
 
     <span class="comment">// erase the details of the rpc_client, by storing</span>
     <span class="comment">// it in a generic Echo interface.</span>
-    <a class="code" href="classboost_1_1idl_1_1any.html">boost::idl::any&lt;Echo&gt;</a> any_echo = client;
+    boost::reflect::any&lt;Echo&gt; any_echo = client;
 
     std::string line;
     std::string cmd;
@@ -106,16 +104,16 @@ RPC Design Approach</a></h2>
     }
 </pre></div><h2><a class="anchor" id="implement_rpc_server">
 Implementing RPC Server</a></h2>
-<p>The server is a boost::idl::any&lt;InterfaceType&gt; that also implements the visitor pattern. It creates a map from method name to a geneirc function that takes a serialized string for arguments and returns a serialized string as return value.</p>
-<div class="fragment"><pre class="fragment"><span class="keyword">namespace </span>boost { <span class="keyword">namespace </span>idl {
+<p>The server is a boost::reflect::any&lt;InterfaceType&gt; that also implements the visitor pattern. It creates a map from method name to a geneirc function that takes a serialized string for arguments and returns a serialized string as return value.</p>
+<div class="fragment"><pre class="fragment"><span class="keyword">namespace </span>boost { <span class="keyword">namespace </span>reflect {
 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> InterfaceType&gt;
-<span class="keyword">class </span>rpc_server : <span class="keyword">public</span> boost::idl::visitor&lt; rpc_server&lt;InterfaceType&gt; &gt;, 
-                   <span class="keyword">public</span> idl::any&lt;InterfaceType&gt;
+<span class="keyword">class </span>rpc_server : <span class="keyword">public</span> boost::reflect::visitor&lt; rpc_server&lt;InterfaceType&gt; &gt;, 
+                   <span class="keyword">public</span> reflect::any&lt;InterfaceType&gt;
 {
     <span class="keyword">public</span>:
        <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
        rpc_server( T v )
-       :idl::any&lt;InterfaceType&gt;(v)
+       :reflect::any&lt;InterfaceType&gt;(v)
        {
             <span class="comment">// initialize ourself</span>
             start_visit(*<span class="keyword">this</span>); 
@@ -203,12 +201,12 @@ Implementing RPC Server</a></h2>
        std::map&lt;std::string, boost::function&lt;std::string(const std::string)&gt; &gt; methods;
 };
 
-} } <span class="comment">// namespace boost::idl</span>
+} } <span class="comment">// namespace boost::reflect</span>
 </pre></div><h2><a class="anchor" id="implement_rpc_client">
 Implementing RPC Client</a></h2>
 <p>The RPC Client needs to define a new object that implements the interface in such a way that it sends the method name and serialized parameters over a socket. In this case, the implementation of the interface is fully dynamic.</p>
 <div class="fragment"><pre class="fragment"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> InterfaceType&gt;
-<span class="keyword">class </span>rpc_client : <span class="keyword">public</span> boost::idl::visitor&lt; rpc_client&lt;InterfaceType&gt; &gt;, <span class="keyword">public</span> idl::any&lt;InterfaceType&gt;
+<span class="keyword">class </span>rpc_client : <span class="keyword">public</span> boost::reflect::visitor&lt; rpc_client&lt;InterfaceType&gt; &gt;, <span class="keyword">public</span> reflect::any&lt;InterfaceType&gt;
 {
     <span class="keyword">public</span>:
        rpc_client()
@@ -292,7 +290,7 @@ Implementing RPC Client</a></h2>
 <td>
 </td>
 <td align="right">
-Boost IDL Library  
+Boost Reflect Library  
 </td>
 </tr>
 </table>
