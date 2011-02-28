@@ -2,7 +2,6 @@
     #ifndef BOOST_REFLECT_MIRROR_INTERFACE_HPP
     #define BOOST_REFLECT_MIRROR_INTERFACE_HPP
     #include <boost/reflect/member_from_signature.hpp>
-    #include <boost/reflect/fast_delegate.hpp>
     #include <boost/fusion/container/vector.hpp>
     #include <boost/fusion/container/generation/make_vector.hpp>
     #include <boost/fusion/functional/generation/make_fused_function_object.hpp>
@@ -79,6 +78,7 @@
 
 
     #define PARAM_NAME(z,n,type)         BOOST_PP_CAT(a,n)
+    #define PARAM_PLACE_HOLDER(z,n,type) BOOST_PP_CAT(_,BOOST_PP_ADD(n,1) )
     #define PARAM_TYPE_NAME(z,n,type)   BOOST_PP_CAT(typename A,n)
     #define PARAM_TYPE(z,n,type)   BOOST_PP_CAT(A,n)
 //    #define PARAM_TYPE(z,n,type)    BOOST_PP_CAT(BOOST_PP_CAT(typename traits::arg,BOOST_PP_ADD(n,1)),_type)
@@ -104,6 +104,7 @@
 
 #define n BOOST_PP_ITERATION()
 #define PARAM_NAMES          BOOST_PP_ENUM(n,PARAM_NAME,A) // name_N
+#define PARAM_PLACE_HOLDERS  BOOST_PP_ENUM_TRAILING(n,PARAM_PLACE_HOLDER,A) // _(N+1)
 #define PARAM_ARGS           BOOST_PP_ENUM(n,PARAM_ARG,A) // TYPE_N name_N
 #define PARAM_TYPE_NAMES     BOOST_PP_ENUM(n,PARAM_TYPE_NAME,A) // typename TYPE_N
 #define PARAM_TYPES          BOOST_PP_ENUM(n,PARAM_TYPE,A) // TYPE_N
@@ -134,7 +135,7 @@
         template<typename C, typename M>
         void set_delegate(  C*& s, M m )
         {
-            m_delegate = boost::fusion::make_fused_function_object( make_fast_delegate(s,m) ); 
+            m_delegate = boost::fusion::make_fused_function_object( boost::bind(m,s PARAM_PLACE_HOLDERS) ); //make_fast_delegate(s,m) ); 
         }
         boost::function<R(const fused_params&)> m_delegate; 
     };
@@ -165,7 +166,7 @@
         template<typename C, typename M>
         void set_delegate(  C*& s, M m )
         {
-            m_delegate = boost::fusion::make_fused_function_object( make_fast_delegate(s,m) ); 
+            m_delegate = boost::fusion::make_fused_function_object( boost::bind(m,s PARAM_PLACE_HOLDERS) ); //make_fast_delegate(s,m) ); 
         }
         boost::function<R(const fused_params&)> m_delegate; 
     };
