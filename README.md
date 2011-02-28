@@ -1,12 +1,12 @@
-Boost.IDL - Interface Description Language 
+Boost.Reflect - Simple Reflection Library
 ---------------------------------------
 
-The Boost IDL library provides a means to describe the interface
+The Boost Reflect library provides a means to describe the interface
 of a class or struct to provide compile-time and run-time reflection.
 
-Some of the useful features provided by the IDL library include:
+Some of the useful features provided by the Reflect library include:
 
-* boost::idl::any<Interface>  - a class that can contain any object
+* boost::reflect::any<Interface>  - a class that can contain any object
     that implements Interface.
 * Use visitors to create dynamic interfaces.
     - RPC client/server stubs
@@ -18,11 +18,11 @@ Some of the useful features provided by the IDL library include:
 Example: Simple Command Line Calculator
 ---------------------------------------
 
-An [example](https://github.com/bytemaster/boost_idl/blob/master/examples/simple.cpp) 
+An [example](https://github.com/bytemaster/boost_reflect/blob/master/examples/simple.cpp) 
 of how to create a command line calculator can be found in the examples directory.
 
 
-    #include <boost/idl/idl.hpp>
+    #include <boost/reflect/any.hpp>
 
     struct calculator {
         calculator():result_(0){}
@@ -34,11 +34,11 @@ of how to create a command line calculator can be found in the examples director
             double result_;
     };
 
-    BOOST_IDL_INTERFACE( calculator, BOOST_PP_NIL, (add)(sub)(result) )
+    BOOST_REFLECT_ANY( calculator, BOOST_PP_NIL, (add)(sub)(result) )
 
     int main( int argc, char** argv )
     {
-        boost::idl::any<calculator> calc = calculator();
+        boost::reflect::any<calculator> calc = calculator();
 
         cli  m_cli;
         m_cli.start_visit(calc);
