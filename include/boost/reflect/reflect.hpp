@@ -15,6 +15,7 @@
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/type_traits/remove_pointer.hpp>
+#include <stdint.h>
 #include <string>
 #include <typeinfo>
 #include <vector>
@@ -92,29 +93,40 @@ struct get_typeinfo<NAME<dummy_arg,dummy_arg> > { \
 
 #define CUSTOM_MEMBER_CASES(r, data, i, elem)\
 case BOOST_PP_TUPLE_ELEM( 3, 1, elem ):\
-   v.accept_member( name, &data::BOOST_PP_TUPLE_ELEM(3, 0, elem), BOOST_PP_STRINGIZE( BOOST_PP_TUPLE_ELEM(3,0,elem) ), BOOST_PP_TUPLE_ELEM(3, 2,elem) );\
+   v.accept_member( name, &Type::BOOST_PP_TUPLE_ELEM(3, 0, elem), BOOST_PP_STRINGIZE( BOOST_PP_TUPLE_ELEM(3,0,elem) ), BOOST_PP_TUPLE_ELEM(3, 2,elem) );\
    break;
 
 #define CUSTOM_MEMBER_ALL(r, data, i, elem)\
-   v.accept_member( name, &data::BOOST_PP_TUPLE_ELEM(3, 0, elem), BOOST_PP_STRINGIZE( BOOST_PP_TUPLE_ELEM(3,0,elem) ), BOOST_PP_TUPLE_ELEM(3, 2,elem) );\
+   v.accept_member( name, &Type::BOOST_PP_TUPLE_ELEM(3, 0, elem), BOOST_PP_STRINGIZE( BOOST_PP_TUPLE_ELEM(3,0,elem) ), BOOST_PP_TUPLE_ELEM(3, 2,elem) );\
 
 #define MEMBER_CASES(r, data, i, elem)\
 case i:\
-   v.accept_member( name, &data::elem, BOOST_PP_STRINGIZE( elem ), i ); \
+   v.accept_member( name, &Type::elem, BOOST_PP_STRINGIZE( elem ), i ); \
+   break;
+
+#define MEMBER_CASES_OTHER(r, data, i, elem)\
+case i:\
+   v.accept_member( name, &Type::elem, other, &Other::elem, BOOST_PP_STRINGIZE( elem ), i ); \
    break;
 
 #define MEMBER_ALL(r, data, i, elem)\
-   v.accept_member( name, &data::elem, BOOST_PP_STRINGIZE( elem ), i );
+   v.accept_member( name, &Type::elem, BOOST_PP_STRINGIZE( elem ), i );
+
+#define MEMBER_ALL_OTHER(r, data, i, elem)\
+   v.accept_member( name, &Type::elem, other, &Other::elem, BOOST_PP_STRINGIZE( elem ), i );
 
 #define INHERITS (baseA)(baseB)
 
 #define ACCEPT_BASE(r, data, i, elem) \
-    v.accept_base( *static_cast<elem*>(&name), BOOST_PP_STRINGIZE( elem ), field );
+    v.template accept_base<elem>( name, BOOST_PP_STRINGIZE( elem ), field );
+
+#define ACCEPT_BASE_OTHER(r, data, i, elem) \
+    v.template accept_base<elem>( name, other, BOOST_PP_STRINGIZE( elem ), field );
 
 
 #define BOOST_REFLECT_IMPL( CONST,TYPE, INHERITS, MEMBERS ) \
-template<typename Visitor>\
-static inline void visit( CONST TYPE& name, Visitor& v, uint32_t field = -1 ) { \
+template<typename Visitor, typename Type>\
+static inline void visit( CONST Type& name, Visitor& v, uint32_t field = -1 ) { \
     v.start(name, BOOST_PP_STRINGIZE(TYPE) );\
     BOOST_PP_SEQ_FOR_EACH_I( ACCEPT_BASE, TYPE, INHERITS ) \
     switch( field ) { \
@@ -128,9 +140,28 @@ static inline void visit( CONST TYPE& name, Visitor& v, uint32_t field = -1 ) { 
     v.end(name, BOOST_PP_STRINGIZE(TYPE) );\
 } \
 
-#define BOOST_IDL_CUSTOM_REFLECT_IMPL( CONST,TYPE, INHERITS, MEMBERS ) \
-template<typename Visitor>\
-static inline void visit( CONST TYPE& name, Visitor& v, uint32_t field = -1 ) { \
+
+#define BOOST_REFLECT_BINARY_IMPL( CONST,TYPE, INHERITS, MEMBERS ) \
+template<typename Visitor, typename Type, typename Other>\
+static inline void visit( CONST Type& name, CONST Other& other, Visitor& v, uint32_t field = -1 ) { \
+    v.start(name, BOOST_PP_STRINGIZE(TYPE) );\
+    BOOST_PP_SEQ_FOR_EACH_I( ACCEPT_BASE_OTHER, TYPE, INHERITS ) \
+    switch( field ) { \
+        case -1: \
+            BOOST_PP_SEQ_FOR_EACH_I( MEMBER_ALL_OTHER, TYPE, MEMBERS ) \
+            break; \
+        BOOST_PP_SEQ_FOR_EACH_I( MEMBER_CASES_OTHER, TYPE, MEMBERS ) \
+        default: \
+            v.not_found( name, field );\
+    }\
+    v.end(name, BOOST_PP_STRINGIZE(TYPE) );\
+} \
+
+
+
+#define BOOST_REFLECT_CUSTOM_REFLECT_IMPL( CONST,TYPE, INHERITS, MEMBERS ) \
+template<typename Visitor, typename Type>\
+static inline void visit( CONST Type& name, Visitor& v, uint32_t field = -1 ) { \
     v.start(name, BOOST_PP_STRINGIZE(TYPE) );\
     BOOST_PP_SEQ_FOR_EACH_I( ACCEPT_BASE, TYPE, INHERITS ) \
     switch( field ) { \
@@ -144,7 +175,7 @@ static inline void visit( CONST TYPE& name, Visitor& v, uint32_t field = -1 ) { 
     v.end(name, BOOST_PP_STRINGIZE(TYPE) );\
 } \
 
-#define BOOST_IDL_EMPTY
+#define BOOST_REFLECT_EMPTY
 
 /**
  *  @param MEMBERS - a sequence of member names.  (field1)(field2)(field3)
@@ -154,7 +185,9 @@ static inline void visit( CONST TYPE& name, Visitor& v, uint32_t field = -1 ) { 
 namespace boost { namespace reflect { \
 template<> struct reflector<TYPE> {\
     BOOST_REFLECT_IMPL( const, TYPE, INHERITS, MEMBERS ) \
-    BOOST_REFLECT_IMPL( BOOST_IDL_EMPTY, TYPE, INHERITS, MEMBERS ) \
+    BOOST_REFLECT_BINARY_IMPL( const, TYPE, INHERITS, MEMBERS ) \
+    BOOST_REFLECT_IMPL( BOOST_REFLECT_EMPTY, TYPE, INHERITS, MEMBERS ) \
+    BOOST_REFLECT_BINARY_IMPL( BOOST_REFLECT_EMPTY, TYPE, INHERITS, MEMBERS ) \
 }; } }
 
 /*
@@ -171,15 +204,13 @@ template<> struct reflector<TYPE> { \
  *                    ((field_name, NUMBER, FLAGS))((field_name1, NUMBER, FLAGS))
  *
  */
-#define BOOST_IDL_CUSTOM_REFLECT( TYPE, INHERITS, MEMBERS ) \
+#define BOOST_REFLECT_CUSTOM_REFLECT( TYPE, INHERITS, MEMBERS ) \
     BOOST_REFLECT_TYPEINFO(TYPE) \
 namespace boost { namespace reflect { \
 template<> struct reflector<TYPE> { \
-    BOOST_IDL_CUSTOM_REFLECT_IMPL( const, TYPE, INHERITS, MEMBERS ) \
-    BOOST_IDL_CUSTOM_REFLECT_IMPL( BOOST_IDL_EMPTY, TYPE, INHERITS, MEMBERS ) \
+    BOOST_REFLECT_CUSTOM_REFLECT_IMPL( const, TYPE, INHERITS, MEMBERS ) \
+    BOOST_REFLECT_CUSTOM_REFLECT_IMPL( BOOST_REFLECT_EMPTY, TYPE, INHERITS, MEMBERS ) \
 } } }
-
-
 
 /**
  *  Unless this is specialized, visit() will not be defined for T.
@@ -191,6 +222,29 @@ template<typename T>
 struct reflector 
 {
 };
+
+template<typename Derived>
+struct visitor 
+{
+    template<typename T>
+    void start( const T& c, const char* name ){}
+    template<typename T>
+    void end( T, const char* ){}
+    template<typename T>
+    void not_found( T, int32_t i ){};
+
+    template<typename Base, typename T1, typename T2>
+    void accept_base( T1& m, T2& m2, const char* name , int field = -1)
+    {
+        boost::reflect::reflector<Base>::visit( m, m2, *static_cast<Derived*>(this), field );
+    }
+    template<typename Base, typename T1, typename T2>
+    void accept_base( const T1& m, const T2& m2, const char* name , int field = -1)
+    {
+        boost::reflect::reflector<Base>::visit( m, m2, *static_cast<Derived*>(this), field );
+    }
+};
+
 
 } } // namespace boost::reflect
 

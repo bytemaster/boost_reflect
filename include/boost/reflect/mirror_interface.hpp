@@ -2,11 +2,16 @@
     #ifndef BOOST_REFLECT_MIRROR_INTERFACE_HPP
     #define BOOST_REFLECT_MIRROR_INTERFACE_HPP
     #include <boost/reflect/member_from_signature.hpp>
+    #include <boost/type_traits/remove_pointer.hpp>
     #include <boost/fusion/container/vector.hpp>
     #include <boost/fusion/container/generation/make_vector.hpp>
     #include <boost/fusion/functional/generation/make_fused_function_object.hpp>
 
     namespace boost { namespace reflect {
+
+        template<int NumParams, bool IsMemberFunction>
+        struct set_delegate_helper
+        {};
         
         template<typename MemberPtr>
         struct mirror_member
@@ -74,6 +79,16 @@
             {
                 typedef mirror_member<MemberPointer>  type; 
             };
+
+            struct set_any_visitor : boost::reflect::visitor<set_any_visitor>
+            {
+                template<typename T, typename TM, typename T2, typename T2M>
+                void accept_member( T& m, TM mp,  T2& m2, T2M mp2, const char* name, int32_t i = -1 )
+                {
+                    (m.*mp).set_delegate(&m2, mp2);
+                }
+            };
+
         };
 
 
@@ -81,7 +96,6 @@
     #define PARAM_PLACE_HOLDER(z,n,type) BOOST_PP_CAT(_,BOOST_PP_ADD(n,1) )
     #define PARAM_TYPE_NAME(z,n,type)   BOOST_PP_CAT(typename A,n)
     #define PARAM_TYPE(z,n,type)   BOOST_PP_CAT(A,n)
-//    #define PARAM_TYPE(z,n,type)    BOOST_PP_CAT(BOOST_PP_CAT(typename traits::arg,BOOST_PP_ADD(n,1)),_type)
     #define PARAM_ARG(z,n,type)     PARAM_TYPE(z,n,type) PARAM_NAME(z,n,type)
 
 #        ifndef BOOST_REFLECT_MIRROR_IMPL_SIZE
@@ -109,6 +123,7 @@
 #define PARAM_TYPE_NAMES     BOOST_PP_ENUM(n,PARAM_TYPE_NAME,A) // typename TYPE_N
 #define PARAM_TYPES          BOOST_PP_ENUM(n,PARAM_TYPE,A) // TYPE_N
 
+
     template<typename R, typename Class BOOST_PP_COMMA_IF(n) PARAM_TYPE_NAMES>
     struct mirror_member<R(Class::*)(PARAM_TYPES)const> 
     {
@@ -133,9 +148,9 @@
             return *this;
         }
         template<typename C, typename M>
-        void set_delegate(  C*& s, M m )
+        void set_delegate(  C* s, M m )
         {
-            m_delegate = boost::fusion::make_fused_function_object( boost::bind(m,s PARAM_PLACE_HOLDERS) ); //make_fast_delegate(s,m) ); 
+            set_delegate_helper<n, boost::is_member_function_pointer<M>::value>::template set_delegate<R>(m_delegate, s, m );
         }
         boost::function<R(const fused_params&)> m_delegate; 
     };
@@ -164,12 +179,39 @@
             return *this;
         }
         template<typename C, typename M>
-        void set_delegate(  C*& s, M m )
+        void set_delegate(  C* s, M m )
         {
-            m_delegate = boost::fusion::make_fused_function_object( boost::bind(m,s PARAM_PLACE_HOLDERS) ); //make_fast_delegate(s,m) ); 
+            set_delegate_helper<n, boost::is_member_function_pointer<M>::value>::template set_delegate<R>(m_delegate, s, m );
         }
         boost::function<R(const fused_params&)> m_delegate; 
     };
 
+
+    template<>
+    struct set_delegate_helper<n,true>
+    {
+        template<typename R, typename BoostFunction, typename C, typename M>
+        static void set_delegate( BoostFunction& f, C* c, M m )
+        {
+            f = boost::fusion::make_fused_function_object( boost::bind(m,c PARAM_PLACE_HOLDERS) );
+        }
+    };
+    template<>
+    struct set_delegate_helper<n,false>
+    {
+        template<typename R, typename BoostFunction, typename C, typename M>
+        static void set_delegate( BoostFunction& f, C* c, M m )
+        {
+            f = boost::fusion::make_fused_function_object( boost::bind( boost::ref(c->*m) PARAM_PLACE_HOLDERS) );
+        }
+    };
+
+
+#undef n 
+#undef PARAM_NAMES       
+#undef PARAM_PLACE_HOLDERS
+#undef PARAM_ARGS        
+#undef PARAM_TYPE_NAMES   
+#undef PARAM_TYPES 
 
 #endif // BOOST_PP_IS_ITERATING
