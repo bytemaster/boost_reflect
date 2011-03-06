@@ -51,7 +51,8 @@ class any {};
 BOOST_REFLECT( NAME, INHERITS, MEMBERS ) \
 namespace boost { namespace reflect { \
 template<typename InterfaceDelegate > \
-class any<NAME,InterfaceDelegate> :BOOST_PP_SEQ_FOR_EACH( PUBLIC_BASE, InterfaceDelegate, INHERITS )  virtual protected boost::any \
+class any<NAME,InterfaceDelegate> : BOOST_PP_SEQ_FOR_EACH( PUBLIC_BASE, InterfaceDelegate, INHERITS ) \
+                                    public InterfaceDelegate::template base_class< NAME > \
 { \
     public: \
         typedef NAME reflect_definition_class; \
@@ -87,32 +88,26 @@ class any<NAME,InterfaceDelegate> :BOOST_PP_SEQ_FOR_EACH( PUBLIC_BASE, Interface
             return *this; \
         }\
         template<typename T> \
-        any& operator=( T* v ) \
-        { \
+        any& operator=( T* v ) {\
             boost::any::operator=(v); \
             if( v ) { \
             typename InterfaceDelegate::set_any_visitor vis; \
             boost::reflect::reflector<NAME>::visit( *this, *v, vis, -1 ); \
-            \} \
+            } \
             return *this; \
         }\
         template<typename T> \
-        any& operator=( const T& v ) \
-        { \
+        any& operator=( const T& v ) { \
             boost::any::operator=(v); \
             typename InterfaceDelegate::set_any_visitor vis; \
             boost::reflect::reflector<NAME>::visit( *this, boost::any_cast<T&>(*this), vis, -1 ); \
             return *this; \
         }\
-        any& operator=( const any& v ) \
-        { \
-            if( this == &v )  \
-                return *this; \
+        any& operator=( const any& v ) { \
+            if( this == &v ) return *this; \
             boost::any::operator=(v); \
             typename InterfaceDelegate::set_any_visitor vis; \
-            boost::reflect::reflector<NAME>::visit( *this, boost::any_cast<any&>(*this), vis, -1 ); \
-            return *this; \
-        } \
+            boost::reflect::reflector<NAME>::visit( *this, boost::any_cast<any&>(*this), vis, -1 );return *this; } \
 }; \
 } } 
 

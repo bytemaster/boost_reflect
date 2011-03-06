@@ -89,6 +89,12 @@
                 }
             };
 
+            template< typename T >
+            struct base_class : public virtual boost::any
+            {
+                typedef T reflect_definition_class;
+            };
+
         };
 
 
