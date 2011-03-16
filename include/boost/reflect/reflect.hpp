@@ -184,6 +184,7 @@ static inline void visit( CONST Type& name, Visitor& v, uint32_t field = -1 ) { 
     BOOST_REFLECT_TYPEINFO(TYPE) \
 namespace boost { namespace reflect { \
 template<> struct reflector<TYPE> {\
+    enum is_defined_enum{ is_defined = 1 }; \
     BOOST_REFLECT_IMPL( const, TYPE, INHERITS, MEMBERS ) \
     BOOST_REFLECT_BINARY_IMPL( const, TYPE, INHERITS, MEMBERS ) \
     BOOST_REFLECT_IMPL( BOOST_REFLECT_EMPTY, TYPE, INHERITS, MEMBERS ) \
@@ -208,6 +209,7 @@ template<> struct reflector<TYPE> { \
     BOOST_REFLECT_TYPEINFO(TYPE) \
 namespace boost { namespace reflect { \
 template<> struct reflector<TYPE> { \
+    enum is_defined_enum{ is_defined = 1 }; \
     BOOST_REFLECT_CUSTOM_REFLECT_IMPL( const, TYPE, INHERITS, MEMBERS ) \
     BOOST_REFLECT_CUSTOM_REFLECT_IMPL( BOOST_REFLECT_EMPTY, TYPE, INHERITS, MEMBERS ) \
 } } }
@@ -221,6 +223,7 @@ template<> struct reflector<TYPE> { \
 template<typename T>
 struct reflector 
 {
+    enum is_defined_enum{ is_defined = 0 };
 };
 
 template<typename Derived>
