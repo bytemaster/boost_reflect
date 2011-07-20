@@ -3,17 +3,19 @@
 #include <sstream>
 #include <iomanip>
 #include <iostream>
-
 #include <boost/fusion/sequence/io.hpp>
-#include <boost/reflect/mirror_interface.hpp>
-#include <boost/reflect/any.hpp>
+#include <boost/reflect/reflect.hpp>
 
 /**
  *  Takes any interface object and provides a command line interface for it.
  */
-class cli : public boost::reflect::visitor< cli >
+class cli 
 {
     public:
+       template<typename T>
+       cli( T aptr) {
+            boost::reflect::reflector<typename T::interface_type>::visit( *aptr, *this ); 
+       }
        template<typename InterfaceName, typename M>
        bool accept( M& m, const char* name )
        {

@@ -1,6 +1,4 @@
-#include <boost/reflect/mirror_interface.hpp>
-#include <boost/reflect/any.hpp>
-
+#include <boost/reflect/any_ptr.hpp>
 #include "cli.hpp"
 
 struct Service
@@ -43,12 +41,10 @@ class CalculatorService
 
 int main( int argc, char** argv )
 {
-    boost::reflect::any<Calculator> s = CalculatorService();
+    boost::reflect::any_ptr<Calculator> s( new CalculatorService() );
+    printf( "Result: %f\n", s->result() );
 
-    printf( "Result: %f\n", s.result() );
-
-    cli  m_cli;
-    m_cli.start_visit(s);
+    cli  m_cli(s);
 
     std::string line;
     std::string cmd;
