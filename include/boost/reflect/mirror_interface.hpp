@@ -18,63 +18,42 @@
             static M& do_get( C* c, M C::* m )
             { return c->*m; }
         }
-/* VC++ finds this ambigious with <R(Class::*)()> need another workaround... TTI?
-        template<typename Class, typename MemberType>
-        struct mirror_member<MemberType Class::*>
-        {
-            typedef MemberType signature;
-            static const bool is_const = false;
-
-            operator MemberType& ()
-            {
-                return get();
-            }
-            operator const MemberType& ()const
-            {
-                return get();
-            }
-            MemberType& operator = ( const MemberType& a )
-            {
-                return get() = a;
-            }
-            const MemberType& operator * () const
-            {
-                return get();
-            }
-            MemberType& operator * ()
-            {
-                return get();
-            }
-
-            const MemberType& operator -> () const
-            {
-                return get();
-            }
-
-            MemberType& operator -> () 
-            {
-                return get();
-            }
-
-            template<typename C>
-            void set_delegate(  C*& s, MemberType C::* m )
-            {
-                MemberType& (*do_get_impl)(C*, MemberType C::* ) = &detail::do_get;
-                get = boost::bind( do_get_impl, s, m );
-            }
-
-            mirror_member& operator = ( const boost::function<MemberType&()> a ) { get = a; return *this; }
-            boost::function<MemberType&()>                  get;
-        };
-*/
         
         struct mirror_interface 
         {
             template<typename MemberPointer>
-            struct calculate_type
-            {
+            struct calculate_type {
                 typedef mirror_member<MemberPointer>  type; 
             };
+
+            template<typename T>
+            class set_visitor {
+                public:
+                   set_visitor( T* self = 0)
+                   :m_self(self){}
+
+                   template<typename InterfaceName, typename M>
+                   bool accept( M& m, const char* name ) {
+                        assign<M> a(m_self,m);
+                        M::template get_member_ptr<T>( a );
+                        return true;
+                   }
+               private:
+                   template<typename Member>
+                   struct assign {
+                        assign( T* _v, Member& _m ):v(_v),m(_m){}
+
+                        template<typename MemberPtr>
+                        void operator=( const MemberPtr& p ) {
+                            m.set_delegate( v, p );
+                        }
+                        private:
+                            T*      v;
+                            Member& m;
+                   };
+                   T* m_self;
+            };
+
         };
 
 
@@ -82,11 +61,10 @@
     #define PARAM_PLACE_HOLDER(z,n,type) BOOST_PP_CAT(_,BOOST_PP_ADD(n,1) )
     #define PARAM_TYPE_NAME(z,n,type)   BOOST_PP_CAT(typename A,n)
     #define PARAM_TYPE(z,n,type)   BOOST_PP_CAT(A,n)
-//    #define PARAM_TYPE(z,n,type)    BOOST_PP_CAT(BOOST_PP_CAT(typename traits::arg,BOOST_PP_ADD(n,1)),_type)
     #define PARAM_ARG(z,n,type)     PARAM_TYPE(z,n,type) PARAM_NAME(z,n,type)
 
 #        ifndef BOOST_REFLECT_MIRROR_IMPL_SIZE
-#           define BOOST_REFLECT_MIRROR_IMPL_SIZE 5
+#           define BOOST_REFLECT_MIRROR_IMPL_SIZE 8
 #        endif
 
 #       include <boost/preprocessor/iteration/iterate.hpp>
@@ -152,22 +130,18 @@
         typedef R                                                         result_type;
         typedef typename boost::remove_pointer<R(*)(PARAM_TYPES)>::type   signature;
         static const bool                                                 is_const = false;
-        R operator()( PARAM_ARGS )
-        {
+        R operator()( PARAM_ARGS ) {
             return m_delegate( boost::fusion::make_vector(PARAM_NAMES) );
         }
-        R operator() ( const fused_params& fp )
-        {
+        R operator() ( const fused_params& fp ) {
             return m_delegate( fp );
         }
-        mirror_member& operator=( const  boost::function<R(PARAM_TYPES)>& d )  
-        {
+        mirror_member& operator=( const  boost::function<R(PARAM_TYPES)>& d )  {
             m_delegate = d;
             return *this;
         }
         template<typename C, typename M>
-        void set_delegate(  C*& s, M m )
-        {
+        void set_delegate(  C*& s, M m ) {
             m_delegate = boost::fusion::make_fused_function_object( boost::bind(m,s PARAM_PLACE_HOLDERS) ); //make_fast_delegate(s,m) ); 
         }
         boost::function<R(const fused_params&)> m_delegate; 

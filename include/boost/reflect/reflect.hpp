@@ -25,6 +25,8 @@
 
 namespace boost { namespace reflect {
 
+struct dummy_arg{};
+
 template<typename T>
 struct get_typeinfo { 
     enum is_defined_enum{ is_defined = 0 };
@@ -35,18 +37,16 @@ struct get_typeinfo {
  *  Removes all decorations and returns the typename.
  */
 template<typename T>
-inline const char* get_typename() 
-{ 
+inline const char* get_typename()  {
     return get_typeinfo<typename boost::remove_const<
                         typename boost::remove_reference<
                         typename boost::remove_pointer<T>::type>::type>::type>::name();
 }
 
-// used to specify templay get_typeinfo
-struct dummy_arg{};
-
 template<typename TP, template<typename> class C> 
 struct get_typeinfo< C<TP> > { 
+    // used to specify template get_typeinfo
+
     enum is_defined_enum{ is_defined = get_typeinfo<TP>::is_defined }; 
     static const char* name() 
     {  
@@ -131,7 +131,7 @@ static inline void visit( CONST TYPE& name, Visitor& v, uint32_t field = -1 ) { 
     v.end(name, BOOST_PP_STRINGIZE(TYPE) );\
 } \
 
-#define BOOST_IDL_CUSTOM_REFLECT_IMPL( CONST,TYPE, INHERITS, MEMBERS ) \
+#define BOOST_REFLECT_CUSTOM_IMPL( CONST,TYPE, INHERITS, MEMBERS ) \
 template<typename Visitor>\
 static inline void visit( CONST TYPE& name, Visitor& v, uint32_t field = -1 ) { \
     v.start(name, BOOST_PP_STRINGIZE(TYPE) );\
@@ -147,7 +147,10 @@ static inline void visit( CONST TYPE& name, Visitor& v, uint32_t field = -1 ) { 
     v.end(name, BOOST_PP_STRINGIZE(TYPE) );\
 } \
 
-#define BOOST_IDL_EMPTY
+#define BOOST_REFLECT_EMPTY
+
+#define VISIT_BASE( r, data, elem ) reflector<elem>::visit( *((vtable<elem,InterfaceDelegate>*)&a), data );
+#define VISIT_MEMBER( r, data, elem ) t.template accept<data>( a.elem, BOOST_PP_STRINGIZE(elem) );
 
 /**
  *  @param MEMBERS - a sequence of member names.  (field1)(field2)(field3)
@@ -157,13 +160,14 @@ static inline void visit( CONST TYPE& name, Visitor& v, uint32_t field = -1 ) { 
 namespace boost { namespace reflect { \
 template<> struct reflector<TYPE> {\
     BOOST_REFLECT_IMPL( const, TYPE, INHERITS, MEMBERS ) \
-    BOOST_REFLECT_IMPL( BOOST_IDL_EMPTY, TYPE, INHERITS, MEMBERS ) \
+    BOOST_REFLECT_IMPL( BOOST_REFLECT_EMPTY, TYPE, INHERITS, MEMBERS ) \
+\
+    template<typename T, typename InterfaceDelegate> \
+    static void visit( boost::reflect::vtable<TYPE,InterfaceDelegate>& a, T& t ) { \
+        BOOST_PP_SEQ_FOR_EACH( VISIT_BASE, t, INHERITS ) \
+        BOOST_PP_SEQ_FOR_EACH( VISIT_MEMBER, TYPE, MEMBERS ) \
+    } \
 }; } }
-
-/*
-template<> struct reflector<TYPE> { \
-} } }
-*/
 
 
 /**
@@ -174,12 +178,12 @@ template<> struct reflector<TYPE> { \
  *                    ((field_name, NUMBER, FLAGS))((field_name1, NUMBER, FLAGS))
  *
  */
-#define BOOST_IDL_CUSTOM_REFLECT( TYPE, INHERITS, MEMBERS ) \
+#define BOOST_REFLECT_CUSTOM( TYPE, INHERITS, MEMBERS ) \
     BOOST_REFLECT_TYPEINFO(TYPE) \
 namespace boost { namespace reflect { \
 template<> struct reflector<TYPE> { \
-    BOOST_IDL_CUSTOM_REFLECT_IMPL( const, TYPE, INHERITS, MEMBERS ) \
-    BOOST_IDL_CUSTOM_REFLECT_IMPL( BOOST_IDL_EMPTY, TYPE, INHERITS, MEMBERS ) \
+    BOOST_REFLECT_CUSTOM_IMPL( const, TYPE, INHERITS, MEMBERS ) \
+    BOOST_REFLECT_CUSTOM_IMPL( BOOST_REFLECT_EMPTY, TYPE, INHERITS, MEMBERS ) \
 } } }
 
 
@@ -191,9 +195,7 @@ template<> struct reflector<TYPE> { \
  *  automatic "reflection" on fusion sequences.
  */
 template<typename T>
-struct reflector 
-{
-};
+struct reflector{};
 
 } } // namespace boost::reflect
 
