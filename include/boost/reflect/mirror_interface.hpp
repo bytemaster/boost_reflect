@@ -18,7 +18,7 @@
             static M& do_get( C* c, M C::* m )
             { return c->*m; }
         }
-
+/* VC++ finds this ambigious with <R(Class::*)()> need another workaround... TTI?
         template<typename Class, typename MemberType>
         struct mirror_member<MemberType Class::*>
         {
@@ -66,6 +66,7 @@
             mirror_member& operator = ( const boost::function<MemberType&()> a ) { get = a; return *this; }
             boost::function<MemberType&()>                  get;
         };
+*/
         
         struct mirror_interface 
         {
@@ -119,23 +120,24 @@
         // boost::result_of
         typedef R                                                         result_type;
         static const bool                                                 is_const = true;
-        R operator()( PARAM_ARGS )const
-        {
+        R operator()( PARAM_ARGS )const {
             return m_delegate( boost::fusion::make_vector(PARAM_NAMES) );
         }
-        R operator() ( const fused_params& fp )const
-        {
+        R operator() ( const fused_params& fp )const {
             return m_delegate( fp );
         }
-        mirror_member& operator=( const  boost::function<R(PARAM_TYPES)>& d )  
-        {
+        mirror_member& operator=( const mirror_member& d )  {
+            m_delegate = d.m_delegate;
+            return *this;
+        }
+        template<typename T>
+        mirror_member& operator=( const T& d )  {
             m_delegate = d;
             return *this;
         }
         template<typename C, typename M>
-        void set_delegate(  C*& s, M m )
-        {
-            m_delegate = boost::fusion::make_fused_function_object( boost::bind(m,s PARAM_PLACE_HOLDERS) ); //make_fast_delegate(s,m) ); 
+        void set_delegate(  C*& s, const M& m ) {
+            m_delegate = boost::fusion::make_fused_function_object( boost::bind(m,s PARAM_PLACE_HOLDERS) );  
         }
         boost::function<R(const fused_params&)> m_delegate; 
     };
@@ -171,5 +173,12 @@
         boost::function<R(const fused_params&)> m_delegate; 
     };
 
+
+#undef n
+#undef PARAM_NAMES         
+#undef PARAM_PLACE_HOLDERS
+#undef PARAM_ARGS        
+#undef PARAM_TYPE_NAMES 
+#undef PARAM_TYPES     
 
 #endif // BOOST_PP_IS_ITERATING

@@ -21,6 +21,7 @@
 #include <list>
 #include <set>
 #include <map>
+#include <stdint.h>
 
 namespace boost { namespace reflect {
 
@@ -36,7 +37,9 @@ struct get_typeinfo {
 template<typename T>
 inline const char* get_typename() 
 { 
-    return get_typeinfo<typename boost::remove_const<typename boost::remove_reference<typename boost::remove_pointer<T>::type>::type>::type>::name();
+    return get_typeinfo<typename boost::remove_const<
+                        typename boost::remove_reference<
+                        typename boost::remove_pointer<T>::type>::type>::type>::name();
 }
 
 // used to specify templay get_typeinfo
