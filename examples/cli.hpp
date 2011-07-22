@@ -5,6 +5,7 @@
 #include <iostream>
 #include <boost/fusion/sequence/io.hpp>
 #include <boost/reflect/reflect.hpp>
+#include <boost/utility/result_of.hpp>
 
 /**
  *  Takes any interface object and provides a command line interface for it.
@@ -29,18 +30,22 @@ class cli
        { return methods[name]; }
 
    private:
+
+
        template<typename Seq, typename Functor>
        struct cli_functor
        {
            cli_functor( Functor f )
            :m_func(f){}
 
+           typedef typename boost::remove_reference<Functor>::type functor_type;
+
            std::string operator()( const std::string& cli )
            {
                 std::stringstream ss(cli);
                 Seq s; ss >> boost::fusion::tuple_delimiter(',') >> s;
                 std::stringstream rtn;
-                rtn << m_func( s );
+                rtn << m_func(s);
                 return rtn.str();
            }
            Functor m_func;

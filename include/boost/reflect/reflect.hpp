@@ -9,6 +9,7 @@
 
 #include <boost/static_assert.hpp>
 #include <boost/preprocessor/seq/for_each_i.hpp>
+#include <boost/preprocessor/seq/seq.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/preprocessor/tuple/elem.hpp>
 #include <boost/preprocessor/facilities/empty.hpp>
@@ -22,10 +23,10 @@
 #include <set>
 #include <map>
 #include <stdint.h>
+#include <boost/reflect/void.hpp>
+#include <boost/reflect/vtable.hpp>
 
 namespace boost { namespace reflect {
-
-struct dummy_arg{};
 
 template<typename T>
 struct get_typeinfo { 
@@ -50,7 +51,7 @@ struct get_typeinfo< C<TP> > {
     enum is_defined_enum{ is_defined = get_typeinfo<TP>::is_defined }; 
     static const char* name() 
     {  
-        static std::string n = std::string( get_typename<C<dummy_arg> >() ) + std::string("<") + std::string(get_typename<TP>()) +  ">"; 
+        static std::string n = std::string( get_typename<C<void_t> >() ) + std::string("<") + std::string(get_typename<TP>()) +  ">"; 
         return n.c_str(); 
     } 
 }; 
@@ -60,7 +61,7 @@ struct get_typeinfo< C<TP,TP2> > {
     enum is_defined_enum{ is_defined = get_typeinfo<TP>::is_defined && get_typeinfo<TP2>::is_defined }; 
     static const char* name() 
     {  
-        static std::string n = std::string( get_typename< C<dummy_arg,dummy_arg> >() ) + "<" + std::string(get_typename<TP>()) +  "," + 
+        static std::string n = std::string( get_typename< C<void_t,void_t> >() ) + "<" + std::string(get_typename<TP>()) +  "," + 
                                std::string( get_typename<TP>() ) + ">"; 
         return n.c_str(); 
     } 
@@ -79,7 +80,7 @@ struct get_typeinfo<NAME> { \
 #define BOOST_REFLECT_TEMPLATE_TYPEINFO( NAME ) \
 namespace boost { namespace reflect {\
 template<>\
-struct get_typeinfo<NAME<dummy_arg> > { \
+struct get_typeinfo<NAME<void_t> > { \
     enum is_defined_enum{ is_defined = 1 }; \
     static const char* name() { return BOOST_PP_STRINGIZE(NAME); } \
 }; } }
@@ -87,7 +88,7 @@ struct get_typeinfo<NAME<dummy_arg> > { \
 #define BOOST_REFLECT_TEMPLATE2_TYPEINFO( NAME ) \
 namespace boost { namespace reflect {\
 template<>\
-struct get_typeinfo<NAME<dummy_arg,dummy_arg> > { \
+struct get_typeinfo<NAME<void_t,void_t> > { \
     enum is_defined_enum{ is_defined = 1 }; \
     static const char* name() { return BOOST_PP_STRINGIZE(NAME); } \
 }; } }
@@ -197,6 +198,29 @@ template<> struct reflector<TYPE> { \
 template<typename T>
 struct reflector{};
 
+template<> struct reflector<void_t> {
+    template<typename Visitor>static inline void visit( const void_t& name, Visitor& v, uint32_t field = -1 ) {
+        v.start(name, "void_t" );
+        switch( field ) {
+            case -1:
+                break;
+            default:
+                v.not_found( name, field );
+        }
+        v.end(name, "void_t" );
+    } 
+    template<typename Visitor>static inline void visit( void_t& name, Visitor& v, uint32_t field = -1 ) {
+        v.start(name, "void_t" );
+        switch( field ) {
+        case -1:
+            break;
+        default:
+            v.not_found( name, field );
+        }
+        v.end(name, "void_t" );
+    } 
+};
+
 } } // namespace boost::reflect
 
 // these macros specify namespace boost::reflect 
@@ -218,6 +242,7 @@ BOOST_REFLECT_TEMPLATE_TYPEINFO( std::set )
 BOOST_REFLECT_TEMPLATE_TYPEINFO( std::list )
 BOOST_REFLECT_TEMPLATE2_TYPEINFO( std::map )
 BOOST_REFLECT_TEMPLATE2_TYPEINFO( std::pair )
+
 
 #include <boost/reflect/reflect_function_signature.hpp>
 

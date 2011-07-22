@@ -8,7 +8,7 @@ struct Service
 };
 struct Calculator : Service
 {
-    double add( double v );           
+    void add( double v );           
     double add2( double v, double v2 );
     double sub( double v );           
     double mult( double v );           
@@ -25,8 +25,8 @@ class CalculatorService
         CalculatorService():m_result(0){}
 
         std::string name()const            { return "CalculatorService"; }
-        int   exit()                       { ::exit(0);                  }
-        double add( double v )             { return m_result += v;       }
+        int    exit()                       { ::exit(0);                  }
+        void   add( double v )             { m_result += v;       }
         double sub( double v )             { return m_result -= v;       }
         double mult( double v )            { return m_result *= v;       }
         double div( double v )             { return m_result /= v;       }
