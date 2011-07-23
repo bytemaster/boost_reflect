@@ -1,7 +1,10 @@
 #ifndef BOOST_PP_IS_ITERATING
   #ifndef BOOST_REFLECT_MIRROR_INTERFACE_HPP
   #define BOOST_REFLECT_MIRROR_INTERFACE_HPP
-  #include <boost/reflect/member_from_signature.hpp>
+  #include <boost/bind.hpp>
+  #include <boost/preprocessor/repetition.hpp>
+  #include <boost/preprocessor/seq/for_each.hpp>
+
   #include <boost/fusion/container/vector.hpp>
   #include <boost/fusion/container/generation/make_vector.hpp>
   #include <boost/fusion/functional/generation/make_fused_function_object.hpp>

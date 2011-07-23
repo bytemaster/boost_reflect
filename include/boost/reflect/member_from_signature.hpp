@@ -1,3 +1,4 @@
+DEPRECATED, REMOVE UNUSED CODE BUT KEEP FOR REFERENCE
 /**
  *  @file member_from_signature.hpp
  *
