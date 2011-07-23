@@ -25,15 +25,15 @@ namespace boost { namespace reflect {
 
 #define PUBLIC_BASE( r, data, elem )  boost::reflect::vtable<elem,data>,
 #define DEFINE_MEMBER( r, data, elem ) \
-        struct BOOST_PP_CAT( __reflect__, elem) : public InterfaceDelegate::template calculate_type<BOOST_TYPEOF(&reflect_definition_class::elem)>::type  \
-        {  \
-            typedef typename InterfaceDelegate::template calculate_type<BOOST_TYPEOF(&reflect_definition_class::elem)>::type base_type;  \
-            using base_type::operator=;\
-            static const char* name() { return BOOST_PP_STRINGIZE(data); } \
-            template<typename Type, typename AssignType> \
-            static void get_member_ptr( AssignType v ) {  v = &Type::elem; } \
-        } elem;
-
+  struct BOOST_PP_CAT( __reflect__, elem) : \
+    public InterfaceDelegate::template calculate_type<BOOST_TYPEOF(&reflect_definition_class::elem)>::type  \
+  {  \
+      typedef typename InterfaceDelegate::template calculate_type<BOOST_TYPEOF(&reflect_definition_class::elem)>::type base_type;  \
+      using base_type::operator=;\
+      static const char* name() { return BOOST_PP_STRINGIZE(data); } \
+      template<typename Type, typename AssignType> \
+      static void get_member_ptr( AssignType v ) {  v = &Type::elem; } \
+  } elem;
 
 #define BOOST_REFLECT_BASE BOOST_PP_SEQ_NIL
 #define BOOST_REFLECT_ANY( NAME, INHERITS, MEMBERS ) \

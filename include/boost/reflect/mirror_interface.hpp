@@ -56,7 +56,6 @@
           };
           T* m_self;
       };
-
     };
 
     /**
@@ -202,33 +201,26 @@ struct mirror_member< boost::signal<R(PARAM_TYPES)> (Class::*) >
   // boost::result_of
   typedef typename boost::remove_pointer<result_type(*)(PARAM_TYPES)>::type   signature;
 
-
   result_type operator()( PARAM_ARGS ) {
     return (*this)( boost::fusion::make_vector(PARAM_NAMES) );
   }
 
   result_type operator() ( const fused_params& fp ) {
     scoped_block_signal block_reverse(m_reverse_con);
-    slog( "emit local" );
-    if( int(m_signal.num_slots()) - 1 > 0 ) {
-        elog( "emit m_signal... %1%", m_signal.num_slots() );
+    if( int(m_signal.num_slots()) - 1 > 0 )  // do not count our reverse connection
         boost::fusion::make_fused_function_object( boost::ref(m_signal) )(fp);
-        elog( "for the win..." );
-    }
     return m_delegate( fp );
   }
 
   // emits locally, but does not forward to delegate
   result_type emit( const fused_params& fp ) {
     scoped_block_signal block_reverse(m_reverse_con);
-    slog( "emit from remote %1% %2%", m_signal.num_slots(), this );
     return adapt_void<R,boost::function<R(const fused_params&)> >(
             boost::fusion::make_fused_function_object( boost::ref(m_signal) ) )(fp);
   }
 
   template<typename T>
   mirror_member& operator=( const T& d )  {
-    wlog( "m_delegate = ... " );
     m_delegate = adapt_void<R,T>(d);
     return *this;
   }
@@ -236,67 +228,55 @@ struct mirror_member< boost::signal<R(PARAM_TYPES)> (Class::*) >
   template<typename Functor>
   boost::signals::connection connect( const Functor& f ) {
     boost::signals::connection c = m_signal.connect(adapt_void<R,Functor>(f) );
-    slog( "mirrored signal %2%connecting functor, count %1%", m_signal.num_slots(), this );
     if( m_connect_delegate )
         m_connect_delegate(m_signal.num_slots());
-    else
-        elog( "no connect delegate" );
     return c;
   }
   void disconnect( const boost::signals::connection& c ) {
-    wlog( "disconnect!" );
     c.disconnect();
     if( m_connect_delegate )
         m_connect_delegate(m_signal.num_slots());
   }
 
   void set_connect_delegate( const boost::function<void(int)>& f ) {
-    wlog( "set connect delegate" );
     m_connect_delegate = f;
-    if( m_connect_delegate )
-        m_connect_delegate(m_signal.num_slots());
   }
-
-  int slot_count()const {
-    return m_slot_count_delegate();
-  }
-
-  struct emit_or_throw {
-      struct no_connected_slots : public std::exception, public boost::exception {
-        const char* what()const throw() { return "no connected slots"; }
-      };
-      emit_or_throw( signal_type& s ):sig(s){}
-      result_type operator()( const fused_params& p ) {
-        wlog( "emit or throw" );
-        if( int(sig.num_slots()) -1 > 0 ) {
-          return adapt_void<R, boost::function<R(const fused_params&)> >(
-                    boost::fusion::make_fused_function_object(boost::ref(sig)))(p);
-        }
-        BOOST_THROW_EXCEPTION( no_connected_slots() );
-      }
-      signal_type&            sig;
-  };
 
   // sets the delegate that will be called when the signal is 'emited'
   template<typename C, typename M>
   void set_delegate(  C*& s, M m ) {
-    wlog( "disconnect all slots" );
     m_signal.disconnect_all_slots();
     m_reverse_con = 
         (s->*m).connect( boost::fusion::make_unfused( 
                             boost::bind( &mirror_member::emit, this, _1) )  );
 
-    /*
-    boost::function<result_type(const fused_params&)>  emit_signal =; 
-                    adapt_void<R, boost::function<R(const fused_params&)> >(
-                    boost::fusion::make_fused_function_object(boost::ref(s->*m)));
-    */
     m_delegate = emit_or_throw( s->*m );
   }
 
+  ~mirror_member() {
+    m_signal.disconnect_all_slots();
+    if( m_reverse_con != boost::signals::connection() )
+        m_reverse_con.disconnect();
+  }
+
   private:
+
+    struct emit_or_throw {
+        struct no_connected_slots : public std::exception, public boost::exception {
+          const char* what()const throw() { return "no connected slots"; }
+        };
+        emit_or_throw( signal_type& s ):sig(s){}
+        result_type operator()( const fused_params& p ) {
+          if( int(sig.num_slots()) -1 > 0 ) { // do not count our reverse connection
+            return adapt_void<R, boost::function<R(const fused_params&)> >(
+                      boost::fusion::make_fused_function_object(boost::ref(sig)))(p);
+          }
+          BOOST_THROW_EXCEPTION( no_connected_slots() );
+        }
+        signal_type&            sig;
+    };
+
     boost::function<void(int)>                         m_connect_delegate;
-    boost::function<int()>                             m_slot_count_delegate;
     boost::function<result_type(const fused_params&)>  m_delegate; 
     boost::signals::connection                         m_reverse_con;
     boost::signal<R(PARAM_TYPES)>                      m_signal;
