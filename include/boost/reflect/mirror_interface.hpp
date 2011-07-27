@@ -11,55 +11,82 @@
   #include <boost/fusion/include/make_unfused.hpp>
   #include <boost/reflect/void.hpp>
   #include <boost/signals.hpp>
-  
-  #include <boost/cmt/log/log.hpp>
+  #include <boost/reflect/vtable.hpp>
 
   namespace boost { namespace reflect {
-      
+    /**
+     *  @brief Specialized to mirror the member 
+     *         variable/method pointed to by MemberPtr
+     */
     template<typename MemberPtr>
     struct mirror_member{};
-
-    namespace detail {
-    template<typename C, typename M>
-      static M& do_get( C* c, M C::* m )
-      { return c->*m; }
-    }
     
+    /**
+     *  @brief Interface Delegate that mirrors the 
+     *         reflected interface without any transformation.
+     *  
+     *  To specialize how a particular member is mirrored define
+     *  the partial specialization of mirror_member for your type.
+     *
+     *  @code
+     *  template<typename Type, typename Class>
+     *  mirror_member<Type(Class::*)> 
+     *  @endcode
+     */
     struct mirror_interface 
     {
+      /**
+       * @brief Implements the InterfaceDelegate meta-function to 
+       *      determine what type to create to mirror MemberPointer 
+       *      in boost::reflect::vtable used by boost::reflect::any_ptr
+       */
       template<typename MemberPointer>
       struct calculate_type {
         typedef mirror_member<MemberPointer>  type; 
       };
 
-      template<typename T>
+      #ifndef DOXYGEN
+      template<typename T, typename VTableType>
       class set_visitor {
         public:
-          set_visitor( T* self = 0)
-          :m_self(self){}
+          set_visitor( VTableType& vt, T& self )
+          :m_self(self),vtable(vt){}
 
           template<typename InterfaceName, typename M>
-          bool accept( M& m, const char* name ) {
-            assign<M> a(m_self,m);
+          void operator()( M InterfaceName::* m, const char* name )const {
+            assign<M> a(m_self,vtable.*m);
             M::template get_member_ptr<T>( a );
-            return true;
           }
         private:
           template<typename Member>
           struct assign {
-            assign( T* _v, Member& _m ):v(_v),m(_m){}
+            assign( T& _v, Member& _m ):v(_v),m(_m){}
 
             template<typename MemberPtr>
             void operator=( const MemberPtr& p ) {
-              m.set_delegate( v, p );
+              m.set_delegate( &v, p );
             }
             private:
-              T*      v;
+              T&      v;
               Member& m;
           };
-          T* m_self;
+          T&          m_self;
+          VTableType& vtable;
       };
+      #endif 
+      template<typename T, typename VTableType>
+      static void set_vtable( VTableType& vtable, T& value ) {
+        vtable_reflector<typename VTableType::interface_type>::visit( &vtable,
+                    set_visitor<T,VTableType>(vtable,value) );
+      }
+      template<typename T, typename VTableType>
+      static void set_vtable( VTableType& vtable, const T& value ) {
+        vtable_reflector<typename VTableType::interface_type>::visit( &vtable,
+                    set_visitor<T,VTableType>(vtable,value) );
+      }
     };
+
+    #ifndef DOXYGEN
 
     /**
      *  Blocks a signal if it is currently unblocked and 
@@ -82,6 +109,7 @@
         bool                        unblock;
         boost::signals::connection& c; 
     };
+    #endif
 
 
   #define PARAM_NAME(z,n,type)         BOOST_PP_CAT(a,n)
@@ -129,7 +157,7 @@ struct mirror_member<R(Class::*)(PARAM_TYPES)const>
   typedef typename boost::remove_pointer<result_type(*)(PARAM_TYPES)>::type   signature;
 
   result_type operator()( PARAM_ARGS )const {
-    return m_delegate( boost::ref( boost::fusion::make_vector(PARAM_NAMES) ) );
+    return m_delegate( boost::fusion::make_vector(PARAM_NAMES) );
   }
   result_type operator() ( const fused_params& fp )const {
     return m_delegate( fp );
@@ -144,7 +172,7 @@ struct mirror_member<R(Class::*)(PARAM_TYPES)const>
     return *this;
   }
   template<typename C, typename M>
-  void set_delegate(  C*& s, const M& m ) {
+  void set_delegate(  C* s, M m ) {
     m_delegate = adapt_void<R, boost::function<R(const fused_params&)> >(
                     boost::fusion::make_fused_function_object( 
                                     boost::bind(m,s PARAM_PLACE_HOLDERS ) ));
@@ -180,7 +208,7 @@ struct mirror_member<R(Class::*)(PARAM_TYPES)>
     return *this;
   }
   template<typename C, typename M>
-  void set_delegate(  C*& s, M m ) {
+  void set_delegate(  C* s, M m ) {
     m_delegate = adapt_void<R, boost::function<R(const fused_params&)> >(
                       boost::fusion::make_fused_function_object( 
                                        boost::bind(m,s PARAM_PLACE_HOLDERS ) ));
@@ -247,7 +275,7 @@ struct mirror_member< boost::signal<R(PARAM_TYPES)> (Class::*) >
 
   // sets the delegate that will be called when the signal is 'emited'
   template<typename C, typename M>
-  void set_delegate(  C*& s, M m ) {
+  void set_delegate(  C* s, M m ) {
     m_signal.disconnect_all_slots();
     m_reverse_con = 
         (s->*m).connect( boost::fusion::make_unfused( 

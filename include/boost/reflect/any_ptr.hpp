@@ -29,21 +29,13 @@ namespace boost { namespace reflect {
 
             template<typename T>
             any_ptr( T* v )
-            :m_vtable(new vtable_type()) {
-                typename InterfaceDelegate::template set_visitor<T> vi(v);
-                reflector<interface_type>::visit( *m_vtable, vi );
+            :m_ptr(v),m_vtable(new vtable_type()) {
+                InterfaceDelegate::set_vtable(*m_vtable,*v);
             }
             template<typename T>
             any_ptr( const boost::shared_ptr<T>& v )
             :m_ptr(v),m_vtable(new vtable_type()) {
-                typename InterfaceDelegate::template set_visitor<T> vi(v.get());
-                reflector<interface_type>::visit( *m_vtable, vi );
-            }
-
-            any_ptr( const any_ptr& cp )
-            :m_ptr(cp.m_ptr),m_vtable(cp.m_vtable)
-            {
-                
+                InterfaceDelegate::set_vtable(*m_vtable,*v);
             }
 
             const vtable_type& operator*()const  { return *m_vtable;  } 
@@ -56,6 +48,15 @@ namespace boost { namespace reflect {
             boost::any                          m_ptr;
             boost::shared_ptr<vtable_type>      m_vtable;
     };
+    /**
+     * @brief Helper function to enable automatic type deduction.
+     *
+     * Calls visitor with each member of the vtable of the any_ptr.
+     */
+    template<typename InterfaceType,typename InterfaceDelegate, typename Visitor>
+    void visit( const any_ptr<InterfaceType,InterfaceDelegate>& aptr, Visitor v ) {
+        boost::reflect::vtable_reflector<InterfaceType>::visit( &*aptr, v );
+    }
 
 } }
 

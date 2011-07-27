@@ -23,228 +23,78 @@
 #include <set>
 #include <map>
 #include <stdint.h>
+#include <boost/fusion/container/vector.hpp>
 #include <boost/reflect/void.hpp>
 #include <boost/reflect/vtable.hpp>
+#include <boost/reflect/typeinfo.hpp>
 
 namespace boost { namespace reflect {
 
-template<typename T>
-struct get_typeinfo { 
-    enum is_defined_enum{ is_defined = 0 };
-    static const char* name() { return typeid(T).name(); }
-};
-
 /**
- *  Removes all decorations and returns the typename.
- */
-template<typename T>
-inline const char* get_typename()  {
-    return get_typeinfo<typename boost::remove_const<
-                        typename boost::remove_reference<
-                        typename boost::remove_pointer<T>::type>::type>::type>::name();
-}
-
-template<typename TP, template<typename> class C> 
-struct get_typeinfo< C<TP> > { 
-    // used to specify template get_typeinfo
-
-    enum is_defined_enum{ is_defined = get_typeinfo<TP>::is_defined }; 
-    static const char* name() 
-    {  
-        static std::string n = std::string( get_typename<C<void_t> >() ) + std::string("<") + std::string(get_typename<TP>()) +  ">"; 
-        return n.c_str(); 
-    } 
-}; 
-
-template<typename TP, typename TP2, template<typename, typename> class C> 
-struct get_typeinfo< C<TP,TP2> > { 
-    enum is_defined_enum{ is_defined = get_typeinfo<TP>::is_defined && get_typeinfo<TP2>::is_defined }; 
-    static const char* name() 
-    {  
-        static std::string n = std::string( get_typename< C<void_t,void_t> >() ) + "<" + std::string(get_typename<TP>()) +  "," + 
-                               std::string( get_typename<TP>() ) + ">"; 
-        return n.c_str(); 
-    } 
-};
-
-
-#define BOOST_REFLECT_TYPEINFO( NAME ) \
-namespace boost { namespace reflect { \
-template<> \
-struct get_typeinfo<NAME> { \
-    enum is_defined_enum{ is_defined = 1 }; \
-    static const char* name() { return BOOST_PP_STRINGIZE(NAME); } \
-}; } }
-
-
-#define BOOST_REFLECT_TEMPLATE_TYPEINFO( NAME ) \
-namespace boost { namespace reflect {\
-template<>\
-struct get_typeinfo<NAME<void_t> > { \
-    enum is_defined_enum{ is_defined = 1 }; \
-    static const char* name() { return BOOST_PP_STRINGIZE(NAME); } \
-}; } }
-
-#define BOOST_REFLECT_TEMPLATE2_TYPEINFO( NAME ) \
-namespace boost { namespace reflect {\
-template<>\
-struct get_typeinfo<NAME<void_t,void_t> > { \
-    enum is_defined_enum{ is_defined = 1 }; \
-    static const char* name() { return BOOST_PP_STRINGIZE(NAME); } \
-}; } }
-
-
-#define CUSTOM_MEMBER_CASES(r, data, i, elem)\
-case BOOST_PP_TUPLE_ELEM( 3, 1, elem ):\
-   v.accept_member( name, &data::BOOST_PP_TUPLE_ELEM(3, 0, elem), BOOST_PP_STRINGIZE( BOOST_PP_TUPLE_ELEM(3,0,elem) ), BOOST_PP_TUPLE_ELEM(3, 2,elem) );\
-   break;
-
-#define CUSTOM_MEMBER_ALL(r, data, i, elem)\
-   v.accept_member( name, &data::BOOST_PP_TUPLE_ELEM(3, 0, elem), BOOST_PP_STRINGIZE( BOOST_PP_TUPLE_ELEM(3,0,elem) ), BOOST_PP_TUPLE_ELEM(3, 2,elem) );\
-
-#define MEMBER_CASES(r, data, i, elem)\
-case i:\
-   v.accept_member( name, &data::elem, BOOST_PP_STRINGIZE( elem ), i ); \
-   break;
-
-#define MEMBER_ALL(r, data, i, elem)\
-   v.accept_member( name, &data::elem, BOOST_PP_STRINGIZE( elem ), i );
-
-#define INHERITS (baseA)(baseB)
-
-#define ACCEPT_BASE(r, data, i, elem) \
-    v.accept_base( *static_cast<elem*>(&name), BOOST_PP_STRINGIZE( elem ), field );
-
-
-#define BOOST_REFLECT_IMPL( CONST,TYPE, INHERITS, MEMBERS ) \
-template<typename Visitor>\
-static inline void visit( CONST TYPE& name, Visitor& v, uint32_t field = -1 ) { \
-    v.start(name, BOOST_PP_STRINGIZE(TYPE) );\
-    BOOST_PP_SEQ_FOR_EACH_I( ACCEPT_BASE, TYPE, INHERITS ) \
-    switch( field ) { \
-        case -1: \
-            BOOST_PP_SEQ_FOR_EACH_I( MEMBER_ALL, TYPE, MEMBERS ) \
-            break; \
-        BOOST_PP_SEQ_FOR_EACH_I( MEMBER_CASES, TYPE, MEMBERS ) \
-        default: \
-            v.not_found( name, field );\
-    }\
-    v.end(name, BOOST_PP_STRINGIZE(TYPE) );\
-} \
-
-#define BOOST_REFLECT_CUSTOM_IMPL( CONST,TYPE, INHERITS, MEMBERS ) \
-template<typename Visitor>\
-static inline void visit( CONST TYPE& name, Visitor& v, uint32_t field = -1 ) { \
-    v.start(name, BOOST_PP_STRINGIZE(TYPE) );\
-    BOOST_PP_SEQ_FOR_EACH_I( ACCEPT_BASE, TYPE, INHERITS ) \
-    switch( field ) { \
-        case -1: \
-            BOOST_PP_SEQ_FOR_EACH_I( CUSTOM_MEMBER_ALL, TYPE, MEMBERS ) \
-            break; \
-        BOOST_PP_SEQ_FOR_EACH_I( CUSTOM_MEMBER_CASES, TYPE, MEMBERS ) \
-        default: \
-            v.not_found( name, field );\
-    }\
-    v.end(name, BOOST_PP_STRINGIZE(TYPE) );\
-} \
-
-#define BOOST_REFLECT_EMPTY
-
-#define VISIT_BASE( r, data, elem ) reflector<elem>::visit( *((vtable<elem,InterfaceDelegate>*)&a), data );
-#define VISIT_MEMBER( r, data, elem ) t.template accept<data>( a.elem, BOOST_PP_STRINGIZE(elem) );
-
-/**
- *  @param MEMBERS - a sequence of member names.  (field1)(field2)(field3)
- */
-#define BOOST_REFLECT( TYPE, INHERITS, MEMBERS ) \
-    BOOST_REFLECT_TYPEINFO(TYPE) \
-namespace boost { namespace reflect { \
-template<> struct reflector<TYPE> {\
-    BOOST_REFLECT_IMPL( const, TYPE, INHERITS, MEMBERS ) \
-    BOOST_REFLECT_IMPL( BOOST_REFLECT_EMPTY, TYPE, INHERITS, MEMBERS ) \
-\
-    template<typename T, typename InterfaceDelegate> \
-    static void visit( boost::reflect::vtable<TYPE,InterfaceDelegate>& a, T& t ) { \
-        BOOST_PP_SEQ_FOR_EACH( VISIT_BASE, t, INHERITS ) \
-        BOOST_PP_SEQ_FOR_EACH( VISIT_MEMBER, TYPE, MEMBERS ) \
-    } \
-}; } }
-
-
-/**
- *   This macro is identical to BOOST_REFLECT, except that it gives you
- *   the ability to customize field numbers and flags.
- *
- *   @param MEMBERS  - a sequence of 3 param tuples.
- *                    ((field_name, NUMBER, FLAGS))((field_name1, NUMBER, FLAGS))
- *
- */
-#define BOOST_REFLECT_CUSTOM( TYPE, INHERITS, MEMBERS ) \
-    BOOST_REFLECT_TYPEINFO(TYPE) \
-namespace boost { namespace reflect { \
-template<> struct reflector<TYPE> { \
-    BOOST_REFLECT_CUSTOM_IMPL( const, TYPE, INHERITS, MEMBERS ) \
-    BOOST_REFLECT_CUSTOM_IMPL( BOOST_REFLECT_EMPTY, TYPE, INHERITS, MEMBERS ) \
-} } }
-
-
-
-/**
+ *  @brief defines visit functions for T
  *  Unless this is specialized, visit() will not be defined for T.
  *
- *  Boost.Fusion sequences have special handling because we can provide
- *  automatic "reflection" on fusion sequences.
+ *  The @ref BOOST_REFLECT(TYPE,INHERITS,MEMBERS) macro is used to specialize this
+ *  class for your type.
  */
 template<typename T>
-struct reflector{};
-
-template<> struct reflector<void_t> {
-    template<typename Visitor>static inline void visit( const void_t& name, Visitor& v, uint32_t field = -1 ) {
-        v.start(name, "void_t" );
-        switch( field ) {
-            case -1:
-                break;
-            default:
-                v.not_found( name, field );
-        }
-        v.end(name, "void_t" );
-    } 
-    template<typename Visitor>static inline void visit( void_t& name, Visitor& v, uint32_t field = -1 ) {
-        v.start(name, "void_t" );
-        switch( field ) {
-        case -1:
-            break;
-        default:
-            v.not_found( name, field );
-        }
-        v.end(name, "void_t" );
-    } 
+struct reflector{
+    typedef T type;
+    typedef boost::fusion::vector<> base_class_types;
+    enum is_defined { defined = false };
+    template<typename Visitor>
+    static inline void visit( const Visitor&  ){}; 
 };
 
 } } // namespace boost::reflect
 
-// these macros specify namespace boost::reflect 
-BOOST_REFLECT_TYPEINFO( void )
-BOOST_REFLECT_TYPEINFO( bool )
-BOOST_REFLECT_TYPEINFO( uint8_t )
-BOOST_REFLECT_TYPEINFO( uint16_t )
-BOOST_REFLECT_TYPEINFO( uint32_t )
-BOOST_REFLECT_TYPEINFO( uint64_t )
-BOOST_REFLECT_TYPEINFO( int8_t )
-BOOST_REFLECT_TYPEINFO( int16_t )
-BOOST_REFLECT_TYPEINFO( int32_t )
-BOOST_REFLECT_TYPEINFO( int64_t )
-BOOST_REFLECT_TYPEINFO( double )
-BOOST_REFLECT_TYPEINFO( float )
-BOOST_REFLECT_TYPEINFO( void_t )
-BOOST_REFLECT_TYPEINFO( std::string )
-BOOST_REFLECT_TEMPLATE_TYPEINFO( std::vector )
-BOOST_REFLECT_TEMPLATE_TYPEINFO( std::set )
-BOOST_REFLECT_TEMPLATE_TYPEINFO( std::list )
-BOOST_REFLECT_TEMPLATE2_TYPEINFO( std::map )
-BOOST_REFLECT_TEMPLATE2_TYPEINFO( std::pair )
+#ifndef DOXYGEN
+
+#define BOOST_REFLECT_VISIT_BASE(r, visitor, base) \
+  boost::reflect::reflector<base>::visit( visitor );
+
+#define BOOST_REFLECT_VISIT_MEMBER( r, visitor, elem ) \
+  visitor( &type::elem, BOOST_PP_STRINGIZE(elem) );
+
+#define BOOST_REFLECT_IMPL( TYPE, INHERITS, MEMBERS ) \
+template<typename Visitor>\
+static inline void visit( const Visitor& v ) { \
+    BOOST_PP_SEQ_FOR_EACH( BOOST_REFLECT_VISIT_BASE, v, INHERITS ) \
+    BOOST_PP_SEQ_FOR_EACH( BOOST_REFLECT_VISIT_MEMBER, v, MEMBERS ) \
+} 
+
+#endif // DOXYGEN
+
+/**
+ *  @brief Specializes boost::reflect::reflector for TYPE where 
+ *         type inherits other reflected classes
+ *
+ *  @param INHERITS - a sequence of base class names (basea)(baseb)(basec)
+ *  @param MEMBERS - a sequence of member names.  (field1)(field2)(field3)
+ */
+#define BOOST_REFLECT_DERIVED( TYPE, INHERITS, MEMBERS ) \
+BOOST_REFLECT_TYPEINFO(TYPE) \
+namespace boost { namespace reflect { \
+template<> struct reflector<TYPE> {\
+    typedef TYPE type; \
+    enum is_defined { defined = true }; \
+    BOOST_REFLECT_IMPL( TYPE, INHERITS, MEMBERS ) \
+}; } }
+
+    //typedef boost::fusion::vector<BOOST_PP_SEQ_ENUM(INHERITS)> base_class_types; \
+
+/**
+ *  @brief Specializes boost::reflect::reflector for TYPE
+ *
+ *  @param MEMBERS - a sequence of member names.  (field1)(field2)(field3)
+ *
+ *  @see BOOST_REFLECT_DERIVED
+ */
+#define BOOST_REFLECT( TYPE, MEMBERS ) \
+    BOOST_REFLECT_DERIVED( TYPE, BOOST_PP_SEQ_NIL, MEMBERS )
 
 
-#include <boost/reflect/reflect_function_signature.hpp>
+
+
 
 #endif

@@ -16,8 +16,8 @@ struct Calculator : Service
     double result()const;
 };
 
-BOOST_REFLECT_ANY( Service, BOOST_PP_SEQ_NIL, (name)(exit) )
-BOOST_REFLECT_ANY( Calculator, (Service), (add)(add2)(sub)(mult)(div)(result) )
+BOOST_REFLECT_ANY( Service, (name)(exit) )
+BOOST_REFLECT_ANY_DERIVED( Calculator, (Service), (add)(add2)(sub)(mult)(div)(result) )
 
 class CalculatorService
 {

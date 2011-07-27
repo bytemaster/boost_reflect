@@ -14,23 +14,26 @@ class cli
 {
     public:
        template<typename T>
-       cli( T aptr) {
-            boost::reflect::reflector<typename T::interface_type>::visit( *aptr, *this ); 
+       cli( T aptr) { 
+            boost::reflect::visit( aptr, visitor<typename T::vtable_type>( *this, *aptr) ); 
        }
-       template<typename InterfaceName, typename M>
-       bool accept( M& m, const char* name )
-       {
-            std::cerr << std::setw(10) << std::setiosflags(std::ios::left) << name 
-                      << " " << boost::reflect::get_typename<typename M::signature>()
-                      << (M::is_const ? "const" : "") <<std::endl;
-            methods[name] = cli_functor<typename M::fused_params, M&>(m);
-            return true;
-       }
+
        boost::function<std::string(const std::string&)>& operator[]( const std::string& name ) 
        { return methods[name]; }
 
    private:
-
+       template<typename VTableType> struct visitor {
+           visitor( cli& c, VTableType& vtbl ):m_cli(c),m_vtbl(vtbl){}
+           template<typename M, typename InterfaceName>
+           void operator()( M InterfaceName::* m, const char* name ) const {
+                std::cerr << std::setw(10) << std::setiosflags(std::ios::left) << name 
+                          << " " << boost::reflect::get_typename<typename M::signature>()
+                          << (M::is_const ? "const" : "") <<std::endl;
+                m_cli.methods[name] = cli_functor<typename M::fused_params, M&>(m_vtbl.*m);
+           }
+           VTableType&   m_vtbl;
+           cli&          m_cli;
+       };
 
        template<typename Seq, typename Functor>
        struct cli_functor

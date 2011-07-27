@@ -17,8 +17,8 @@ struct Calculator : Service
     boost::signal<void(double)> got_result;
 };
 
-BOOST_REFLECT_ANY( Service, BOOST_PP_SEQ_NIL, (name)(exit) )
-BOOST_REFLECT_ANY( Calculator, (Service), (add)(add2)(sub)(mult)(div)(result)(got_result) )
+BOOST_REFLECT_ANY( Service, (name)(exit) )
+BOOST_REFLECT_ANY_DERIVED( Calculator, (Service), (add)(add2)(sub)(mult)(div)(result)(got_result) )
 
 class CalculatorService
 {
@@ -53,14 +53,14 @@ int main( int argc, char** argv )
     se->got_result(5);
     if( se->got_result.empty() )
         std::cerr<<"EMPTY!\n";
-    se->got_result.connect(print);
+    se->got_result.connect(&print);
     if( !se->got_result.empty() )
         std::cerr<<"NOT EMPTY!\n";
     se->got_result(5);
 
 
     boost::reflect::any_ptr<Calculator> s( se );
-    s->got_result.connect(print2);
+    s->got_result.connect(&print2);
     se->got_result(1234);
     printf( "Result: %f\n", s->result() );
 
