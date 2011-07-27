@@ -12,6 +12,7 @@
   <div class="tabs">
     <ul>
       <li><a href="index.html"><span>Main&nbsp;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&nbsp;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -31,26 +32,26 @@
 </ul>
 <h2><a class="anchor" id="boost_reflect_basic">
 Basic Reflection</a></h2>
-<p>Basic reflection of a type is achieved using the <a class="el" href="reflect_8hpp.html#ac349b37ce6abc17c2c5e556a6368acb2">BOOST_REFLECT(TYPE,INHERITS,MEMBERS)</a> macro to specify base classes and class members. Below is an example of reflecting a struct.</p>
+<p>Basic reflection of a type is achieved using the <a class="el" href="reflect_8hpp.html#a90309261db059f46860d655ed351013d">BOOST_REFLECT(TYPE,INHERITS,MEMBERS)</a> macro to specify base classes and class members. Below is an example of reflecting a struct.</p>
 <div class="fragment"><pre class="fragment">    <span class="keyword">struct </span>my_struct {
         <span class="keywordtype">int</span>         hello;
         std::string world;
     };
-    <a class="code" href="reflect_8hpp.html#ac349b37ce6abc17c2c5e556a6368acb2" title="Specializes boost::reflect::reflector for TYPE.">BOOST_REFLECT</a>( my_struct, (hello)(world) )
+    <a class="code" href="old_8hpp.html#ac349b37ce6abc17c2c5e556a6368acb2" title="Specializes boost::reflect::reflector for TYPE.">BOOST_REFLECT</a>( my_struct, (hello)(world) )
 </pre></div><p>Now that we have reflected the struct, we can dump it to XML with a simple visitor.</p>
 <div class="fragment"><pre class="fragment">    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
     <span class="keyword">struct </span>xml_printer {
         xml_printer( <span class="keyword">const</span> T&amp; c ):self(c){}
 
-        <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Class, <span class="keyword">typename</span> T&gt;
-        <span class="keywordtype">void</span> operator()( T (Class::*p), <span class="keyword">const</span> <span class="keywordtype">char</span>* name ) {
+        <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Class, <span class="keyword">typename</span> Member&gt;
+        <span class="keywordtype">void</span> operator()( Member Class::*p, <span class="keyword">const</span> <span class="keywordtype">char</span>* name ) {
             std::cerr&lt;&lt;<span class="stringliteral">&quot;&lt;&quot;</span>&lt;&lt;name&lt;&lt;<span class="stringliteral">&quot;&gt;&quot;</span>&lt;&lt;(<span class="keyword">self</span>.*p)&lt;&lt;<span class="stringliteral">&quot;&lt;/&quot;</span>&lt;&lt;name&lt;&lt;<span class="stringliteral">&quot;&gt;\n&quot;</span>;
         }
         <span class="keyword">const</span> T&amp; <span class="keyword">self</span>;
     };
 </pre></div><p>The visitor can then be applied like so: </p>
 <div class="fragment"><pre class="fragment">        my_struct s;
-        <a class="code" href="structboost_1_1reflect_1_1reflector.html" title="defines visit functions for T Unless this is specialized, visit() will not be defined...">boost::reflect::reflector&lt;my_struct&gt;::visit</a>( xml_printer(s) );
+        <a class="code" href="structboost_1_1reflect_1_1reflector.html#ad7e2371eee574b5bbd1a0237204634d2">boost::reflect::reflector&lt;my_struct&gt;::visit</a>( xml_printer(s) );
 </pre></div><h2><a class="anchor" id="boost_reflect_erasures">
 Type Erasures</a></h2>
 <p>Type Erasure is one means to hide implementation details by defining a type that can contain any object that implements the required interface. Examples are boost::any and boost::function. Boost.Reflect enables the rapid generation of new type erasures for arbitrary interfaces via the <a class="el" href="classboost_1_1reflect_1_1any__ptr.html">any_ptr&lt;Interface&gt; </a> type.</p>
@@ -68,9 +69,9 @@ Type Erasures</a></h2>
       <span class="keywordtype">double</span> result()<span class="keyword">const</span>;
     };
 
-    <a class="code" href="vtable_8hpp.html#a39175c9ad438485e7f8f1cde7537fbbe">BOOST_REFLECT_ANY</a>( Service, <a class="code" href="vtable_8hpp.html#ad3d578b71bdf5089618602a178de6701">BOOST_REFLECT_BASE</a>, (name)(exit) )
-    <a class="code" href="vtable_8hpp.html#a39175c9ad438485e7f8f1cde7537fbbe">BOOST_REFLECT_ANY</a>( Calculator, (Service), (add)(sub)(mult)(div)(result) )
-</pre></div><dl class="note"><dt><b>Note:</b></dt><dd>When you define an interface, you need not provide implementations of the methods; however, it you want you may also use an interace like any other class without limititations.</dd></dl>
+    <a class="code" href="vtable_8hpp.html#a800b79c6db12c7d5daf890912c5e8cf1">BOOST_REFLECT_ANY</a>( Service,(name)(exit) )
+    <a class="code" href="vtable_8hpp.html#a02f144061854c3535f18367805c7e293">BOOST_REFLECT_ANY_DERIVED</a>( Calculator, (Service), (add)(sub)(mult)(div)(result) )
+</pre></div><dl class="note"><dt><b>Note:</b></dt><dd>When you define an interface, you need not provide implementations of the methods; however, if you want you may also use an interace like any other class without limititations.</dd></dl>
 <div class="fragment"><pre class="fragment">    <span class="keyword">class </span>CalculatorService {
       <span class="keyword">public</span>:
         CalculatorService():m_result(0){}
@@ -96,7 +97,8 @@ Type Erasures</a></h2>
     }
 </pre></div><p>Some things to note, CalculatorService did not inherit either Calculator or Service, it simply exposed all of the methods defined by the interface. If it looks like a Duck, quacks like a Duck, then it is a Duck.</p>
 <p>The interface of any_ptr&lt;Calculator&gt; is 'identical' to the Calculator defined above.</p>
-<p>Pointer semantics was chosen to discourage using reflect::anys as values where assignment and copy construction creates a new instance. Initialization of <a class="el" href="classboost_1_1reflect_1_1any__ptr.html">any_ptr </a> with a new pointer is a relatively expensive operation and value semantics would create objects that are much bigger and more expensive to copy than traditional types as each method is a functor that must be initialized at copy/construction time. </p>
+<p>Pointer semantics were chosen to discourage using reflect::anys as values where assignment and copy construction creates a new instance. Initialization of <a class="el" href="classboost_1_1reflect_1_1any__ptr.html">any_ptr </a> with a new pointer is a relatively expensive operation and value semantics would create objects that are much bigger and more expensive to copy than traditional types as each method is a functor that must be initialized at copy/construction time.</p>
+<p>Generally speaking, any_ptr&lt;&gt; should be used to abstract long-lived objects and not for temporaries. </p>
 </div>
 <hr/>
 <table border=0 width="100%">

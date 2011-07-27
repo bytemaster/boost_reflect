@@ -12,6 +12,7 @@
   <div class="tabs">
     <ul>
       <li><a href="index.html"><span>Main&nbsp;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&nbsp;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -34,7 +35,7 @@
 <code>#include &lt;boost/fusion/include/make_unfused.hpp&gt;</code><br/>
 <code>#include &lt;<a class="el" href="void_8hpp_source.html">boost/reflect/void.hpp</a>&gt;</code><br/>
 <code>#include &lt;boost/signals.hpp&gt;</code><br/>
-<code>#include &lt;boost/cmt/log/log.hpp&gt;</code><br/>
+<code>#include &lt;<a class="el" href="vtable_8hpp_source.html">boost/reflect/vtable.hpp</a>&gt;</code><br/>
 <code>#include &lt;boost/preprocessor/iteration/iterate.hpp&gt;</code><br/>
 
 <p><a href="mirror__interface_8hpp_source.html">Go to the source code of this file.</a></p>
@@ -45,7 +46,7 @@
 <tr><td class="memItemLeft" align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structboost_1_1reflect_1_1mirror__interface.html">mirror_interface</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Interface Delegate that mirrors the reflected interface without any transformation.  <a href="structboost_1_1reflect_1_1mirror__interface.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structboost_1_1reflect_1_1mirror__interface_1_1calculate__type.html">calculate_type&lt; MemberPointer &gt;</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Implements the InterfaceDelegate meta-function to determine what type to create to mirror MemberPointer in <a class="el" href="classboost_1_1reflect_1_1vtable.html" title="Contains functors defined by InterfaceDelegate for each reflected member of T.">boost::reflect::vtable</a> used by <a class="el" href="classboost_1_1reflect_1_1any__ptr.html" title="Behaves like a smart pointer that can handle any type with the same interface.">boost::reflect::any_ptr</a>.  <a href="structboost_1_1reflect_1_1mirror__interface_1_1calculate__type.html#_details">More...</a><br/></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Implements the InterfaceDelegate meta-function to determine what type to create to mirror MemberPointer in <a class="el" href="classboost_1_1reflect_1_1vtable.html" title="Contains functors defined by InterfaceDelegate for each reflected member of InterfaceType...">boost::reflect::vtable</a> used by <a class="el" href="classboost_1_1reflect_1_1any__ptr.html" title="Behaves like a smart pointer that can handle any type with the same interface.">boost::reflect::any_ptr</a>.  <a href="structboost_1_1reflect_1_1mirror__interface_1_1calculate__type.html#_details">More...</a><br/></td></tr>
 <tr><td colspan="2"><h2>Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="mirror__interface_8hpp.html#a997e932bcde763683042e78343c34186">PARAM_NAME</a>(z, n, type)&nbsp;&nbsp;&nbsp;BOOST_PP_CAT(a,n)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="mirror__interface_8hpp.html#a2dd8c5c8f2bb32c5f222b49055f798aa">PARAM_PLACE_HOLDER</a>(z, n, type)&nbsp;&nbsp;&nbsp;BOOST_PP_CAT(_,BOOST_PP_ADD(n,1) )</td></tr>
@@ -83,7 +84,7 @@
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="mirror__interface_8hpp_source.html#l00105">105</a> of file <a class="el" href="mirror__interface_8hpp_source.html">mirror_interface.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mirror__interface_8hpp_source.html#l00115">115</a> of file <a class="el" href="mirror__interface_8hpp_source.html">mirror_interface.hpp</a>.</p>
 
 </div>
 </div>
@@ -113,7 +114,7 @@
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="mirror__interface_8hpp_source.html#l00106">106</a> of file <a class="el" href="mirror__interface_8hpp_source.html">mirror_interface.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mirror__interface_8hpp_source.html#l00116">116</a> of file <a class="el" href="mirror__interface_8hpp_source.html">mirror_interface.hpp</a>.</p>
 
 </div>
 </div>
@@ -143,7 +144,7 @@
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="mirror__interface_8hpp_source.html#l00107">107</a> of file <a class="el" href="mirror__interface_8hpp_source.html">mirror_interface.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mirror__interface_8hpp_source.html#l00117">117</a> of file <a class="el" href="mirror__interface_8hpp_source.html">mirror_interface.hpp</a>.</p>
 
 </div>
 </div>
@@ -173,7 +174,7 @@
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="mirror__interface_8hpp_source.html#l00108">108</a> of file <a class="el" href="mirror__interface_8hpp_source.html">mirror_interface.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mirror__interface_8hpp_source.html#l00118">118</a> of file <a class="el" href="mirror__interface_8hpp_source.html">mirror_interface.hpp</a>.</p>
 
 </div>
 </div>
@@ -203,7 +204,7 @@
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="mirror__interface_8hpp_source.html#l00109">109</a> of file <a class="el" href="mirror__interface_8hpp_source.html">mirror_interface.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mirror__interface_8hpp_source.html#l00119">119</a> of file <a class="el" href="mirror__interface_8hpp_source.html">mirror_interface.hpp</a>.</p>
 
 </div>
 </div>
@@ -218,7 +219,7 @@
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="mirror__interface_8hpp_source.html#l00112">112</a> of file <a class="el" href="mirror__interface_8hpp_source.html">mirror_interface.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mirror__interface_8hpp_source.html#l00122">122</a> of file <a class="el" href="mirror__interface_8hpp_source.html">mirror_interface.hpp</a>.</p>
 
 </div>
 </div>
@@ -233,7 +234,7 @@
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="mirror__interface_8hpp_source.html#l00116">116</a> of file <a class="el" href="mirror__interface_8hpp_source.html">mirror_interface.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mirror__interface_8hpp_source.html#l00126">126</a> of file <a class="el" href="mirror__interface_8hpp_source.html">mirror_interface.hpp</a>.</p>
 
 </div>
 </div>
@@ -248,7 +249,7 @@
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="mirror__interface_8hpp_source.html#l00117">117</a> of file <a class="el" href="mirror__interface_8hpp_source.html">mirror_interface.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mirror__interface_8hpp_source.html#l00127">127</a> of file <a class="el" href="mirror__interface_8hpp_source.html">mirror_interface.hpp</a>.</p>
 
 </div>
 </div>

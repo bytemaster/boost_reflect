@@ -12,6 +12,7 @@
   <div class="tabs">
     <ul>
       <li><a href="index.html"><span>Main&nbsp;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&nbsp;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -48,7 +49,6 @@ Type Erasure</a></h2>
 <ul>
 <li><a href="http://www.boostpro.com/mplbook/">C++ Template Metaprogramming</a> by Dave Abrahams &amp; Aleksy Curtovoy</li>
 </ul>
-<p>More than that, you can adapt interfaces, morph inheritance based interfaces into value semantics, or perform other transformations on an interface in the process of 'erasing' its type.</p>
 <p>Common uses of type erasure include boost::any and boost::function. Boost.Any erases all type information except its name and copy semantics. Boost.Function erases everything about a type except the calling signature. Algorithms written with Boost.Any and Boost.Function can be agnostic to the huge amount of type variation possible for functors, function pointers, member function pointers, or storage.</p>
 <p>This article on <a href="http://www.artima.com/cppsource/type_erasure.html">type erasure</a> shows how Generic Programming (Templates) often conflicts with good Object Oriented design because generic programing exposes the internal implementation details that good Object Oriented design goes to great lengths to hide.</p>
 <center><table  width="75%">

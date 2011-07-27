@@ -12,6 +12,7 @@
   <div class="tabs">
     <ul>
       <li><a href="index.html"><span>Main&nbsp;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&nbsp;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -36,306 +37,316 @@
 <a name="l00011"></a>00011 <span class="preprocessor">  #include &lt;boost/fusion/include/make_unfused.hpp&gt;</span>
 <a name="l00012"></a>00012 <span class="preprocessor">  #include &lt;<a class="code" href="void_8hpp.html">boost/reflect/void.hpp</a>&gt;</span>
 <a name="l00013"></a>00013 <span class="preprocessor">  #include &lt;boost/signals.hpp&gt;</span>
-<a name="l00014"></a>00014   
-<a name="l00015"></a>00015 <span class="preprocessor">  #include &lt;boost/cmt/log/log.hpp&gt;</span>
-<a name="l00016"></a>00016 
-<a name="l00017"></a>00017   <span class="keyword">namespace </span>boost { <span class="keyword">namespace </span>reflect {<span class="comment"></span>
-<a name="l00018"></a>00018 <span class="comment">    /**</span>
-<a name="l00019"></a>00019 <span class="comment">     *  @brief Specialized to mirror the member </span>
-<a name="l00020"></a>00020 <span class="comment">     *         variable/method pointed to by MemberPtr</span>
-<a name="l00021"></a>00021 <span class="comment">     */</span>
-<a name="l00022"></a>00022     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> MemberPtr&gt;
-<a name="l00023"></a><a class="code" href="structboost_1_1reflect_1_1mirror__member.html">00023</a>     <span class="keyword">struct </span><a class="code" href="structboost_1_1reflect_1_1mirror__member.html" title="Specialized to mirror the member variable/method pointed to by MemberPtr.">mirror_member</a>{};
-<a name="l00024"></a>00024     <span class="comment"></span>
-<a name="l00025"></a>00025 <span class="comment">    /**</span>
-<a name="l00026"></a>00026 <span class="comment">     *  @brief Interface Delegate that mirrors the </span>
-<a name="l00027"></a>00027 <span class="comment">     *         reflected interface without any transformation.</span>
-<a name="l00028"></a>00028 <span class="comment">     *  </span>
-<a name="l00029"></a>00029 <span class="comment">     *  To specialize how a particular member is mirrored define</span>
-<a name="l00030"></a>00030 <span class="comment">     *  the partial specialization of mirror_member for your type.</span>
-<a name="l00031"></a>00031 <span class="comment">     *</span>
-<a name="l00032"></a>00032 <span class="comment">     *  @code</span>
-<a name="l00033"></a>00033 <span class="comment">     *  template&lt;typename Type, typename Class&gt;</span>
-<a name="l00034"></a>00034 <span class="comment">     *  mirror_member&lt;Type(Class::*)&gt; </span>
-<a name="l00035"></a>00035 <span class="comment">     *  @endcode</span>
-<a name="l00036"></a>00036 <span class="comment">     */</span>
-<a name="l00037"></a><a class="code" href="structboost_1_1reflect_1_1mirror__interface.html">00037</a>     <span class="keyword">struct </span><a class="code" href="structboost_1_1reflect_1_1mirror__interface.html" title="Interface Delegate that mirrors the reflected interface without any transformation...">mirror_interface</a> 
-<a name="l00038"></a>00038     {<span class="comment"></span>
-<a name="l00039"></a>00039 <span class="comment">      /**</span>
-<a name="l00040"></a>00040 <span class="comment">       * @brief Implements the InterfaceDelegate meta-function to </span>
-<a name="l00041"></a>00041 <span class="comment">       *      determine what type to create to mirror MemberPointer </span>
-<a name="l00042"></a>00042 <span class="comment">       *      in boost::reflect::vtable used by boost::reflect::any_ptr</span>
-<a name="l00043"></a>00043 <span class="comment">       */</span>
-<a name="l00044"></a>00044       <span class="keyword">template</span>&lt;<span class="keyword">typename</span> MemberPo<span class="keywordtype">int</span>er&gt;
-<a name="l00045"></a><a class="code" href="structboost_1_1reflect_1_1mirror__interface_1_1calculate__type.html">00045</a>       <span class="keyword">struct </span><a class="code" href="structboost_1_1reflect_1_1mirror__interface_1_1calculate__type.html" title="Implements the InterfaceDelegate meta-function to determine what type to create to...">calculate_type</a> {
-<a name="l00046"></a><a class="code" href="structboost_1_1reflect_1_1mirror__interface_1_1calculate__type.html#a0ec32cf4f26b1c69c578d8b41343bb7d">00046</a>         <span class="keyword">typedef</span> <a class="code" href="structboost_1_1reflect_1_1mirror__member.html" title="Specialized to mirror the member variable/method pointed to by MemberPtr.">mirror_member&lt;MemberPointer&gt;</a>  <a class="code" href="structboost_1_1reflect_1_1mirror__member.html" title="Specialized to mirror the member variable/method pointed to by MemberPtr.">type</a>; 
-<a name="l00047"></a>00047       };
-<a name="l00048"></a>00048       
-<a name="l00049"></a>00049 <span class="preprocessor">      #ifndef DOXYGEN</span>
-<a name="l00050"></a>00050 <span class="preprocessor"></span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
-<a name="l00051"></a>00051       <span class="keyword">class </span>set_visitor {
-<a name="l00052"></a>00052         <span class="keyword">public</span>:
-<a name="l00053"></a>00053           set_visitor( T* <span class="keyword">self</span> = 0)
-<a name="l00054"></a>00054           :m_self(<span class="keyword">self</span>){}
-<a name="l00055"></a>00055 
-<a name="l00056"></a>00056           <span class="keyword">template</span>&lt;<span class="keyword">typename</span> InterfaceName, <span class="keyword">typename</span> M&gt;
-<a name="l00057"></a>00057           <span class="keywordtype">bool</span> accept( M&amp; m, <span class="keyword">const</span> <span class="keywordtype">char</span>* name ) {
-<a name="l00058"></a>00058             assign&lt;M&gt; a(m_self,m);
-<a name="l00059"></a>00059             M::template get_member_ptr&lt;T&gt;( a );
-<a name="l00060"></a>00060             <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00061"></a>00061           }
-<a name="l00062"></a>00062         <span class="keyword">private</span>:
-<a name="l00063"></a>00063           <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Member&gt;
-<a name="l00064"></a>00064           <span class="keyword">struct </span>assign {
-<a name="l00065"></a>00065             assign( T* _v, Member&amp; _m ):v(_v),m(_m){}
-<a name="l00066"></a>00066 
-<a name="l00067"></a>00067             <span class="keyword">template</span>&lt;<span class="keyword">typename</span> MemberPtr&gt;
-<a name="l00068"></a>00068             <span class="keywordtype">void</span> operator=( <span class="keyword">const</span> MemberPtr&amp; p ) {
-<a name="l00069"></a>00069               m.set_delegate( v, p );
-<a name="l00070"></a>00070             }
-<a name="l00071"></a>00071             <span class="keyword">private</span>:
-<a name="l00072"></a>00072               T*      v;
-<a name="l00073"></a>00073               Member&amp; m;
-<a name="l00074"></a>00074           };
-<a name="l00075"></a>00075           T* m_self;
-<a name="l00076"></a>00076       };
-<a name="l00077"></a>00077 <span class="preprocessor">      #endif </span>
-<a name="l00078"></a>00078 <span class="preprocessor"></span>    };
-<a name="l00079"></a>00079 
-<a name="l00080"></a>00080 <span class="preprocessor">    #ifndef DOXYGEN</span>
-<a name="l00081"></a>00081 <span class="preprocessor"></span><span class="comment">    /**</span>
-<a name="l00082"></a>00082 <span class="comment">     *  Blocks a signal if it is currently unblocked and </span>
-<a name="l00083"></a>00083 <span class="comment">     *  unblocks it when it goes out of scope if it was blocked</span>
-<a name="l00084"></a>00084 <span class="comment">     *  when constructed. </span>
-<a name="l00085"></a>00085 <span class="comment">     */</span>
-<a name="l00086"></a>00086     <span class="keyword">struct </span>scoped_block_signal {
-<a name="l00087"></a>00087       scoped_block_signal( boost::signals::connection&amp; _c )
-<a name="l00088"></a>00088       :c(_c),unblock(false){ 
-<a name="l00089"></a>00089         <span class="keywordflow">if</span>( c != boost::signals::connection() &amp;&amp; !c.blocked() )  {
-<a name="l00090"></a>00090           unblock = <span class="keyword">true</span>;
-<a name="l00091"></a>00091           c.block();
-<a name="l00092"></a>00092         }
-<a name="l00093"></a>00093       }
-<a name="l00094"></a>00094       ~scoped_block_signal() { 
-<a name="l00095"></a>00095         <span class="keywordflow">if</span>( unblock &amp;&amp; c != boost::signals::connection() ) 
-<a name="l00096"></a>00096             c.unblock(); 
-<a name="l00097"></a>00097       }
-<a name="l00098"></a>00098       <span class="keyword">private</span>:
-<a name="l00099"></a>00099         <span class="keywordtype">bool</span>                        unblock;
-<a name="l00100"></a>00100         boost::signals::connection&amp; c; 
-<a name="l00101"></a>00101     };
-<a name="l00102"></a>00102 <span class="preprocessor">    #endif</span>
-<a name="l00103"></a>00103 <span class="preprocessor"></span>
-<a name="l00104"></a>00104 
-<a name="l00105"></a><a class="code" href="mirror__interface_8hpp.html#a997e932bcde763683042e78343c34186">00105</a> <span class="preprocessor">  #define PARAM_NAME(z,n,type)         BOOST_PP_CAT(a,n)</span>
-<a name="l00106"></a><a class="code" href="mirror__interface_8hpp.html#a2dd8c5c8f2bb32c5f222b49055f798aa">00106</a> <span class="preprocessor"></span><span class="preprocessor">  #define PARAM_PLACE_HOLDER(z,n,type) BOOST_PP_CAT(_,BOOST_PP_ADD(n,1) )</span>
-<a name="l00107"></a><a class="code" href="mirror__interface_8hpp.html#a0ee1d08763851f5a671fa29d6b9e110d">00107</a> <span class="preprocessor"></span><span class="preprocessor">  #define PARAM_TYPE_NAME(z,n,type)   BOOST_PP_CAT(typename A,n)</span>
-<a name="l00108"></a><a class="code" href="mirror__interface_8hpp.html#a4b65a1710d3a32349380f74be0ef82ca">00108</a> <span class="preprocessor"></span><span class="preprocessor">  #define PARAM_TYPE(z,n,type)   BOOST_PP_CAT(A,n)</span>
-<a name="l00109"></a><a class="code" href="mirror__interface_8hpp.html#a576db89c791d4eab998cabcec09e5783">00109</a> <span class="preprocessor"></span><span class="preprocessor">  #define PARAM_ARG(z,n,type)     PARAM_TYPE(z,n,type) PARAM_NAME(z,n,type)</span>
-<a name="l00110"></a>00110 <span class="preprocessor"></span>
-<a name="l00111"></a>00111 <span class="preprocessor">#        ifndef BOOST_REFLECT_MIRROR_IMPL_SIZE</span>
-<a name="l00112"></a><a class="code" href="mirror__interface_8hpp.html#a35a1958213ca9b87eabfadb59b9ba91a">00112</a> <span class="preprocessor"></span><span class="preprocessor">#           define BOOST_REFLECT_MIRROR_IMPL_SIZE 8</span>
-<a name="l00113"></a>00113 <span class="preprocessor"></span><span class="preprocessor">#        endif</span>
-<a name="l00114"></a>00114 <span class="preprocessor"></span>
-<a name="l00115"></a>00115 <span class="preprocessor">#       include &lt;boost/preprocessor/iteration/iterate.hpp&gt;</span>
-<a name="l00116"></a><a class="code" href="mirror__interface_8hpp.html#a32c85728220c00c69b807cc6da39ad40">00116</a> <span class="preprocessor">#       define BOOST_PP_ITERATION_LIMITS (0, BOOST_REFLECT_MIRROR_IMPL_SIZE -1 )</span>
-<a name="l00117"></a><a class="code" href="mirror__interface_8hpp.html#a1ed7c98d32220d2344966959584f9778">00117</a> <span class="preprocessor"></span><span class="preprocessor">#       define BOOST_PP_FILENAME_1 &lt;boost/reflect/mirror_interface.hpp&gt;</span>
-<a name="l00118"></a>00118 <span class="preprocessor"></span><span class="preprocessor">#       include BOOST_PP_ITERATE()</span>
-<a name="l00119"></a>00119 <span class="preprocessor"></span>
-<a name="l00120"></a>00120 <span class="preprocessor">  #undef PARAM_NAME</span>
-<a name="l00121"></a>00121 <span class="preprocessor"></span><span class="preprocessor">  #undef PARAM_TYPE</span>
-<a name="l00122"></a>00122 <span class="preprocessor"></span><span class="preprocessor">  #undef PARAM_ARG</span>
-<a name="l00123"></a>00123 <span class="preprocessor"></span>
-<a name="l00124"></a>00124   } } <span class="comment">// namespace boost::reflect</span>
-<a name="l00125"></a>00125 <span class="preprocessor">  #endif // BOOST_REFLECT_MIRROR_INTERFACE_HPP</span>
-<a name="l00126"></a>00126 <span class="preprocessor"></span>
-<a name="l00127"></a>00127 <span class="preprocessor">#else // BOOST_PP_IS_ITERATING</span>
-<a name="l00128"></a>00128 <span class="preprocessor"></span>
-<a name="l00129"></a>00129 <span class="preprocessor">#define n BOOST_PP_ITERATION()</span>
-<a name="l00130"></a>00130 <span class="preprocessor"></span><span class="preprocessor">#define PARAM_NAMES          BOOST_PP_ENUM(n,PARAM_NAME,A) // name_N</span>
-<a name="l00131"></a>00131 <span class="preprocessor"></span><span class="preprocessor">#define PARAM_PLACE_HOLDERS  BOOST_PP_ENUM_TRAILING(n,PARAM_PLACE_HOLDER,A) // _(N+1)</span>
-<a name="l00132"></a>00132 <span class="preprocessor"></span><span class="preprocessor">#define PARAM_ARGS           BOOST_PP_ENUM(n,PARAM_ARG,A) // TYPE_N name_N</span>
-<a name="l00133"></a>00133 <span class="preprocessor"></span><span class="preprocessor">#define PARAM_TYPE_NAMES     BOOST_PP_ENUM(n,PARAM_TYPE_NAME,A) // typename TYPE_N</span>
-<a name="l00134"></a>00134 <span class="preprocessor"></span><span class="preprocessor">#define PARAM_TYPES          BOOST_PP_ENUM(n,PARAM_TYPE,A) // TYPE_N</span>
-<a name="l00135"></a>00135 <span class="preprocessor"></span>
-<a name="l00136"></a>00136 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> R, <span class="keyword">typename</span> Class BOOST_PP_COMMA_IF(n) PARAM_TYPE_NAMES&gt;
-<a name="l00137"></a>00137 <span class="keyword">struct </span>mirror_member&lt;R(Class::*)(PARAM_TYPES)const&gt; 
-<a name="l00138"></a>00138 {
-<a name="l00139"></a>00139   <span class="comment">// boost::result_of</span>
-<a name="l00140"></a>00140   <span class="keyword">typedef</span> <span class="keyword">typename</span> adapt_void&lt;R&gt;::result_type                    result_type;
-<a name="l00141"></a>00141   <span class="keyword">typedef</span> mirror_member                                          self_type;
-<a name="l00142"></a>00142   <span class="keyword">typedef</span> boost::fusion::vector&lt;PARAM_TYPES&gt;                     fused_params;
-<a name="l00143"></a>00143   <span class="keyword">typedef</span> boost::function_traits&lt;result_type(PARAM_TYPES)&gt;       traits;
-<a name="l00144"></a>00144   <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span>                                              is_const = <span class="keyword">true</span>;
-<a name="l00145"></a>00145   <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span>                                              is_signal = <span class="keyword">false</span>;
-<a name="l00146"></a>00146 
-<a name="l00147"></a>00147   <span class="keyword">typedef</span> <span class="keyword">typename</span> boost::remove_pointer&lt;result_type(*)(PARAM_TYPES)&gt;::type   signature;
-<a name="l00148"></a>00148 
-<a name="l00149"></a>00149   result_type operator()( PARAM_ARGS )<span class="keyword">const </span>{
-<a name="l00150"></a>00150     <span class="keywordflow">return</span> m_delegate( boost::ref( boost::fusion::make_vector(PARAM_NAMES) ) );
-<a name="l00151"></a>00151   }
-<a name="l00152"></a>00152   result_type operator() ( <span class="keyword">const</span> fused_params&amp; fp )<span class="keyword">const </span>{
-<a name="l00153"></a>00153     <span class="keywordflow">return</span> m_delegate( fp );
-<a name="l00154"></a>00154   }
-<a name="l00155"></a>00155   mirror_member&amp; operator=( <span class="keyword">const</span> mirror_member&amp; d )  {
-<a name="l00156"></a>00156     m_delegate = d.m_delegate;
-<a name="l00157"></a>00157     <span class="keywordflow">return</span> *<span class="keyword">this</span>;
-<a name="l00158"></a>00158   }
-<a name="l00159"></a>00159   <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
-<a name="l00160"></a>00160   mirror_member&amp; operator=( <span class="keyword">const</span> T&amp; d )  {
-<a name="l00161"></a>00161     m_delegate = adapt_void&lt;R,T&gt;(d);
-<a name="l00162"></a>00162     <span class="keywordflow">return</span> *<span class="keyword">this</span>;
-<a name="l00163"></a>00163   }
-<a name="l00164"></a>00164   <span class="keyword">template</span>&lt;<span class="keyword">typename</span> C, <span class="keyword">typename</span> M&gt;
-<a name="l00165"></a>00165   <span class="keywordtype">void</span> set_delegate(  C*&amp; s, <span class="keyword">const</span> M&amp; m ) {
-<a name="l00166"></a>00166     m_delegate = adapt_void&lt;R, boost::function&lt;R(const fused_params&amp;)&gt; &gt;(
-<a name="l00167"></a>00167                     boost::fusion::make_fused_function_object( 
-<a name="l00168"></a>00168                                     boost::bind(m,s PARAM_PLACE_HOLDERS ) ));
-<a name="l00169"></a>00169   }
-<a name="l00170"></a>00170   <span class="keyword">private</span>:
-<a name="l00171"></a>00171     boost::function&lt;result_type(const fused_params&amp;)&gt; m_delegate; 
-<a name="l00172"></a>00172 };
-<a name="l00173"></a>00173 
-<a name="l00174"></a>00174 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> R, <span class="keyword">typename</span> Class  BOOST_PP_COMMA_IF(n) PARAM_TYPE_NAMES&gt;
-<a name="l00175"></a>00175 <span class="keyword">struct </span>mirror_member&lt;R(Class::*)(PARAM_TYPES)&gt; 
-<a name="l00176"></a>00176 {
-<a name="l00177"></a>00177   <span class="keyword">typedef</span> <span class="keyword">typename</span> adapt_void&lt;R&gt;::result_type                result_type;
-<a name="l00178"></a>00178                                                                                        
-<a name="l00179"></a>00179   <span class="keyword">typedef</span> mirror_member                                      self_type;
-<a name="l00180"></a>00180   <span class="keyword">typedef</span> boost::fusion::vector&lt;PARAM_TYPES&gt;                 fused_params;
-<a name="l00181"></a>00181   <span class="keyword">typedef</span> boost::function_traits&lt;R(PARAM_TYPES)&gt;             traits;
-<a name="l00182"></a>00182   <span class="keyword">typedef</span> boost::function&lt;result_type(const fused_params&amp;)&gt;  delegate_type;
-<a name="l00183"></a>00183   <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span>                                          is_const  = <span class="keyword">false</span>;
-<a name="l00184"></a>00184   <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span>                                          is_signal = <span class="keyword">false</span>;
-<a name="l00185"></a>00185 
-<a name="l00186"></a>00186   <span class="comment">// boost::result_of</span>
-<a name="l00187"></a>00187   <span class="keyword">typedef</span> <span class="keyword">typename</span> boost::remove_pointer&lt;result_type(*)(PARAM_TYPES)&gt;::type signature;
-<a name="l00188"></a>00188 
-<a name="l00189"></a>00189   result_type operator()( PARAM_ARGS ) {
-<a name="l00190"></a>00190     <span class="keywordflow">return</span> m_delegate( boost::fusion::make_vector(PARAM_NAMES) );
-<a name="l00191"></a>00191   }
-<a name="l00192"></a>00192   result_type operator() ( <span class="keyword">const</span> fused_params&amp; fp ) {
-<a name="l00193"></a>00193     <span class="keywordflow">return</span> m_delegate( fp );
-<a name="l00194"></a>00194   }
-<a name="l00195"></a>00195   <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
-<a name="l00196"></a>00196   mirror_member&amp; operator=( <span class="keyword">const</span> T&amp; d )  {
-<a name="l00197"></a>00197     m_delegate = adapt_void&lt;R,T&gt;(d);
-<a name="l00198"></a>00198     <span class="keywordflow">return</span> *<span class="keyword">this</span>;
-<a name="l00199"></a>00199   }
-<a name="l00200"></a>00200   <span class="keyword">template</span>&lt;<span class="keyword">typename</span> C, <span class="keyword">typename</span> M&gt;
-<a name="l00201"></a>00201   <span class="keywordtype">void</span> set_delegate(  C*&amp; s, M m ) {
-<a name="l00202"></a>00202     m_delegate = adapt_void&lt;R, boost::function&lt;R(const fused_params&amp;)&gt; &gt;(
-<a name="l00203"></a>00203                       boost::fusion::make_fused_function_object( 
-<a name="l00204"></a>00204                                        boost::bind(m,s PARAM_PLACE_HOLDERS ) ));
-<a name="l00205"></a>00205   }
-<a name="l00206"></a>00206   <span class="keyword">private</span>:
-<a name="l00207"></a>00207     delegate_type m_delegate; 
-<a name="l00208"></a>00208 };
-<a name="l00209"></a>00209 
-<a name="l00210"></a>00210 
-<a name="l00211"></a>00211 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> R, <span class="keyword">typename</span> Class  BOOST_PP_COMMA_IF(n) PARAM_TYPE_NAMES&gt;
-<a name="l00212"></a>00212 <span class="keyword">struct </span>mirror_member&lt; boost::signal&lt;R(PARAM_TYPES)&gt; (Class::*) &gt; 
-<a name="l00213"></a>00213 {
-<a name="l00214"></a>00214   <span class="keyword">typedef</span> <span class="keyword">typename</span> adapt_void&lt;R&gt;::result_type                result_type;
-<a name="l00215"></a>00215   <span class="keyword">typedef</span> mirror_member                                      self_type;
-<a name="l00216"></a>00216   <span class="keyword">typedef</span> boost::fusion::vector&lt;PARAM_TYPES&gt;                 fused_params;
-<a name="l00217"></a>00217   <span class="keyword">typedef</span> boost::function_traits&lt;result_type(PARAM_TYPES)&gt;   traits;
-<a name="l00218"></a>00218   <span class="keyword">typedef</span> boost::signal&lt;R(PARAM_TYPES)&gt;                      signal_type;
-<a name="l00219"></a>00219   <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span>                                          is_const = <span class="keyword">false</span>;
-<a name="l00220"></a>00220   <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span>                                          is_signal = <span class="keyword">true</span>;
-<a name="l00221"></a>00221 
-<a name="l00222"></a>00222   <span class="comment">// boost::result_of</span>
-<a name="l00223"></a>00223   <span class="keyword">typedef</span> <span class="keyword">typename</span> boost::remove_pointer&lt;result_type(*)(PARAM_TYPES)&gt;::type   signature;
-<a name="l00224"></a>00224 
-<a name="l00225"></a>00225   result_type operator()( PARAM_ARGS ) {
-<a name="l00226"></a>00226     <span class="keywordflow">return</span> (*<span class="keyword">this</span>)( boost::fusion::make_vector(PARAM_NAMES) );
-<a name="l00227"></a>00227   }
-<a name="l00228"></a>00228 
-<a name="l00229"></a>00229   result_type operator() ( <span class="keyword">const</span> fused_params&amp; fp ) {
-<a name="l00230"></a>00230     scoped_block_signal block_reverse(m_reverse_con);
-<a name="l00231"></a>00231     <span class="keywordflow">if</span>( <span class="keywordtype">int</span>(m_signal.num_slots()) - 1 &gt; 0 )  <span class="comment">// do not count our reverse connection</span>
-<a name="l00232"></a>00232         boost::fusion::make_fused_function_object( boost::ref(m_signal) )(fp);
-<a name="l00233"></a>00233     <span class="keywordflow">return</span> m_delegate( fp );
-<a name="l00234"></a>00234   }
-<a name="l00235"></a>00235 
-<a name="l00236"></a>00236   <span class="comment">// emits locally, but does not forward to delegate</span>
-<a name="l00237"></a>00237   result_type emit( <span class="keyword">const</span> fused_params&amp; fp ) {
-<a name="l00238"></a>00238     scoped_block_signal block_reverse(m_reverse_con);
-<a name="l00239"></a>00239     <span class="keywordflow">return</span> adapt_void&lt;R,boost::function&lt;R(const fused_params&amp;)&gt; &gt;(
-<a name="l00240"></a>00240             boost::fusion::make_fused_function_object( boost::ref(m_signal) ) )(fp);
-<a name="l00241"></a>00241   }
-<a name="l00242"></a>00242 
-<a name="l00243"></a>00243   <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
-<a name="l00244"></a>00244   mirror_member&amp; operator=( <span class="keyword">const</span> T&amp; d )  {
-<a name="l00245"></a>00245     m_delegate = adapt_void&lt;R,T&gt;(d);
-<a name="l00246"></a>00246     <span class="keywordflow">return</span> *<span class="keyword">this</span>;
-<a name="l00247"></a>00247   }
-<a name="l00248"></a>00248 
-<a name="l00249"></a>00249   <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Functor&gt;
-<a name="l00250"></a>00250   boost::signals::connection connect( <span class="keyword">const</span> Functor&amp; f ) {
-<a name="l00251"></a>00251     boost::signals::connection c = m_signal.connect(adapt_void&lt;R,Functor&gt;(f) );
-<a name="l00252"></a>00252     <span class="keywordflow">if</span>( m_connect_delegate )
-<a name="l00253"></a>00253         m_connect_delegate(m_signal.num_slots());
-<a name="l00254"></a>00254     <span class="keywordflow">return</span> c;
-<a name="l00255"></a>00255   }
-<a name="l00256"></a>00256   <span class="keywordtype">void</span> disconnect( <span class="keyword">const</span> boost::signals::connection&amp; c ) {
-<a name="l00257"></a>00257     c.disconnect();
-<a name="l00258"></a>00258     <span class="keywordflow">if</span>( m_connect_delegate )
-<a name="l00259"></a>00259         m_connect_delegate(m_signal.num_slots());
-<a name="l00260"></a>00260   }
-<a name="l00261"></a>00261 
-<a name="l00262"></a>00262   <span class="keywordtype">void</span> set_connect_delegate( <span class="keyword">const</span> boost::function&lt;<span class="keywordtype">void</span>(<span class="keywordtype">int</span>)&gt;&amp; f ) {
-<a name="l00263"></a>00263     m_connect_delegate = f;
-<a name="l00264"></a>00264   }
-<a name="l00265"></a>00265 
-<a name="l00266"></a>00266   <span class="comment">// sets the delegate that will be called when the signal is &#39;emited&#39;</span>
-<a name="l00267"></a>00267   <span class="keyword">template</span>&lt;<span class="keyword">typename</span> C, <span class="keyword">typename</span> M&gt;
-<a name="l00268"></a>00268   <span class="keywordtype">void</span> set_delegate(  C*&amp; s, M m ) {
-<a name="l00269"></a>00269     m_signal.disconnect_all_slots();
-<a name="l00270"></a>00270     m_reverse_con = 
-<a name="l00271"></a>00271         (s-&gt;*m).connect( boost::fusion::make_unfused( 
-<a name="l00272"></a>00272                             boost::bind( &amp;mirror_member::emit, <span class="keyword">this</span>, _1) )  );
-<a name="l00273"></a>00273 
-<a name="l00274"></a>00274     m_delegate = emit_or_throw( s-&gt;*m );
-<a name="l00275"></a>00275   }
-<a name="l00276"></a>00276 
-<a name="l00277"></a>00277   ~mirror_member() {
-<a name="l00278"></a>00278     m_signal.disconnect_all_slots();
-<a name="l00279"></a>00279     <span class="keywordflow">if</span>( m_reverse_con != boost::signals::connection() )
-<a name="l00280"></a>00280         m_reverse_con.disconnect();
-<a name="l00281"></a>00281   }
-<a name="l00282"></a>00282 
-<a name="l00283"></a>00283   <span class="keyword">private</span>:
-<a name="l00284"></a>00284 
-<a name="l00285"></a>00285     <span class="keyword">struct </span>emit_or_throw {
-<a name="l00286"></a>00286         <span class="keyword">struct </span>no_connected_slots : <span class="keyword">public</span> std::exception, <span class="keyword">public</span> boost::exception {
-<a name="l00287"></a>00287           <span class="keyword">const</span> <span class="keywordtype">char</span>* what()<span class="keyword">const</span> throw() { <span class="keywordflow">return</span> <span class="stringliteral">&quot;no connected slots&quot;</span>; }
-<a name="l00288"></a>00288         };
-<a name="l00289"></a>00289         emit_or_throw( signal_type&amp; s ):sig(s){}
-<a name="l00290"></a>00290         result_type operator()( <span class="keyword">const</span> fused_params&amp; p ) {
-<a name="l00291"></a>00291           <span class="keywordflow">if</span>( <span class="keywordtype">int</span>(sig.num_slots()) -1 &gt; 0 ) { <span class="comment">// do not count our reverse connection</span>
-<a name="l00292"></a>00292             <span class="keywordflow">return</span> adapt_void&lt;R, boost::function&lt;R(const fused_params&amp;)&gt; &gt;(
-<a name="l00293"></a>00293                       boost::fusion::make_fused_function_object(boost::ref(sig)))(p);
-<a name="l00294"></a>00294           }
-<a name="l00295"></a>00295           BOOST_THROW_EXCEPTION( no_connected_slots() );
-<a name="l00296"></a>00296         }
-<a name="l00297"></a>00297         signal_type&amp;            sig;
-<a name="l00298"></a>00298     };
-<a name="l00299"></a>00299 
-<a name="l00300"></a>00300     boost::function&lt;void(int)&gt;                         m_connect_delegate;
-<a name="l00301"></a>00301     boost::function&lt;result_type(const fused_params&amp;)&gt;  m_delegate; 
-<a name="l00302"></a>00302     boost::signals::connection                         m_reverse_con;
-<a name="l00303"></a>00303     boost::signal&lt;R(PARAM_TYPES)&gt;                      m_signal;
-<a name="l00304"></a>00304 };
-<a name="l00305"></a>00305 
-<a name="l00306"></a>00306 <span class="preprocessor">#undef n</span>
-<a name="l00307"></a>00307 <span class="preprocessor"></span><span class="preprocessor">#undef PARAM_NAMES         </span>
-<a name="l00308"></a>00308 <span class="preprocessor"></span><span class="preprocessor">#undef PARAM_PLACE_HOLDERS</span>
-<a name="l00309"></a>00309 <span class="preprocessor"></span><span class="preprocessor">#undef PARAM_ARGS        </span>
-<a name="l00310"></a>00310 <span class="preprocessor"></span><span class="preprocessor">#undef PARAM_TYPE_NAMES </span>
-<a name="l00311"></a>00311 <span class="preprocessor"></span><span class="preprocessor">#undef PARAM_TYPES     </span>
-<a name="l00312"></a>00312 <span class="preprocessor"></span>
-<a name="l00313"></a>00313 <span class="preprocessor">#endif // BOOST_PP_IS_ITERATING</span>
+<a name="l00014"></a>00014 <span class="preprocessor">  #include &lt;<a class="code" href="vtable_8hpp.html">boost/reflect/vtable.hpp</a>&gt;</span>
+<a name="l00015"></a>00015 
+<a name="l00016"></a>00016   <span class="keyword">namespace </span>boost { <span class="keyword">namespace </span>reflect {<span class="comment"></span>
+<a name="l00017"></a>00017 <span class="comment">    /**</span>
+<a name="l00018"></a>00018 <span class="comment">     *  @brief Specialized to mirror the member </span>
+<a name="l00019"></a>00019 <span class="comment">     *         variable/method pointed to by MemberPtr</span>
+<a name="l00020"></a>00020 <span class="comment">     */</span>
+<a name="l00021"></a>00021     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> MemberPtr&gt;
+<a name="l00022"></a><a class="code" href="structboost_1_1reflect_1_1mirror__member.html">00022</a>     <span class="keyword">struct </span><a class="code" href="structboost_1_1reflect_1_1mirror__member.html" title="Specialized to mirror the member variable/method pointed to by MemberPtr.">mirror_member</a>{};
+<a name="l00023"></a>00023     <span class="comment"></span>
+<a name="l00024"></a>00024 <span class="comment">    /**</span>
+<a name="l00025"></a>00025 <span class="comment">     *  @brief Interface Delegate that mirrors the </span>
+<a name="l00026"></a>00026 <span class="comment">     *         reflected interface without any transformation.</span>
+<a name="l00027"></a>00027 <span class="comment">     *  </span>
+<a name="l00028"></a>00028 <span class="comment">     *  To specialize how a particular member is mirrored define</span>
+<a name="l00029"></a>00029 <span class="comment">     *  the partial specialization of mirror_member for your type.</span>
+<a name="l00030"></a>00030 <span class="comment">     *</span>
+<a name="l00031"></a>00031 <span class="comment">     *  @code</span>
+<a name="l00032"></a>00032 <span class="comment">     *  template&lt;typename Type, typename Class&gt;</span>
+<a name="l00033"></a>00033 <span class="comment">     *  mirror_member&lt;Type(Class::*)&gt; </span>
+<a name="l00034"></a>00034 <span class="comment">     *  @endcode</span>
+<a name="l00035"></a>00035 <span class="comment">     */</span>
+<a name="l00036"></a><a class="code" href="structboost_1_1reflect_1_1mirror__interface.html">00036</a>     <span class="keyword">struct </span><a class="code" href="structboost_1_1reflect_1_1mirror__interface.html" title="Interface Delegate that mirrors the reflected interface without any transformation...">mirror_interface</a> 
+<a name="l00037"></a>00037     {<span class="comment"></span>
+<a name="l00038"></a>00038 <span class="comment">      /**</span>
+<a name="l00039"></a>00039 <span class="comment">       * @brief Implements the InterfaceDelegate meta-function to </span>
+<a name="l00040"></a>00040 <span class="comment">       *      determine what type to create to mirror MemberPointer </span>
+<a name="l00041"></a>00041 <span class="comment">       *      in boost::reflect::vtable used by boost::reflect::any_ptr</span>
+<a name="l00042"></a>00042 <span class="comment">       */</span>
+<a name="l00043"></a>00043       <span class="keyword">template</span>&lt;<span class="keyword">typename</span> MemberPo<span class="keywordtype">int</span>er&gt;
+<a name="l00044"></a><a class="code" href="structboost_1_1reflect_1_1mirror__interface_1_1calculate__type.html">00044</a>       <span class="keyword">struct </span><a class="code" href="structboost_1_1reflect_1_1mirror__interface_1_1calculate__type.html" title="Implements the InterfaceDelegate meta-function to determine what type to create to...">calculate_type</a> {
+<a name="l00045"></a><a class="code" href="structboost_1_1reflect_1_1mirror__interface_1_1calculate__type.html#a0ec32cf4f26b1c69c578d8b41343bb7d">00045</a>         <span class="keyword">typedef</span> <a class="code" href="structboost_1_1reflect_1_1mirror__member.html" title="Specialized to mirror the member variable/method pointed to by MemberPtr.">mirror_member&lt;MemberPointer&gt;</a>  <a class="code" href="structboost_1_1reflect_1_1mirror__member.html" title="Specialized to mirror the member variable/method pointed to by MemberPtr.">type</a>; 
+<a name="l00046"></a>00046       };
+<a name="l00047"></a>00047 
+<a name="l00048"></a>00048 <span class="preprocessor">      #ifndef DOXYGEN</span>
+<a name="l00049"></a>00049 <span class="preprocessor"></span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> VTableType&gt;
+<a name="l00050"></a>00050       <span class="keyword">class </span>set_visitor {
+<a name="l00051"></a>00051         <span class="keyword">public</span>:
+<a name="l00052"></a>00052           set_visitor( VTableType&amp; vt, T&amp; <span class="keyword">self</span> )
+<a name="l00053"></a>00053           :m_self(<span class="keyword">self</span>),<a class="code" href="classboost_1_1reflect_1_1vtable.html" title="Contains functors defined by InterfaceDelegate for each reflected member of InterfaceType...">vtable</a>(vt){}
+<a name="l00054"></a>00054 
+<a name="l00055"></a>00055           <span class="keyword">template</span>&lt;<span class="keyword">typename</span> InterfaceName, <span class="keyword">typename</span> M&gt;
+<a name="l00056"></a>00056           <span class="keywordtype">void</span> operator()( M InterfaceName::* m, <span class="keyword">const</span> <span class="keywordtype">char</span>* name )<span class="keyword">const </span>{
+<a name="l00057"></a>00057             assign&lt;M&gt; a(m_self,<a class="code" href="classboost_1_1reflect_1_1vtable.html" title="Contains functors defined by InterfaceDelegate for each reflected member of InterfaceType...">vtable</a>.*m);
+<a name="l00058"></a>00058             M::template get_member_ptr&lt;T&gt;( a );
+<a name="l00059"></a>00059           }
+<a name="l00060"></a>00060         <span class="keyword">private</span>:
+<a name="l00061"></a>00061           <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Member&gt;
+<a name="l00062"></a>00062           <span class="keyword">struct </span>assign {
+<a name="l00063"></a>00063             assign( T&amp; _v, Member&amp; _m ):v(_v),m(_m){}
+<a name="l00064"></a>00064 
+<a name="l00065"></a>00065             <span class="keyword">template</span>&lt;<span class="keyword">typename</span> MemberPtr&gt;
+<a name="l00066"></a>00066             <span class="keywordtype">void</span> operator=( <span class="keyword">const</span> MemberPtr&amp; p ) {
+<a name="l00067"></a>00067               m.set_delegate( &amp;v, p );
+<a name="l00068"></a>00068             }
+<a name="l00069"></a>00069             <span class="keyword">private</span>:
+<a name="l00070"></a>00070               T&amp;      v;
+<a name="l00071"></a>00071               Member&amp; m;
+<a name="l00072"></a>00072           };
+<a name="l00073"></a>00073           T&amp;          m_self;
+<a name="l00074"></a>00074           VTableType&amp; vtable;
+<a name="l00075"></a>00075       };
+<a name="l00076"></a>00076 <span class="preprocessor">      #endif </span>
+<a name="l00077"></a>00077 <span class="preprocessor"></span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> VTableType&gt;
+<a name="l00078"></a><a class="code" href="structboost_1_1reflect_1_1mirror__interface.html#ae4a98e76a10239a588655fd7ab6408b8">00078</a>       <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="structboost_1_1reflect_1_1mirror__interface.html#ae4a98e76a10239a588655fd7ab6408b8">set_vtable</a>( VTableType&amp; <a class="code" href="classboost_1_1reflect_1_1vtable.html" title="Contains functors defined by InterfaceDelegate for each reflected member of InterfaceType...">vtable</a>, T&amp; value ) {
+<a name="l00079"></a>00079         <a class="code" href="structboost_1_1reflect_1_1vtable__reflector.html" title="Enables specialization of visit for InterfaceType.">vtable_reflector&lt;typename VTableType::interface_type&gt;::visit</a>( &amp;vtable,
+<a name="l00080"></a>00080                     set_visitor&lt;T,VTableType&gt;(vtable,value) );
+<a name="l00081"></a>00081       }
+<a name="l00082"></a>00082       <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> VTableType&gt;
+<a name="l00083"></a><a class="code" href="structboost_1_1reflect_1_1mirror__interface.html#ab5163c893781bec5ea9dfda6c8d06780">00083</a>       <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="structboost_1_1reflect_1_1mirror__interface.html#ab5163c893781bec5ea9dfda6c8d06780">set_vtable</a>( VTableType&amp; <a class="code" href="classboost_1_1reflect_1_1vtable.html" title="Contains functors defined by InterfaceDelegate for each reflected member of InterfaceType...">vtable</a>, <span class="keyword">const</span> T&amp; value ) {
+<a name="l00084"></a>00084         <a class="code" href="structboost_1_1reflect_1_1vtable__reflector.html" title="Enables specialization of visit for InterfaceType.">vtable_reflector&lt;typename VTableType::interface_type&gt;::visit</a>( &amp;vtable,
+<a name="l00085"></a>00085                     set_visitor&lt;T,VTableType&gt;(vtable,value) );
+<a name="l00086"></a>00086       }
+<a name="l00087"></a>00087     };
+<a name="l00088"></a>00088 
+<a name="l00089"></a>00089 <span class="preprocessor">    #ifndef DOXYGEN</span>
+<a name="l00090"></a>00090 <span class="preprocessor"></span><span class="comment"></span>
+<a name="l00091"></a>00091 <span class="comment">    /**</span>
+<a name="l00092"></a>00092 <span class="comment">     *  Blocks a signal if it is currently unblocked and </span>
+<a name="l00093"></a>00093 <span class="comment">     *  unblocks it when it goes out of scope if it was blocked</span>
+<a name="l00094"></a>00094 <span class="comment">     *  when constructed. </span>
+<a name="l00095"></a>00095 <span class="comment">     */</span>
+<a name="l00096"></a>00096     <span class="keyword">struct </span>scoped_block_signal {
+<a name="l00097"></a>00097       scoped_block_signal( boost::signals::connection&amp; _c )
+<a name="l00098"></a>00098       :c(_c),unblock(false){ 
+<a name="l00099"></a>00099         <span class="keywordflow">if</span>( c != boost::signals::connection() &amp;&amp; !c.blocked() )  {
+<a name="l00100"></a>00100           unblock = <span class="keyword">true</span>;
+<a name="l00101"></a>00101           c.block();
+<a name="l00102"></a>00102         }
+<a name="l00103"></a>00103       }
+<a name="l00104"></a>00104       ~scoped_block_signal() { 
+<a name="l00105"></a>00105         <span class="keywordflow">if</span>( unblock &amp;&amp; c != boost::signals::connection() ) 
+<a name="l00106"></a>00106             c.unblock(); 
+<a name="l00107"></a>00107       }
+<a name="l00108"></a>00108       <span class="keyword">private</span>:
+<a name="l00109"></a>00109         <span class="keywordtype">bool</span>                        unblock;
+<a name="l00110"></a>00110         boost::signals::connection&amp; c; 
+<a name="l00111"></a>00111     };
+<a name="l00112"></a>00112 <span class="preprocessor">    #endif</span>
+<a name="l00113"></a>00113 <span class="preprocessor"></span>
+<a name="l00114"></a>00114 
+<a name="l00115"></a><a class="code" href="mirror__interface_8hpp.html#a997e932bcde763683042e78343c34186">00115</a> <span class="preprocessor">  #define PARAM_NAME(z,n,type)         BOOST_PP_CAT(a,n)</span>
+<a name="l00116"></a><a class="code" href="mirror__interface_8hpp.html#a2dd8c5c8f2bb32c5f222b49055f798aa">00116</a> <span class="preprocessor"></span><span class="preprocessor">  #define PARAM_PLACE_HOLDER(z,n,type) BOOST_PP_CAT(_,BOOST_PP_ADD(n,1) )</span>
+<a name="l00117"></a><a class="code" href="mirror__interface_8hpp.html#a0ee1d08763851f5a671fa29d6b9e110d">00117</a> <span class="preprocessor"></span><span class="preprocessor">  #define PARAM_TYPE_NAME(z,n,type)   BOOST_PP_CAT(typename A,n)</span>
+<a name="l00118"></a><a class="code" href="mirror__interface_8hpp.html#a4b65a1710d3a32349380f74be0ef82ca">00118</a> <span class="preprocessor"></span><span class="preprocessor">  #define PARAM_TYPE(z,n,type)   BOOST_PP_CAT(A,n)</span>
+<a name="l00119"></a><a class="code" href="mirror__interface_8hpp.html#a576db89c791d4eab998cabcec09e5783">00119</a> <span class="preprocessor"></span><span class="preprocessor">  #define PARAM_ARG(z,n,type)     PARAM_TYPE(z,n,type) PARAM_NAME(z,n,type)</span>
+<a name="l00120"></a>00120 <span class="preprocessor"></span>
+<a name="l00121"></a>00121 <span class="preprocessor">#        ifndef BOOST_REFLECT_MIRROR_IMPL_SIZE</span>
+<a name="l00122"></a><a class="code" href="mirror__interface_8hpp.html#a35a1958213ca9b87eabfadb59b9ba91a">00122</a> <span class="preprocessor"></span><span class="preprocessor">#           define BOOST_REFLECT_MIRROR_IMPL_SIZE 8</span>
+<a name="l00123"></a>00123 <span class="preprocessor"></span><span class="preprocessor">#        endif</span>
+<a name="l00124"></a>00124 <span class="preprocessor"></span>
+<a name="l00125"></a>00125 <span class="preprocessor">#       include &lt;boost/preprocessor/iteration/iterate.hpp&gt;</span>
+<a name="l00126"></a><a class="code" href="mirror__interface_8hpp.html#a32c85728220c00c69b807cc6da39ad40">00126</a> <span class="preprocessor">#       define BOOST_PP_ITERATION_LIMITS (0, BOOST_REFLECT_MIRROR_IMPL_SIZE -1 )</span>
+<a name="l00127"></a><a class="code" href="mirror__interface_8hpp.html#a1ed7c98d32220d2344966959584f9778">00127</a> <span class="preprocessor"></span><span class="preprocessor">#       define BOOST_PP_FILENAME_1 &lt;boost/reflect/mirror_interface.hpp&gt;</span>
+<a name="l00128"></a>00128 <span class="preprocessor"></span><span class="preprocessor">#       include BOOST_PP_ITERATE()</span>
+<a name="l00129"></a>00129 <span class="preprocessor"></span>
+<a name="l00130"></a>00130 <span class="preprocessor">  #undef PARAM_NAME</span>
+<a name="l00131"></a>00131 <span class="preprocessor"></span><span class="preprocessor">  #undef PARAM_TYPE</span>
+<a name="l00132"></a>00132 <span class="preprocessor"></span><span class="preprocessor">  #undef PARAM_ARG</span>
+<a name="l00133"></a>00133 <span class="preprocessor"></span>
+<a name="l00134"></a>00134   } } <span class="comment">// namespace boost::reflect</span>
+<a name="l00135"></a>00135 <span class="preprocessor">  #endif // BOOST_REFLECT_MIRROR_INTERFACE_HPP</span>
+<a name="l00136"></a>00136 <span class="preprocessor"></span>
+<a name="l00137"></a>00137 <span class="preprocessor">#else // BOOST_PP_IS_ITERATING</span>
+<a name="l00138"></a>00138 <span class="preprocessor"></span>
+<a name="l00139"></a>00139 <span class="preprocessor">#define n BOOST_PP_ITERATION()</span>
+<a name="l00140"></a>00140 <span class="preprocessor"></span><span class="preprocessor">#define PARAM_NAMES          BOOST_PP_ENUM(n,PARAM_NAME,A) // name_N</span>
+<a name="l00141"></a>00141 <span class="preprocessor"></span><span class="preprocessor">#define PARAM_PLACE_HOLDERS  BOOST_PP_ENUM_TRAILING(n,PARAM_PLACE_HOLDER,A) // _(N+1)</span>
+<a name="l00142"></a>00142 <span class="preprocessor"></span><span class="preprocessor">#define PARAM_ARGS           BOOST_PP_ENUM(n,PARAM_ARG,A) // TYPE_N name_N</span>
+<a name="l00143"></a>00143 <span class="preprocessor"></span><span class="preprocessor">#define PARAM_TYPE_NAMES     BOOST_PP_ENUM(n,PARAM_TYPE_NAME,A) // typename TYPE_N</span>
+<a name="l00144"></a>00144 <span class="preprocessor"></span><span class="preprocessor">#define PARAM_TYPES          BOOST_PP_ENUM(n,PARAM_TYPE,A) // TYPE_N</span>
+<a name="l00145"></a>00145 <span class="preprocessor"></span>
+<a name="l00146"></a>00146 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> R, <span class="keyword">typename</span> Class BOOST_PP_COMMA_IF(n) PARAM_TYPE_NAMES&gt;
+<a name="l00147"></a>00147 <span class="keyword">struct </span>mirror_member&lt;R(Class::*)(PARAM_TYPES)const&gt; 
+<a name="l00148"></a>00148 {
+<a name="l00149"></a>00149   <span class="comment">// boost::result_of</span>
+<a name="l00150"></a>00150   <span class="keyword">typedef</span> <span class="keyword">typename</span> adapt_void&lt;R&gt;::result_type                    result_type;
+<a name="l00151"></a>00151   <span class="keyword">typedef</span> mirror_member                                          self_type;
+<a name="l00152"></a>00152   <span class="keyword">typedef</span> boost::fusion::vector&lt;PARAM_TYPES&gt;                     fused_params;
+<a name="l00153"></a>00153   <span class="keyword">typedef</span> boost::function_traits&lt;result_type(PARAM_TYPES)&gt;       traits;
+<a name="l00154"></a>00154   <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span>                                              is_const = <span class="keyword">true</span>;
+<a name="l00155"></a>00155   <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span>                                              is_signal = <span class="keyword">false</span>;
+<a name="l00156"></a>00156 
+<a name="l00157"></a>00157   <span class="keyword">typedef</span> <span class="keyword">typename</span> boost::remove_pointer&lt;result_type(*)(PARAM_TYPES)&gt;::type   signature;
+<a name="l00158"></a>00158 
+<a name="l00159"></a>00159   result_type operator()( PARAM_ARGS )<span class="keyword">const </span>{
+<a name="l00160"></a>00160     <span class="keywordflow">return</span> m_delegate( boost::fusion::make_vector(PARAM_NAMES) );
+<a name="l00161"></a>00161   }
+<a name="l00162"></a>00162   result_type operator() ( <span class="keyword">const</span> fused_params&amp; fp )<span class="keyword">const </span>{
+<a name="l00163"></a>00163     <span class="keywordflow">return</span> m_delegate( fp );
+<a name="l00164"></a>00164   }
+<a name="l00165"></a>00165   mirror_member&amp; operator=( <span class="keyword">const</span> mirror_member&amp; d )  {
+<a name="l00166"></a>00166     m_delegate = d.m_delegate;
+<a name="l00167"></a>00167     <span class="keywordflow">return</span> *<span class="keyword">this</span>;
+<a name="l00168"></a>00168   }
+<a name="l00169"></a>00169   <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
+<a name="l00170"></a>00170   mirror_member&amp; operator=( <span class="keyword">const</span> T&amp; d )  {
+<a name="l00171"></a>00171     m_delegate = adapt_void&lt;R,T&gt;(d);
+<a name="l00172"></a>00172     <span class="keywordflow">return</span> *<span class="keyword">this</span>;
+<a name="l00173"></a>00173   }
+<a name="l00174"></a>00174   <span class="keyword">template</span>&lt;<span class="keyword">typename</span> C, <span class="keyword">typename</span> M&gt;
+<a name="l00175"></a>00175   <span class="keywordtype">void</span> set_delegate(  C* s, M m ) {
+<a name="l00176"></a>00176     m_delegate = adapt_void&lt;R, boost::function&lt;R(const fused_params&amp;)&gt; &gt;(
+<a name="l00177"></a>00177                     boost::fusion::make_fused_function_object( 
+<a name="l00178"></a>00178                                     boost::bind(m,s PARAM_PLACE_HOLDERS ) ));
+<a name="l00179"></a>00179   }
+<a name="l00180"></a>00180   <span class="keyword">private</span>:
+<a name="l00181"></a>00181     boost::function&lt;result_type(const fused_params&amp;)&gt; m_delegate; 
+<a name="l00182"></a>00182 };
+<a name="l00183"></a>00183 
+<a name="l00184"></a>00184 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> R, <span class="keyword">typename</span> Class  BOOST_PP_COMMA_IF(n) PARAM_TYPE_NAMES&gt;
+<a name="l00185"></a>00185 <span class="keyword">struct </span>mirror_member&lt;R(Class::*)(PARAM_TYPES)&gt; 
+<a name="l00186"></a>00186 {
+<a name="l00187"></a>00187   <span class="keyword">typedef</span> <span class="keyword">typename</span> adapt_void&lt;R&gt;::result_type                result_type;
+<a name="l00188"></a>00188                                                                                        
+<a name="l00189"></a>00189   <span class="keyword">typedef</span> mirror_member                                      self_type;
+<a name="l00190"></a>00190   <span class="keyword">typedef</span> boost::fusion::vector&lt;PARAM_TYPES&gt;                 fused_params;
+<a name="l00191"></a>00191   <span class="keyword">typedef</span> boost::function_traits&lt;R(PARAM_TYPES)&gt;             traits;
+<a name="l00192"></a>00192   <span class="keyword">typedef</span> boost::function&lt;result_type(const fused_params&amp;)&gt;  delegate_type;
+<a name="l00193"></a>00193   <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span>                                          is_const  = <span class="keyword">false</span>;
+<a name="l00194"></a>00194   <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span>                                          is_signal = <span class="keyword">false</span>;
+<a name="l00195"></a>00195 
+<a name="l00196"></a>00196   <span class="comment">// boost::result_of</span>
+<a name="l00197"></a>00197   <span class="keyword">typedef</span> <span class="keyword">typename</span> boost::remove_pointer&lt;result_type(*)(PARAM_TYPES)&gt;::type signature;
+<a name="l00198"></a>00198 
+<a name="l00199"></a>00199   result_type operator()( PARAM_ARGS ) {
+<a name="l00200"></a>00200     <span class="keywordflow">return</span> m_delegate( boost::fusion::make_vector(PARAM_NAMES) );
+<a name="l00201"></a>00201   }
+<a name="l00202"></a>00202   result_type operator() ( <span class="keyword">const</span> fused_params&amp; fp ) {
+<a name="l00203"></a>00203     <span class="keywordflow">return</span> m_delegate( fp );
+<a name="l00204"></a>00204   }
+<a name="l00205"></a>00205   <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
+<a name="l00206"></a>00206   mirror_member&amp; operator=( <span class="keyword">const</span> T&amp; d )  {
+<a name="l00207"></a>00207     m_delegate = adapt_void&lt;R,T&gt;(d);
+<a name="l00208"></a>00208     <span class="keywordflow">return</span> *<span class="keyword">this</span>;
+<a name="l00209"></a>00209   }
+<a name="l00210"></a>00210   <span class="keyword">template</span>&lt;<span class="keyword">typename</span> C, <span class="keyword">typename</span> M&gt;
+<a name="l00211"></a>00211   <span class="keywordtype">void</span> set_delegate(  C* s, M m ) {
+<a name="l00212"></a>00212     m_delegate = adapt_void&lt;R, boost::function&lt;R(const fused_params&amp;)&gt; &gt;(
+<a name="l00213"></a>00213                       boost::fusion::make_fused_function_object( 
+<a name="l00214"></a>00214                                        boost::bind(m,s PARAM_PLACE_HOLDERS ) ));
+<a name="l00215"></a>00215   }
+<a name="l00216"></a>00216   <span class="keyword">private</span>:
+<a name="l00217"></a>00217     delegate_type m_delegate; 
+<a name="l00218"></a>00218 };
+<a name="l00219"></a>00219 
+<a name="l00220"></a>00220 
+<a name="l00221"></a>00221 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> R, <span class="keyword">typename</span> Class  BOOST_PP_COMMA_IF(n) PARAM_TYPE_NAMES&gt;
+<a name="l00222"></a>00222 <span class="keyword">struct </span>mirror_member&lt; boost::signal&lt;R(PARAM_TYPES)&gt; (Class::*) &gt; 
+<a name="l00223"></a>00223 {
+<a name="l00224"></a>00224   <span class="keyword">typedef</span> <span class="keyword">typename</span> adapt_void&lt;R&gt;::result_type                result_type;
+<a name="l00225"></a>00225   <span class="keyword">typedef</span> mirror_member                                      self_type;
+<a name="l00226"></a>00226   <span class="keyword">typedef</span> boost::fusion::vector&lt;PARAM_TYPES&gt;                 fused_params;
+<a name="l00227"></a>00227   <span class="keyword">typedef</span> boost::function_traits&lt;result_type(PARAM_TYPES)&gt;   traits;
+<a name="l00228"></a>00228   <span class="keyword">typedef</span> boost::signal&lt;R(PARAM_TYPES)&gt;                      signal_type;
+<a name="l00229"></a>00229   <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span>                                          is_const = <span class="keyword">false</span>;
+<a name="l00230"></a>00230   <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span>                                          is_signal = <span class="keyword">true</span>;
+<a name="l00231"></a>00231 
+<a name="l00232"></a>00232   <span class="comment">// boost::result_of</span>
+<a name="l00233"></a>00233   <span class="keyword">typedef</span> <span class="keyword">typename</span> boost::remove_pointer&lt;result_type(*)(PARAM_TYPES)&gt;::type   signature;
+<a name="l00234"></a>00234 
+<a name="l00235"></a>00235   result_type operator()( PARAM_ARGS ) {
+<a name="l00236"></a>00236     <span class="keywordflow">return</span> (*<span class="keyword">this</span>)( boost::fusion::make_vector(PARAM_NAMES) );
+<a name="l00237"></a>00237   }
+<a name="l00238"></a>00238 
+<a name="l00239"></a>00239   result_type operator() ( <span class="keyword">const</span> fused_params&amp; fp ) {
+<a name="l00240"></a>00240     scoped_block_signal block_reverse(m_reverse_con);
+<a name="l00241"></a>00241     <span class="keywordflow">if</span>( <span class="keywordtype">int</span>(m_signal.num_slots()) - 1 &gt; 0 )  <span class="comment">// do not count our reverse connection</span>
+<a name="l00242"></a>00242         boost::fusion::make_fused_function_object( boost::ref(m_signal) )(fp);
+<a name="l00243"></a>00243     <span class="keywordflow">return</span> m_delegate( fp );
+<a name="l00244"></a>00244   }
+<a name="l00245"></a>00245 
+<a name="l00246"></a>00246   <span class="comment">// emits locally, but does not forward to delegate</span>
+<a name="l00247"></a>00247   result_type emit( <span class="keyword">const</span> fused_params&amp; fp ) {
+<a name="l00248"></a>00248     scoped_block_signal block_reverse(m_reverse_con);
+<a name="l00249"></a>00249     <span class="keywordflow">return</span> adapt_void&lt;R,boost::function&lt;R(const fused_params&amp;)&gt; &gt;(
+<a name="l00250"></a>00250             boost::fusion::make_fused_function_object( boost::ref(m_signal) ) )(fp);
+<a name="l00251"></a>00251   }
+<a name="l00252"></a>00252 
+<a name="l00253"></a>00253   <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
+<a name="l00254"></a>00254   mirror_member&amp; operator=( <span class="keyword">const</span> T&amp; d )  {
+<a name="l00255"></a>00255     m_delegate = adapt_void&lt;R,T&gt;(d);
+<a name="l00256"></a>00256     <span class="keywordflow">return</span> *<span class="keyword">this</span>;
+<a name="l00257"></a>00257   }
+<a name="l00258"></a>00258 
+<a name="l00259"></a>00259   <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Functor&gt;
+<a name="l00260"></a>00260   boost::signals::connection connect( <span class="keyword">const</span> Functor&amp; f ) {
+<a name="l00261"></a>00261     boost::signals::connection c = m_signal.connect(adapt_void&lt;R,Functor&gt;(f) );
+<a name="l00262"></a>00262     <span class="keywordflow">if</span>( m_connect_delegate )
+<a name="l00263"></a>00263         m_connect_delegate(m_signal.num_slots());
+<a name="l00264"></a>00264     <span class="keywordflow">return</span> c;
+<a name="l00265"></a>00265   }
+<a name="l00266"></a>00266   <span class="keywordtype">void</span> disconnect( <span class="keyword">const</span> boost::signals::connection&amp; c ) {
+<a name="l00267"></a>00267     c.disconnect();
+<a name="l00268"></a>00268     <span class="keywordflow">if</span>( m_connect_delegate )
+<a name="l00269"></a>00269         m_connect_delegate(m_signal.num_slots());
+<a name="l00270"></a>00270   }
+<a name="l00271"></a>00271 
+<a name="l00272"></a>00272   <span class="keywordtype">void</span> set_connect_delegate( <span class="keyword">const</span> boost::function&lt;<span class="keywordtype">void</span>(<span class="keywordtype">int</span>)&gt;&amp; f ) {
+<a name="l00273"></a>00273     m_connect_delegate = f;
+<a name="l00274"></a>00274   }
+<a name="l00275"></a>00275 
+<a name="l00276"></a>00276   <span class="comment">// sets the delegate that will be called when the signal is &#39;emited&#39;</span>
+<a name="l00277"></a>00277   <span class="keyword">template</span>&lt;<span class="keyword">typename</span> C, <span class="keyword">typename</span> M&gt;
+<a name="l00278"></a>00278   <span class="keywordtype">void</span> set_delegate(  C* s, M m ) {
+<a name="l00279"></a>00279     m_signal.disconnect_all_slots();
+<a name="l00280"></a>00280     m_reverse_con = 
+<a name="l00281"></a>00281         (s-&gt;*m).connect( boost::fusion::make_unfused( 
+<a name="l00282"></a>00282                             boost::bind( &amp;mirror_member::emit, <span class="keyword">this</span>, _1) )  );
+<a name="l00283"></a>00283 
+<a name="l00284"></a>00284     m_delegate = emit_or_throw( s-&gt;*m );
+<a name="l00285"></a>00285   }
+<a name="l00286"></a>00286 
+<a name="l00287"></a>00287   ~mirror_member() {
+<a name="l00288"></a>00288     m_signal.disconnect_all_slots();
+<a name="l00289"></a>00289     <span class="keywordflow">if</span>( m_reverse_con != boost::signals::connection() )
+<a name="l00290"></a>00290         m_reverse_con.disconnect();
+<a name="l00291"></a>00291   }
+<a name="l00292"></a>00292 
+<a name="l00293"></a>00293   <span class="keyword">private</span>:
+<a name="l00294"></a>00294 
+<a name="l00295"></a>00295     <span class="keyword">struct </span>emit_or_throw {
+<a name="l00296"></a>00296         <span class="keyword">struct </span>no_connected_slots : <span class="keyword">public</span> std::exception, <span class="keyword">public</span> boost::exception {
+<a name="l00297"></a>00297           <span class="keyword">const</span> <span class="keywordtype">char</span>* what()<span class="keyword">const</span> throw() { <span class="keywordflow">return</span> <span class="stringliteral">&quot;no connected slots&quot;</span>; }
+<a name="l00298"></a>00298         };
+<a name="l00299"></a>00299         emit_or_throw( signal_type&amp; s ):sig(s){}
+<a name="l00300"></a>00300         result_type operator()( <span class="keyword">const</span> fused_params&amp; p ) {
+<a name="l00301"></a>00301           <span class="keywordflow">if</span>( <span class="keywordtype">int</span>(sig.num_slots()) -1 &gt; 0 ) { <span class="comment">// do not count our reverse connection</span>
+<a name="l00302"></a>00302             <span class="keywordflow">return</span> adapt_void&lt;R, boost::function&lt;R(const fused_params&amp;)&gt; &gt;(
+<a name="l00303"></a>00303                       boost::fusion::make_fused_function_object(boost::ref(sig)))(p);
+<a name="l00304"></a>00304           }
+<a name="l00305"></a>00305           BOOST_THROW_EXCEPTION( no_connected_slots() );
+<a name="l00306"></a>00306         }
+<a name="l00307"></a>00307         signal_type&amp;            sig;
+<a name="l00308"></a>00308     };
+<a name="l00309"></a>00309 
+<a name="l00310"></a>00310     boost::function&lt;void(int)&gt;                         m_connect_delegate;
+<a name="l00311"></a>00311     boost::function&lt;result_type(const fused_params&amp;)&gt;  m_delegate; 
+<a name="l00312"></a>00312     boost::signals::connection                         m_reverse_con;
+<a name="l00313"></a>00313     boost::signal&lt;R(PARAM_TYPES)&gt;                      m_signal;
+<a name="l00314"></a>00314 };
+<a name="l00315"></a>00315 
+<a name="l00316"></a>00316 <span class="preprocessor">#undef n</span>
+<a name="l00317"></a>00317 <span class="preprocessor"></span><span class="preprocessor">#undef PARAM_NAMES         </span>
+<a name="l00318"></a>00318 <span class="preprocessor"></span><span class="preprocessor">#undef PARAM_PLACE_HOLDERS</span>
+<a name="l00319"></a>00319 <span class="preprocessor"></span><span class="preprocessor">#undef PARAM_ARGS        </span>
+<a name="l00320"></a>00320 <span class="preprocessor"></span><span class="preprocessor">#undef PARAM_TYPE_NAMES </span>
+<a name="l00321"></a>00321 <span class="preprocessor"></span><span class="preprocessor">#undef PARAM_TYPES     </span>
+<a name="l00322"></a>00322 <span class="preprocessor"></span>
+<a name="l00323"></a>00323 <span class="preprocessor">#endif // BOOST_PP_IS_ITERATING</span>
 </pre></div></div>
 <hr/>
 <table border=0 width="100%">

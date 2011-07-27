@@ -12,6 +12,7 @@
   <div class="tabs">
     <ul>
       <li><a href="index.html"><span>Main&nbsp;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&nbsp;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -48,249 +49,81 @@
 <a name="l00023"></a>00023 <span class="preprocessor">#include &lt;set&gt;</span>
 <a name="l00024"></a>00024 <span class="preprocessor">#include &lt;map&gt;</span>
 <a name="l00025"></a>00025 <span class="preprocessor">#include &lt;stdint.h&gt;</span>
-<a name="l00026"></a>00026 <span class="preprocessor">#include &lt;<a class="code" href="void_8hpp.html">boost/reflect/void.hpp</a>&gt;</span>
-<a name="l00027"></a>00027 <span class="preprocessor">#include &lt;<a class="code" href="vtable_8hpp.html">boost/reflect/vtable.hpp</a>&gt;</span>
-<a name="l00028"></a>00028 
-<a name="l00029"></a>00029 <span class="keyword">namespace </span>boost { <span class="keyword">namespace </span>reflect {<span class="comment"></span>
-<a name="l00030"></a>00030 <span class="comment">/**</span>
-<a name="l00031"></a>00031 <span class="comment"> *  @brief provides compile time access to name of a type.</span>
-<a name="l00032"></a>00032 <span class="comment"> */</span>
-<a name="l00033"></a>00033 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
-<a name="l00034"></a><a class="code" href="structboost_1_1reflect_1_1get__typeinfo.html">00034</a> <span class="keyword">struct </span><a class="code" href="structboost_1_1reflect_1_1get__typeinfo.html" title="provides compile time access to name of a type.">get_typeinfo</a> { 
-<a name="l00035"></a><a class="code" href="structboost_1_1reflect_1_1get__typeinfo.html#a0c8de4a53a426c0d36db4ca0146c061b">00035</a>     <span class="keyword">enum</span> <a class="code" href="structboost_1_1reflect_1_1get__typeinfo.html#a0c8de4a53a426c0d36db4ca0146c061b">is_defined_enum</a>{ <a class="code" href="structboost_1_1reflect_1_1get__typeinfo.html#a0c8de4a53a426c0d36db4ca0146c061ba81b6c8f933bd318111799f0a581f9fee">is_defined</a> = 0 };
-<a name="l00036"></a><a class="code" href="structboost_1_1reflect_1_1get__typeinfo.html#aa6be32e0d1b4bd24f8745d1d3267b295">00036</a>     <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="structboost_1_1reflect_1_1get__typeinfo.html#aa6be32e0d1b4bd24f8745d1d3267b295">name</a>() { <span class="keywordflow">return</span> <span class="keyword">typeid</span>(T).<a class="code" href="structboost_1_1reflect_1_1get__typeinfo.html#aa6be32e0d1b4bd24f8745d1d3267b295">name</a>(); }
-<a name="l00037"></a>00037 };
-<a name="l00038"></a>00038 <span class="comment"></span>
-<a name="l00039"></a>00039 <span class="comment">/**</span>
-<a name="l00040"></a>00040 <span class="comment"> *  @brief Removes all decorations and returns the typename.</span>
-<a name="l00041"></a>00041 <span class="comment"> */</span>
-<a name="l00042"></a>00042 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
-<a name="l00043"></a>00043 <span class="keyword">inline</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* get_typename()  {
-<a name="l00044"></a>00044     <span class="keywordflow">return</span> get_typeinfo&lt;<span class="keyword">typename</span> boost::remove_const&lt;
-<a name="l00045"></a>00045                         <span class="keyword">typename</span> boost::remove_reference&lt;
-<a name="l00046"></a>00046                         <span class="keyword">typename</span> boost::remove_pointer&lt;T&gt;::type&gt;::type&gt;::type&gt;::name();
-<a name="l00047"></a>00047 }
-<a name="l00048"></a>00048 <span class="preprocessor">#ifndef DOXYGEN</span>
-<a name="l00049"></a>00049 <span class="preprocessor"></span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> TP, <span class="keyword">template</span>&lt;<span class="keyword">typename</span>&gt; <span class="keyword">class </span>C&gt; 
-<a name="l00050"></a>00050 <span class="keyword">struct </span>get_typeinfo&lt; C&lt;TP&gt; &gt; { 
-<a name="l00051"></a>00051     <span class="comment">// used to specify template get_typeinfo</span>
-<a name="l00052"></a>00052 
-<a name="l00053"></a>00053     <span class="keyword">enum</span> <a class="code" href="structboost_1_1reflect_1_1get__typeinfo.html#a0c8de4a53a426c0d36db4ca0146c061b">is_defined_enum</a>{ <a class="code" href="structboost_1_1reflect_1_1get__typeinfo.html#a0c8de4a53a426c0d36db4ca0146c061ba81b6c8f933bd318111799f0a581f9fee">is_defined</a> = get_typeinfo&lt;TP&gt;::is_defined }; 
-<a name="l00054"></a>00054     <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="structboost_1_1reflect_1_1get__typeinfo.html#aa6be32e0d1b4bd24f8745d1d3267b295">name</a>() 
-<a name="l00055"></a>00055     {  
-<a name="l00056"></a>00056         <span class="keyword">static</span> std::string n = std::string( get_typename&lt;C&lt;void_t&gt; &gt;() ) + std::string(<span class="stringliteral">&quot;&lt;&quot;</span>) + std::string(get_typename&lt;TP&gt;()) +  <span class="stringliteral">&quot;&gt;&quot;</span>; 
-<a name="l00057"></a>00057         <span class="keywordflow">return</span> n.c_str(); 
-<a name="l00058"></a>00058     } 
-<a name="l00059"></a>00059 }; 
-<a name="l00060"></a>00060 
-<a name="l00061"></a>00061 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TP, <span class="keyword">typename</span> TP2, <span class="keyword">template</span>&lt;<span class="keyword">typename</span>, <span class="keyword">typename</span>&gt; <span class="keyword">class </span>C&gt; 
-<a name="l00062"></a>00062 <span class="keyword">struct </span>get_typeinfo&lt; C&lt;TP,TP2&gt; &gt; { 
-<a name="l00063"></a>00063     <span class="keyword">enum</span> <a class="code" href="structboost_1_1reflect_1_1get__typeinfo.html#a0c8de4a53a426c0d36db4ca0146c061b">is_defined_enum</a>{ <a class="code" href="structboost_1_1reflect_1_1get__typeinfo.html#a0c8de4a53a426c0d36db4ca0146c061ba81b6c8f933bd318111799f0a581f9fee">is_defined</a> = get_typeinfo&lt;TP&gt;::is_defined &amp;&amp; get_typeinfo&lt;TP2&gt;::is_defined }; 
-<a name="l00064"></a>00064     <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="structboost_1_1reflect_1_1get__typeinfo.html#aa6be32e0d1b4bd24f8745d1d3267b295">name</a>() 
-<a name="l00065"></a>00065     {  
-<a name="l00066"></a>00066         <span class="keyword">static</span> std::string n = std::string( get_typename&lt; C&lt;void_t,void_t&gt; &gt;() ) + <span class="stringliteral">&quot;&lt;&quot;</span> + std::string(get_typename&lt;TP&gt;()) +  <span class="stringliteral">&quot;,&quot;</span> + 
-<a name="l00067"></a>00067                                std::string( get_typename&lt;TP&gt;() ) + <span class="stringliteral">&quot;&gt;&quot;</span>; 
-<a name="l00068"></a>00068         <span class="keywordflow">return</span> n.c_str(); 
-<a name="l00069"></a>00069     } 
-<a name="l00070"></a>00070 };
-<a name="l00071"></a>00071 <span class="preprocessor">#endif</span>
-<a name="l00072"></a>00072 <span class="preprocessor"></span><span class="comment"></span>
-<a name="l00073"></a>00073 <span class="comment">/**</span>
-<a name="l00074"></a>00074 <span class="comment"> *  @brief Allows the typename to be accessed via get_typename&lt;T&gt;() in a </span>
-<a name="l00075"></a>00075 <span class="comment"> *  cross-platform, demangled way that std::typeinfo cannot do.</span>
-<a name="l00076"></a>00076 <span class="comment"> */</span>
-<a name="l00077"></a><a class="code" href="reflect_8hpp.html#a28ba3dd540c332863ba827d6926a7b85">00077</a> <span class="preprocessor">#define BOOST_REFLECT_TYPEINFO( NAME ) \</span>
-<a name="l00078"></a>00078 <span class="preprocessor">namespace boost { namespace reflect { \</span>
-<a name="l00079"></a>00079 <span class="preprocessor">template&lt;&gt; \</span>
-<a name="l00080"></a>00080 <span class="preprocessor">struct get_typeinfo&lt;NAME&gt; { \</span>
-<a name="l00081"></a>00081 <span class="preprocessor">    enum is_defined_enum{ is_defined = 1 }; \</span>
-<a name="l00082"></a>00082 <span class="preprocessor">    static const char* name() { return BOOST_PP_STRINGIZE(NAME); } \</span>
-<a name="l00083"></a>00083 <span class="preprocessor">}; } }</span>
-<a name="l00084"></a>00084 <span class="preprocessor"></span>
-<a name="l00085"></a>00085 <span class="comment"></span>
+<a name="l00026"></a>00026 <span class="preprocessor">#include &lt;boost/fusion/container/vector.hpp&gt;</span>
+<a name="l00027"></a>00027 <span class="preprocessor">#include &lt;<a class="code" href="void_8hpp.html">boost/reflect/void.hpp</a>&gt;</span>
+<a name="l00028"></a>00028 <span class="preprocessor">#include &lt;<a class="code" href="vtable_8hpp.html">boost/reflect/vtable.hpp</a>&gt;</span>
+<a name="l00029"></a>00029 <span class="preprocessor">#include &lt;<a class="code" href="typeinfo_8hpp.html">boost/reflect/typeinfo.hpp</a>&gt;</span>
+<a name="l00030"></a>00030 
+<a name="l00031"></a>00031 <span class="keyword">namespace </span>boost { <span class="keyword">namespace </span>reflect {
+<a name="l00032"></a>00032 <span class="comment"></span>
+<a name="l00033"></a>00033 <span class="comment">/**</span>
+<a name="l00034"></a>00034 <span class="comment"> *  @brief defines visit functions for T</span>
+<a name="l00035"></a>00035 <span class="comment"> *  Unless this is specialized, visit() will not be defined for T.</span>
+<a name="l00036"></a>00036 <span class="comment"> *</span>
+<a name="l00037"></a>00037 <span class="comment"> *  The @ref BOOST_REFLECT(TYPE,INHERITS,MEMBERS) macro is used to specialize this</span>
+<a name="l00038"></a>00038 <span class="comment"> *  class for your type.</span>
+<a name="l00039"></a>00039 <span class="comment"> */</span>
+<a name="l00040"></a>00040 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
+<a name="l00041"></a><a class="code" href="structboost_1_1reflect_1_1reflector.html">00041</a> <span class="keyword">struct </span><a class="code" href="structboost_1_1reflect_1_1reflector.html" title="defines visit functions for T Unless this is specialized, visit() will not be defined...">reflector</a>{
+<a name="l00042"></a><a class="code" href="structboost_1_1reflect_1_1reflector.html#a565429e62c1d4fd084335146ba778e17">00042</a>     <span class="keyword">typedef</span> T <a class="code" href="structboost_1_1reflect_1_1reflector.html#a565429e62c1d4fd084335146ba778e17">type</a>;
+<a name="l00043"></a><a class="code" href="structboost_1_1reflect_1_1reflector.html#a01f5d8df396c92e7e11c1f55027904d9">00043</a>     <span class="keyword">typedef</span> boost::fusion::vector&lt;&gt; <a class="code" href="structboost_1_1reflect_1_1reflector.html#a01f5d8df396c92e7e11c1f55027904d9">base_class_types</a>;
+<a name="l00044"></a><a class="code" href="structboost_1_1reflect_1_1reflector.html#a8073b06f47ab19bcf3da6f528649f72c">00044</a>     <span class="keyword">enum</span> <a class="code" href="structboost_1_1reflect_1_1reflector.html#a8073b06f47ab19bcf3da6f528649f72c">is_defined</a> { <a class="code" href="structboost_1_1reflect_1_1reflector.html#a8073b06f47ab19bcf3da6f528649f72cad5e0a5daf43520cf49801971d786cec2">defined</a> = <span class="keyword">false</span> };
+<a name="l00045"></a>00045     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Visitor&gt;
+<a name="l00046"></a><a class="code" href="structboost_1_1reflect_1_1reflector.html#ad7e2371eee574b5bbd1a0237204634d2">00046</a>     <span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="structboost_1_1reflect_1_1reflector.html#ad7e2371eee574b5bbd1a0237204634d2">visit</a>( <span class="keyword">const</span> Visitor&amp;  ){}; 
+<a name="l00047"></a>00047 };
+<a name="l00048"></a>00048 
+<a name="l00049"></a>00049 } } <span class="comment">// namespace boost::reflect</span>
+<a name="l00050"></a>00050 
+<a name="l00051"></a>00051 <span class="preprocessor">#ifndef DOXYGEN</span>
+<a name="l00052"></a>00052 <span class="preprocessor"></span>
+<a name="l00053"></a>00053 <span class="preprocessor">#define BOOST_REFLECT_VISIT_BASE(r, visitor, base) \</span>
+<a name="l00054"></a>00054 <span class="preprocessor">  boost::reflect::reflector&lt;base&gt;::visit( visitor );</span>
+<a name="l00055"></a>00055 <span class="preprocessor"></span>
+<a name="l00056"></a>00056 <span class="preprocessor">#define BOOST_REFLECT_VISIT_MEMBER( r, visitor, elem ) \</span>
+<a name="l00057"></a>00057 <span class="preprocessor">  visitor( &amp;type::elem, BOOST_PP_STRINGIZE(elem) );</span>
+<a name="l00058"></a>00058 <span class="preprocessor"></span>
+<a name="l00059"></a>00059 <span class="preprocessor">#define BOOST_REFLECT_IMPL( TYPE, INHERITS, MEMBERS ) \</span>
+<a name="l00060"></a>00060 <span class="preprocessor">template&lt;typename Visitor&gt;\</span>
+<a name="l00061"></a>00061 <span class="preprocessor">static inline void visit( const Visitor&amp; v ) { \</span>
+<a name="l00062"></a>00062 <span class="preprocessor">    BOOST_PP_SEQ_FOR_EACH( BOOST_REFLECT_VISIT_BASE, v, INHERITS ) \</span>
+<a name="l00063"></a>00063 <span class="preprocessor">    BOOST_PP_SEQ_FOR_EACH( BOOST_REFLECT_VISIT_MEMBER, v, MEMBERS ) \</span>
+<a name="l00064"></a>00064 <span class="preprocessor">} </span>
+<a name="l00065"></a>00065 <span class="preprocessor"></span>
+<a name="l00066"></a>00066 <span class="preprocessor">#endif // DOXYGEN</span>
+<a name="l00067"></a>00067 <span class="preprocessor"></span><span class="comment"></span>
+<a name="l00068"></a>00068 <span class="comment">/**</span>
+<a name="l00069"></a>00069 <span class="comment"> *  @brief Specializes boost::reflect::reflector for TYPE where </span>
+<a name="l00070"></a>00070 <span class="comment"> *         type inherits other reflected classes</span>
+<a name="l00071"></a>00071 <span class="comment"> *</span>
+<a name="l00072"></a>00072 <span class="comment"> *  @param INHERITS - a sequence of base class names (basea)(baseb)(basec)</span>
+<a name="l00073"></a>00073 <span class="comment"> *  @param MEMBERS - a sequence of member names.  (field1)(field2)(field3)</span>
+<a name="l00074"></a>00074 <span class="comment"> */</span>
+<a name="l00075"></a><a class="code" href="reflect_8hpp.html#a89cb84ec0675047f18bdfde076821710">00075</a> <span class="preprocessor">#define BOOST_REFLECT_DERIVED( TYPE, INHERITS, MEMBERS ) \</span>
+<a name="l00076"></a>00076 <span class="preprocessor">BOOST_REFLECT_TYPEINFO(TYPE) \</span>
+<a name="l00077"></a>00077 <span class="preprocessor">namespace boost { namespace reflect { \</span>
+<a name="l00078"></a>00078 <span class="preprocessor">template&lt;&gt; struct reflector&lt;TYPE&gt; {\</span>
+<a name="l00079"></a>00079 <span class="preprocessor">    typedef TYPE type; \</span>
+<a name="l00080"></a>00080 <span class="preprocessor">    enum is_defined { defined = true }; \</span>
+<a name="l00081"></a>00081 <span class="preprocessor">    BOOST_REFLECT_IMPL( TYPE, INHERITS, MEMBERS ) \</span>
+<a name="l00082"></a>00082 <span class="preprocessor">}; } }</span>
+<a name="l00083"></a>00083 <span class="preprocessor"></span>
+<a name="l00084"></a>00084     <span class="comment">//typedef boost::fusion::vector&lt;BOOST_PP_SEQ_ENUM(INHERITS)&gt; base_class_types; \</span>
+<a name="l00085"></a>00085 <span class="comment"></span><span class="comment"></span>
 <a name="l00086"></a>00086 <span class="comment">/**</span>
-<a name="l00087"></a>00087 <span class="comment"> *  @brief Same as BOOST_REFLECT_TYPEINFO except works for templates with 1 paramater.</span>
-<a name="l00088"></a>00088 <span class="comment"> */</span>
-<a name="l00089"></a><a class="code" href="reflect_8hpp.html#a7760302a1d29f7869377b447544b9404">00089</a> <span class="preprocessor">#define BOOST_REFLECT_TEMPLATE_TYPEINFO( NAME ) \</span>
-<a name="l00090"></a>00090 <span class="preprocessor">namespace boost { namespace reflect {\</span>
-<a name="l00091"></a>00091 <span class="preprocessor">template&lt;&gt;\</span>
-<a name="l00092"></a>00092 <span class="preprocessor">struct get_typeinfo&lt;NAME&lt;void_t&gt; &gt; { \</span>
-<a name="l00093"></a>00093 <span class="preprocessor">    enum is_defined_enum{ is_defined = 1 }; \</span>
-<a name="l00094"></a>00094 <span class="preprocessor">    static const char* name() { return BOOST_PP_STRINGIZE(NAME); } \</span>
-<a name="l00095"></a>00095 <span class="preprocessor">}; } }</span>
-<a name="l00096"></a>00096 <span class="preprocessor"></span><span class="comment"></span>
-<a name="l00097"></a>00097 <span class="comment">/**</span>
-<a name="l00098"></a>00098 <span class="comment"> *  @brief Same as BOOST_REFLECT_TYPEINFO except works for templates with 2 paramaters.</span>
-<a name="l00099"></a>00099 <span class="comment"> */</span>
-<a name="l00100"></a><a class="code" href="reflect_8hpp.html#a527556227b5a2910c47477037b1b6bb0">00100</a> <span class="preprocessor">#define BOOST_REFLECT_TEMPLATE2_TYPEINFO( NAME ) \</span>
-<a name="l00101"></a>00101 <span class="preprocessor">namespace boost { namespace reflect {\</span>
-<a name="l00102"></a>00102 <span class="preprocessor">template&lt;&gt;\</span>
-<a name="l00103"></a>00103 <span class="preprocessor">struct get_typeinfo&lt;NAME&lt;void_t,void_t&gt; &gt; { \</span>
-<a name="l00104"></a>00104 <span class="preprocessor">    enum is_defined_enum{ is_defined = 1 }; \</span>
-<a name="l00105"></a>00105 <span class="preprocessor">    static const char* name() { return BOOST_PP_STRINGIZE(NAME); } \</span>
-<a name="l00106"></a>00106 <span class="preprocessor">}; } }</span>
-<a name="l00107"></a>00107 <span class="preprocessor"></span>
-<a name="l00108"></a>00108 <span class="preprocessor">#ifndef DOXYGEN</span>
-<a name="l00109"></a>00109 <span class="preprocessor"></span><span class="preprocessor">#define CUSTOM_MEMBER_CASES(r, data, i, elem)\</span>
-<a name="l00110"></a>00110 <span class="preprocessor">case BOOST_PP_TUPLE_ELEM( 3, 1, elem ):\</span>
-<a name="l00111"></a>00111 <span class="preprocessor">   v.accept_member( name, &amp;data::BOOST_PP_TUPLE_ELEM(3, 0, elem), BOOST_PP_STRINGIZE( BOOST_PP_TUPLE_ELEM(3,0,elem) ), BOOST_PP_TUPLE_ELEM(3, 2,elem) );\</span>
-<a name="l00112"></a>00112 <span class="preprocessor">   break;</span>
-<a name="l00113"></a>00113 <span class="preprocessor"></span>
-<a name="l00114"></a>00114 <span class="preprocessor">#define CUSTOM_MEMBER_ALL(r, data, i, elem)\</span>
-<a name="l00115"></a>00115 <span class="preprocessor">   v.accept_member( name, &amp;data::BOOST_PP_TUPLE_ELEM(3, 0, elem), BOOST_PP_STRINGIZE( BOOST_PP_TUPLE_ELEM(3,0,elem) ), BOOST_PP_TUPLE_ELEM(3, 2,elem) );\</span>
-<a name="l00116"></a>00116 <span class="preprocessor"></span>
-<a name="l00117"></a>00117 <span class="preprocessor"></span><span class="preprocessor">#define MEMBER_CASES(r, data, i, elem)\</span>
-<a name="l00118"></a>00118 <span class="preprocessor">case i:\</span>
-<a name="l00119"></a>00119 <span class="preprocessor">   v.accept_member( name, &amp;data::elem, BOOST_PP_STRINGIZE( elem ), i ); \</span>
-<a name="l00120"></a>00120 <span class="preprocessor">   break;</span>
-<a name="l00121"></a>00121 <span class="preprocessor"></span>
-<a name="l00122"></a>00122 <span class="preprocessor">#define MEMBER_ALL(r, data, i, elem)\</span>
-<a name="l00123"></a>00123 <span class="preprocessor">   v.accept_member( name, &amp;data::elem, BOOST_PP_STRINGIZE( elem ), i );</span>
-<a name="l00124"></a>00124 <span class="preprocessor"></span>
-<a name="l00125"></a>00125 <span class="preprocessor">#define INHERITS (baseA)(baseB)</span>
-<a name="l00126"></a>00126 <span class="preprocessor"></span>
-<a name="l00127"></a>00127 <span class="preprocessor">#define ACCEPT_BASE(r, data, i, elem) \</span>
-<a name="l00128"></a>00128 <span class="preprocessor">    v.accept_base( *static_cast&lt;elem*&gt;(&amp;name), BOOST_PP_STRINGIZE( elem ), field );</span>
-<a name="l00129"></a>00129 <span class="preprocessor"></span>
-<a name="l00130"></a>00130 
-<a name="l00131"></a>00131 <span class="preprocessor">#define BOOST_REFLECT_IMPL( CONST,TYPE, INHERITS, MEMBERS ) \</span>
-<a name="l00132"></a>00132 <span class="preprocessor">template&lt;typename Visitor&gt;\</span>
-<a name="l00133"></a>00133 <span class="preprocessor">static inline void visit( CONST TYPE&amp; name, Visitor&amp; v, uint32_t field = -1 ) { \</span>
-<a name="l00134"></a>00134 <span class="preprocessor">    v.start(name, BOOST_PP_STRINGIZE(TYPE) );\</span>
-<a name="l00135"></a>00135 <span class="preprocessor">    BOOST_PP_SEQ_FOR_EACH_I( ACCEPT_BASE, TYPE, INHERITS ) \</span>
-<a name="l00136"></a>00136 <span class="preprocessor">    switch( field ) { \</span>
-<a name="l00137"></a>00137 <span class="preprocessor">        case -1: \</span>
-<a name="l00138"></a>00138 <span class="preprocessor">            BOOST_PP_SEQ_FOR_EACH_I( MEMBER_ALL, TYPE, MEMBERS ) \</span>
-<a name="l00139"></a>00139 <span class="preprocessor">            break; \</span>
-<a name="l00140"></a>00140 <span class="preprocessor">        BOOST_PP_SEQ_FOR_EACH_I( MEMBER_CASES, TYPE, MEMBERS ) \</span>
-<a name="l00141"></a>00141 <span class="preprocessor">        default: \</span>
-<a name="l00142"></a>00142 <span class="preprocessor">            v.not_found( name, field );\</span>
-<a name="l00143"></a>00143 <span class="preprocessor">    }\</span>
-<a name="l00144"></a>00144 <span class="preprocessor">    v.end(name, BOOST_PP_STRINGIZE(TYPE) );\</span>
-<a name="l00145"></a>00145 <span class="preprocessor">} \</span>
-<a name="l00146"></a>00146 <span class="preprocessor"></span>
-<a name="l00147"></a>00147 <span class="preprocessor"></span><span class="preprocessor">#define BOOST_REFLECT_CUSTOM_IMPL( CONST,TYPE, INHERITS, MEMBERS ) \</span>
-<a name="l00148"></a>00148 <span class="preprocessor">template&lt;typename Visitor&gt;\</span>
-<a name="l00149"></a>00149 <span class="preprocessor">static inline void visit( CONST TYPE&amp; name, Visitor&amp; v, uint32_t field = -1 ) { \</span>
-<a name="l00150"></a>00150 <span class="preprocessor">    v.start(name, BOOST_PP_STRINGIZE(TYPE) );\</span>
-<a name="l00151"></a>00151 <span class="preprocessor">    BOOST_PP_SEQ_FOR_EACH_I( ACCEPT_BASE, TYPE, INHERITS ) \</span>
-<a name="l00152"></a>00152 <span class="preprocessor">    switch( field ) { \</span>
-<a name="l00153"></a>00153 <span class="preprocessor">        case -1: \</span>
-<a name="l00154"></a>00154 <span class="preprocessor">            BOOST_PP_SEQ_FOR_EACH_I( CUSTOM_MEMBER_ALL, TYPE, MEMBERS ) \</span>
-<a name="l00155"></a>00155 <span class="preprocessor">            break; \</span>
-<a name="l00156"></a>00156 <span class="preprocessor">        BOOST_PP_SEQ_FOR_EACH_I( CUSTOM_MEMBER_CASES, TYPE, MEMBERS ) \</span>
-<a name="l00157"></a>00157 <span class="preprocessor">        default: \</span>
-<a name="l00158"></a>00158 <span class="preprocessor">            v.not_found( name, field );\</span>
-<a name="l00159"></a>00159 <span class="preprocessor">    }\</span>
-<a name="l00160"></a>00160 <span class="preprocessor">    v.end(name, BOOST_PP_STRINGIZE(TYPE) );\</span>
-<a name="l00161"></a>00161 <span class="preprocessor">} \</span>
-<a name="l00162"></a>00162 <span class="preprocessor"></span>
-<a name="l00163"></a>00163 <span class="preprocessor"></span><span class="preprocessor">#define BOOST_REFLECT_EMPTY</span>
-<a name="l00164"></a>00164 <span class="preprocessor"></span>
-<a name="l00165"></a>00165 <span class="preprocessor">#define VISIT_BASE( r, data, elem ) reflector&lt;elem&gt;::visit( *((vtable&lt;elem,InterfaceDelegate&gt;*)&amp;a), data );</span>
-<a name="l00166"></a>00166 <span class="preprocessor"></span><span class="preprocessor">#define VISIT_MEMBER( r, data, elem ) t.template accept&lt;data&gt;( a.elem, BOOST_PP_STRINGIZE(elem) );</span>
-<a name="l00167"></a>00167 <span class="preprocessor"></span><span class="preprocessor">#endif // DOXYGEN</span>
-<a name="l00168"></a>00168 <span class="preprocessor"></span><span class="comment"></span>
-<a name="l00169"></a>00169 <span class="comment">/**</span>
-<a name="l00170"></a>00170 <span class="comment"> *  @brief Specializes boost::reflect::reflector for TYPE</span>
-<a name="l00171"></a>00171 <span class="comment"> *</span>
-<a name="l00172"></a>00172 <span class="comment"> *  @param INHERITS - a sequence of base class names (basea)(baseb)(basec)</span>
-<a name="l00173"></a>00173 <span class="comment"> *  @param MEMBERS - a sequence of member names.  (field1)(field2)(field3)</span>
-<a name="l00174"></a>00174 <span class="comment"> */</span>
-<a name="l00175"></a><a class="code" href="reflect_8hpp.html#ac349b37ce6abc17c2c5e556a6368acb2">00175</a> <span class="preprocessor">#define BOOST_REFLECT( TYPE, INHERITS, MEMBERS ) \</span>
-<a name="l00176"></a>00176 <span class="preprocessor">BOOST_REFLECT_TYPEINFO(TYPE) \</span>
-<a name="l00177"></a>00177 <span class="preprocessor">namespace boost { namespace reflect { \</span>
-<a name="l00178"></a>00178 <span class="preprocessor">template&lt;&gt; struct reflector&lt;TYPE&gt; {\</span>
-<a name="l00179"></a>00179 <span class="preprocessor">    BOOST_REFLECT_IMPL( const, TYPE, INHERITS, MEMBERS ) \</span>
-<a name="l00180"></a>00180 <span class="preprocessor">    BOOST_REFLECT_IMPL( BOOST_REFLECT_EMPTY, TYPE, INHERITS, MEMBERS ) \</span>
-<a name="l00181"></a>00181 <span class="preprocessor">\</span>
-<a name="l00182"></a>00182 <span class="preprocessor">    template&lt;typename T, typename InterfaceDelegate&gt; \</span>
-<a name="l00183"></a>00183 <span class="preprocessor">    static void visit( boost::reflect::vtable&lt;TYPE,InterfaceDelegate&gt;&amp; a, T&amp; t ) { \</span>
-<a name="l00184"></a>00184 <span class="preprocessor">        BOOST_PP_SEQ_FOR_EACH( VISIT_BASE, t, INHERITS ) \</span>
-<a name="l00185"></a>00185 <span class="preprocessor">        BOOST_PP_SEQ_FOR_EACH( VISIT_MEMBER, TYPE, MEMBERS ) \</span>
-<a name="l00186"></a>00186 <span class="preprocessor">    } \</span>
-<a name="l00187"></a>00187 <span class="preprocessor">}; } }</span>
-<a name="l00188"></a>00188 <span class="preprocessor"></span>
-<a name="l00189"></a>00189 <span class="comment"></span>
-<a name="l00190"></a>00190 <span class="comment">/**</span>
-<a name="l00191"></a>00191 <span class="comment"> *   This macro is identical to BOOST_REFLECT, except that it gives you</span>
-<a name="l00192"></a>00192 <span class="comment"> *   the ability to customize field numbers and flags.</span>
-<a name="l00193"></a>00193 <span class="comment"> *</span>
-<a name="l00194"></a>00194 <span class="comment"> *   @param MEMBERS  - a sequence of 3 param tuples.</span>
-<a name="l00195"></a>00195 <span class="comment"> *                    ((field_name, NUMBER, FLAGS))((field_name1, NUMBER, FLAGS))</span>
-<a name="l00196"></a>00196 <span class="comment"> *</span>
-<a name="l00197"></a>00197 <span class="comment"> */</span>
-<a name="l00198"></a><a class="code" href="reflect_8hpp.html#a0f64ee296a829ad4e845f987506ec7de">00198</a> <span class="preprocessor">#define BOOST_REFLECT_CUSTOM( TYPE, INHERITS, MEMBERS ) \</span>
-<a name="l00199"></a>00199 <span class="preprocessor">    BOOST_REFLECT_TYPEINFO(TYPE) \</span>
-<a name="l00200"></a>00200 <span class="preprocessor">namespace boost { namespace reflect { \</span>
-<a name="l00201"></a>00201 <span class="preprocessor">template&lt;&gt; struct reflector&lt;TYPE&gt; { \</span>
-<a name="l00202"></a>00202 <span class="preprocessor">    BOOST_REFLECT_CUSTOM_IMPL( const, TYPE, INHERITS, MEMBERS ) \</span>
-<a name="l00203"></a>00203 <span class="preprocessor">    BOOST_REFLECT_CUSTOM_IMPL( BOOST_REFLECT_EMPTY, TYPE, INHERITS, MEMBERS ) \</span>
-<a name="l00204"></a>00204 <span class="preprocessor">} } }</span>
-<a name="l00205"></a>00205 <span class="preprocessor"></span>
-<a name="l00206"></a>00206 
-<a name="l00207"></a>00207 <span class="comment"></span>
-<a name="l00208"></a>00208 <span class="comment">/**</span>
-<a name="l00209"></a>00209 <span class="comment"> *  @brief defines visit functions for T</span>
-<a name="l00210"></a>00210 <span class="comment"> *  Unless this is specialized, visit() will not be defined for T.</span>
-<a name="l00211"></a>00211 <span class="comment"> *</span>
-<a name="l00212"></a>00212 <span class="comment"> *  The @ref BOOST_REFLECT(TYPE,INHERITS,MEMBERS) macro is used to specialize this</span>
-<a name="l00213"></a>00213 <span class="comment"> *  class for your type.</span>
-<a name="l00214"></a>00214 <span class="comment"> */</span>
-<a name="l00215"></a>00215 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
-<a name="l00216"></a><a class="code" href="structboost_1_1reflect_1_1reflector.html">00216</a> <span class="keyword">struct </span><a class="code" href="structboost_1_1reflect_1_1reflector.html" title="defines visit functions for T Unless this is specialized, visit() will not be defined...">reflector</a>{};
-<a name="l00217"></a>00217 <span class="preprocessor">#ifndef DOXYGEN // SPECIAL CASE THAT SHOULD BE REMOVED</span>
-<a name="l00218"></a>00218 <span class="preprocessor"></span><span class="keyword">template</span>&lt;&gt; <span class="keyword">struct </span><a class="code" href="structboost_1_1reflect_1_1reflector.html" title="defines visit functions for T Unless this is specialized, visit() will not be defined...">reflector</a>&lt;<a class="code" href="structboost_1_1reflect_1_1void__t.html" title="A type to replace void in generic code.">void_t</a>&gt; {
-<a name="l00219"></a>00219   <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Visitor&gt;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> visit( <span class="keyword">const</span> <a class="code" href="structboost_1_1reflect_1_1void__t.html" title="A type to replace void in generic code.">void_t</a>&amp; name, Visitor&amp; v, uint32_t field = -1 ) {
-<a name="l00220"></a>00220     v.start(name, <span class="stringliteral">&quot;void_t&quot;</span> );
-<a name="l00221"></a>00221     <span class="keywordflow">switch</span>( field ) {
-<a name="l00222"></a>00222       <span class="keywordflow">case</span> -1:
-<a name="l00223"></a>00223           <span class="keywordflow">break</span>;
-<a name="l00224"></a>00224       <span class="keywordflow">default</span>:
-<a name="l00225"></a>00225           v.not_found( name, field );
-<a name="l00226"></a>00226     }
-<a name="l00227"></a>00227     v.end(name, <span class="stringliteral">&quot;void_t&quot;</span> );
-<a name="l00228"></a>00228   } 
-<a name="l00229"></a>00229   <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Visitor&gt;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> visit( void_t&amp; name, Visitor&amp; v, uint32_t field = -1 ) {
-<a name="l00230"></a>00230     v.start(name, <span class="stringliteral">&quot;void_t&quot;</span> );
-<a name="l00231"></a>00231     <span class="keywordflow">switch</span>( field ) {
-<a name="l00232"></a>00232     <span class="keywordflow">case</span> -1:
-<a name="l00233"></a>00233         <span class="keywordflow">break</span>;
-<a name="l00234"></a>00234     <span class="keywordflow">default</span>:
-<a name="l00235"></a>00235         v.not_found( name, field );
-<a name="l00236"></a>00236     }
-<a name="l00237"></a>00237     v.end(name, <span class="stringliteral">&quot;void_t&quot;</span> );
-<a name="l00238"></a>00238   } 
-<a name="l00239"></a>00239 };
-<a name="l00240"></a>00240 <span class="preprocessor">#endif</span>
-<a name="l00241"></a>00241 <span class="preprocessor"></span>
-<a name="l00242"></a>00242 } } <span class="comment">// namespace boost::reflect</span>
-<a name="l00243"></a>00243 
-<a name="l00244"></a>00244 <span class="comment">// these macros specify namespace boost::reflect </span>
-<a name="l00245"></a>00245 <a class="code" href="reflect_8hpp.html#a28ba3dd540c332863ba827d6926a7b85" title="Allows the typename to be accessed via get_typename&amp;lt;T&amp;gt;() in a cross-platform...">BOOST_REFLECT_TYPEINFO</a>( <span class="keywordtype">void</span> )
-<a name="l00246"></a>00246 <a class="code" href="reflect_8hpp.html#a28ba3dd540c332863ba827d6926a7b85" title="Allows the typename to be accessed via get_typename&amp;lt;T&amp;gt;() in a cross-platform...">BOOST_REFLECT_TYPEINFO</a>( <span class="keywordtype">bool</span> )
-<a name="l00247"></a>00247 <a class="code" href="reflect_8hpp.html#a28ba3dd540c332863ba827d6926a7b85" title="Allows the typename to be accessed via get_typename&amp;lt;T&amp;gt;() in a cross-platform...">BOOST_REFLECT_TYPEINFO</a>( uint8_t )
-<a name="l00248"></a>00248 <a class="code" href="reflect_8hpp.html#a28ba3dd540c332863ba827d6926a7b85" title="Allows the typename to be accessed via get_typename&amp;lt;T&amp;gt;() in a cross-platform...">BOOST_REFLECT_TYPEINFO</a>( uint16_t )
-<a name="l00249"></a>00249 <a class="code" href="reflect_8hpp.html#a28ba3dd540c332863ba827d6926a7b85" title="Allows the typename to be accessed via get_typename&amp;lt;T&amp;gt;() in a cross-platform...">BOOST_REFLECT_TYPEINFO</a>( uint32_t )
-<a name="l00250"></a>00250 <a class="code" href="reflect_8hpp.html#a28ba3dd540c332863ba827d6926a7b85" title="Allows the typename to be accessed via get_typename&amp;lt;T&amp;gt;() in a cross-platform...">BOOST_REFLECT_TYPEINFO</a>( uint64_t )
-<a name="l00251"></a>00251 <a class="code" href="reflect_8hpp.html#a28ba3dd540c332863ba827d6926a7b85" title="Allows the typename to be accessed via get_typename&amp;lt;T&amp;gt;() in a cross-platform...">BOOST_REFLECT_TYPEINFO</a>( int8_t )
-<a name="l00252"></a>00252 <a class="code" href="reflect_8hpp.html#a28ba3dd540c332863ba827d6926a7b85" title="Allows the typename to be accessed via get_typename&amp;lt;T&amp;gt;() in a cross-platform...">BOOST_REFLECT_TYPEINFO</a>( int16_t )
-<a name="l00253"></a>00253 <a class="code" href="reflect_8hpp.html#a28ba3dd540c332863ba827d6926a7b85" title="Allows the typename to be accessed via get_typename&amp;lt;T&amp;gt;() in a cross-platform...">BOOST_REFLECT_TYPEINFO</a>( int32_t )
-<a name="l00254"></a>00254 <a class="code" href="reflect_8hpp.html#a28ba3dd540c332863ba827d6926a7b85" title="Allows the typename to be accessed via get_typename&amp;lt;T&amp;gt;() in a cross-platform...">BOOST_REFLECT_TYPEINFO</a>( int64_t )
-<a name="l00255"></a>00255 <a class="code" href="reflect_8hpp.html#a28ba3dd540c332863ba827d6926a7b85" title="Allows the typename to be accessed via get_typename&amp;lt;T&amp;gt;() in a cross-platform...">BOOST_REFLECT_TYPEINFO</a>( <span class="keywordtype">double</span> )
-<a name="l00256"></a>00256 <a class="code" href="reflect_8hpp.html#a28ba3dd540c332863ba827d6926a7b85" title="Allows the typename to be accessed via get_typename&amp;lt;T&amp;gt;() in a cross-platform...">BOOST_REFLECT_TYPEINFO</a>( <span class="keywordtype">float</span> )
-<a name="l00257"></a>00257 <a class="code" href="reflect_8hpp.html#a28ba3dd540c332863ba827d6926a7b85" title="Allows the typename to be accessed via get_typename&amp;lt;T&amp;gt;() in a cross-platform...">BOOST_REFLECT_TYPEINFO</a>( void_t )
-<a name="l00258"></a>00258 <a class="code" href="reflect_8hpp.html#a28ba3dd540c332863ba827d6926a7b85" title="Allows the typename to be accessed via get_typename&amp;lt;T&amp;gt;() in a cross-platform...">BOOST_REFLECT_TYPEINFO</a>( std::<span class="keywordtype">string</span> )
-<a name="l00259"></a>00259 <a class="code" href="reflect_8hpp.html#a7760302a1d29f7869377b447544b9404" title="Same as BOOST_REFLECT_TYPEINFO except works for templates with 1 paramater.">BOOST_REFLECT_TEMPLATE_TYPEINFO</a>( std::vector )
-<a name="l00260"></a>00260 <a class="code" href="reflect_8hpp.html#a7760302a1d29f7869377b447544b9404" title="Same as BOOST_REFLECT_TYPEINFO except works for templates with 1 paramater.">BOOST_REFLECT_TEMPLATE_TYPEINFO</a>( std::set )
-<a name="l00261"></a>00261 <a class="code" href="reflect_8hpp.html#a7760302a1d29f7869377b447544b9404" title="Same as BOOST_REFLECT_TYPEINFO except works for templates with 1 paramater.">BOOST_REFLECT_TEMPLATE_TYPEINFO</a>( std::list )
-<a name="l00262"></a>00262 <a class="code" href="reflect_8hpp.html#a527556227b5a2910c47477037b1b6bb0" title="Same as BOOST_REFLECT_TYPEINFO except works for templates with 2 paramaters.">BOOST_REFLECT_TEMPLATE2_TYPEINFO</a>( std::map )
-<a name="l00263"></a>00263 <a class="code" href="reflect_8hpp.html#a527556227b5a2910c47477037b1b6bb0" title="Same as BOOST_REFLECT_TYPEINFO except works for templates with 2 paramaters.">BOOST_REFLECT_TEMPLATE2_TYPEINFO</a>( std::pair )
-<a name="l00264"></a>00264 
-<a name="l00265"></a>00265 
-<a name="l00266"></a>00266 <span class="preprocessor">#include &lt;boost/reflect/reflect_function_signature.hpp&gt;</span>
-<a name="l00267"></a>00267 <span class="preprocessor"></span>
-<a name="l00268"></a>00268 <span class="preprocessor">#endif</span>
+<a name="l00087"></a>00087 <span class="comment"> *  @brief Specializes boost::reflect::reflector for TYPE</span>
+<a name="l00088"></a>00088 <span class="comment"> *</span>
+<a name="l00089"></a>00089 <span class="comment"> *  @param MEMBERS - a sequence of member names.  (field1)(field2)(field3)</span>
+<a name="l00090"></a>00090 <span class="comment"> *</span>
+<a name="l00091"></a>00091 <span class="comment"> *  @see BOOST_REFLECT_DERIVED</span>
+<a name="l00092"></a>00092 <span class="comment"> */</span>
+<a name="l00093"></a><a class="code" href="reflect_8hpp.html#a90309261db059f46860d655ed351013d">00093</a> <span class="preprocessor">#define BOOST_REFLECT( TYPE, MEMBERS ) \</span>
+<a name="l00094"></a>00094 <span class="preprocessor">    BOOST_REFLECT_DERIVED( TYPE, BOOST_PP_SEQ_NIL, MEMBERS )</span>
+<a name="l00095"></a>00095 <span class="preprocessor"></span>
+<a name="l00096"></a>00096 
+<a name="l00097"></a>00097 
+<a name="l00098"></a>00098 
+<a name="l00099"></a>00099 
+<a name="l00100"></a>00100 <span class="preprocessor">#endif</span>
 </pre></div></div>
 <hr/>
 <table border=0 width="100%">

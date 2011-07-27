@@ -12,6 +12,7 @@
   <div class="tabs">
     <ul>
       <li><a href="index.html"><span>Main&nbsp;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&nbsp;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -33,10 +34,17 @@
 <a href="#_details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="mirror__interface_8hpp_source.html">mirror_interface.hpp</a>&gt;</code></p>
+
+<p><a href="structboost_1_1reflect_1_1mirror__interface-members.html">List of all members.</a></p>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr><td colspan="2"><h2>Classes</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structboost_1_1reflect_1_1mirror__interface_1_1calculate__type.html">calculate_type</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Implements the InterfaceDelegate meta-function to determine what type to create to mirror MemberPointer in <a class="el" href="classboost_1_1reflect_1_1vtable.html" title="Contains functors defined by InterfaceDelegate for each reflected member of T.">boost::reflect::vtable</a> used by <a class="el" href="classboost_1_1reflect_1_1any__ptr.html" title="Behaves like a smart pointer that can handle any type with the same interface.">boost::reflect::any_ptr</a>.  <a href="structboost_1_1reflect_1_1mirror__interface_1_1calculate__type.html#_details">More...</a><br/></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Implements the InterfaceDelegate meta-function to determine what type to create to mirror MemberPointer in <a class="el" href="classboost_1_1reflect_1_1vtable.html" title="Contains functors defined by InterfaceDelegate for each reflected member of InterfaceType...">boost::reflect::vtable</a> used by <a class="el" href="classboost_1_1reflect_1_1any__ptr.html" title="Behaves like a smart pointer that can handle any type with the same interface.">boost::reflect::any_ptr</a>.  <a href="structboost_1_1reflect_1_1mirror__interface_1_1calculate__type.html#_details">More...</a><br/></td></tr>
+<tr><td colspan="2"><h2>Static Public Member Functions</h2></td></tr>
+<tr><td class="memTemplParams" colspan="2">template&lt;typename T , typename VTableType &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">static void&nbsp;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structboost_1_1reflect_1_1mirror__interface.html#ae4a98e76a10239a588655fd7ab6408b8">set_vtable</a> (VTableType &amp;<a class="el" href="classboost_1_1reflect_1_1vtable.html">vtable</a>, T &amp;value)</td></tr>
+<tr><td class="memTemplParams" colspan="2">template&lt;typename T , typename VTableType &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">static void&nbsp;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structboost_1_1reflect_1_1mirror__interface.html#ab5163c893781bec5ea9dfda6c8d06780">set_vtable</a> (VTableType &amp;<a class="el" href="classboost_1_1reflect_1_1vtable.html">vtable</a>, const T &amp;value)</td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <p>Interface Delegate that mirrors the reflected interface without any transformation. </p>
@@ -44,7 +52,66 @@
 <div class="fragment"><pre class="fragment">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type, <span class="keyword">typename</span> Class&gt;
   mirror_member&lt;Type(Class::*)&gt; 
 </pre></div> 
-<p>Definition at line <a class="el" href="mirror__interface_8hpp_source.html#l00037">37</a> of file <a class="el" href="mirror__interface_8hpp_source.html">mirror_interface.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mirror__interface_8hpp_source.html#l00036">36</a> of file <a class="el" href="mirror__interface_8hpp_source.html">mirror_interface.hpp</a>.</p>
+<hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="ae4a98e76a10239a588655fd7ab6408b8"></a><!-- doxytag: member="boost::reflect::mirror_interface::set_vtable" ref="ae4a98e76a10239a588655fd7ab6408b8" args="(VTableType &amp;vtable, T &amp;value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void set_vtable </td>
+          <td>(</td>
+          <td class="paramtype">VTableType &amp;&nbsp;</td>
+          <td class="paramname"> <em>vtable</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T &amp;&nbsp;</td>
+          <td class="paramname"> <em>value</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td><code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="mirror__interface_8hpp_source.html#l00078">78</a> of file <a class="el" href="mirror__interface_8hpp_source.html">mirror_interface.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ab5163c893781bec5ea9dfda6c8d06780"></a><!-- doxytag: member="boost::reflect::mirror_interface::set_vtable" ref="ab5163c893781bec5ea9dfda6c8d06780" args="(VTableType &amp;vtable, const T &amp;value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void set_vtable </td>
+          <td>(</td>
+          <td class="paramtype">VTableType &amp;&nbsp;</td>
+          <td class="paramname"> <em>vtable</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const T &amp;&nbsp;</td>
+          <td class="paramname"> <em>value</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td><code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="mirror__interface_8hpp_source.html#l00083">83</a> of file <a class="el" href="mirror__interface_8hpp_source.html">mirror_interface.hpp</a>.</p>
+
+</div>
+</div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
 <li><a class="el" href="mirror__interface_8hpp_source.html">mirror_interface.hpp</a></li>
 </ul>

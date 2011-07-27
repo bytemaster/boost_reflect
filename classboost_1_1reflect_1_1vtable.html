@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<title>Boost Reflect Library: vtable&lt; T, InterfaceDelegate &gt; Class Template Reference</title>
+<title>Boost Reflect Library: vtable&lt; InterfaceType, InterfaceDelegate &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -12,6 +12,7 @@
   <div class="tabs">
     <ul>
       <li><a href="index.html"><span>Main&nbsp;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&nbsp;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -28,21 +29,21 @@
   </div>
 </div>
 <div class="contents">
-<h1>vtable&lt; T, InterfaceDelegate &gt; Class Template Reference</h1><!-- doxytag: class="boost::reflect::vtable" -->
-<p>Contains functors defined by InterfaceDelegate for each reflected member of T.  
+<h1>vtable&lt; InterfaceType, InterfaceDelegate &gt; Class Template Reference</h1><!-- doxytag: class="boost::reflect::vtable" -->
+<p>Contains functors defined by InterfaceDelegate for each reflected member of InterfaceType.  
 <a href="#_details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="vtable_8hpp_source.html">vtable.hpp</a>&gt;</code></p>
 <table border="0" cellpadding="0" cellspacing="0">
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
-<h3>template&lt;typename T, typename InterfaceDelegate = boost::reflect::mirror_interface&gt;<br/>
- class boost::reflect::vtable&lt; T, InterfaceDelegate &gt;</h3>
+<h3>template&lt;typename InterfaceType = void, typename InterfaceDelegate = boost::reflect::mirror_interface&gt;<br/>
+ class boost::reflect::vtable&lt; InterfaceType, InterfaceDelegate &gt;</h3>
 
-<p>Contains functors defined by InterfaceDelegate for each reflected member of T. </p>
-<p>Use the <a class="el" href="vtable_8hpp.html#a39175c9ad438485e7f8f1cde7537fbbe">BOOST_REFLECT_ANY(NAME,INHERITS,MEMBERS)</a> to define the vtable for your type. </p>
+<p>Contains functors defined by InterfaceDelegate for each reflected member of InterfaceType. </p>
+<p>Use the <a class="el" href="vtable_8hpp.html#a800b79c6db12c7d5daf890912c5e8cf1">BOOST_REFLECT_ANY(NAME,MEMBERS)</a> or <a class="el" href="vtable_8hpp.html#a02f144061854c3535f18367805c7e293">BOOST_REFLECT_ANY_DERIVED(NAME,BASES,MEMBERS)</a> to define the vtable for your type. </p>
 
-<p>Definition at line <a class="el" href="vtable_8hpp_source.html#l00031">31</a> of file <a class="el" href="vtable_8hpp_source.html">vtable.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vtable_8hpp_source.html#l00036">36</a> of file <a class="el" href="vtable_8hpp_source.html">vtable.hpp</a>.</p>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li><a class="el" href="vtable_8hpp_source.html">vtable.hpp</a></li>
 </ul>

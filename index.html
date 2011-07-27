@@ -12,6 +12,7 @@
   <div class="tabs">
     <ul>
       <li class="current"><a href="index.html"><span>Main&nbsp;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&nbsp;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -35,45 +36,9 @@ Table of Contents</a></h2>
 <li><a class="el" href="group__boost__reflect__quickstart.html#boost_reflect_erasures">Type Erasures</a></li>
 </ul>
 </li>
-<li><a class="el" href="index.html#boost_reflect_implementation_detail">Implementation Details</a></li>
-<li><a class="el" href="index.html#boost_reflect_adapting_an_interface">Adapting an Interface</a></li>
-<li><a class="el" href="index.html#boost_reflect_rationale">Design Rationale</a></li>
-<li><a class="el" href="index.html#boost_reflect_future_dev">Future Development</a></li>
-<li><a class="el" href="index.html#boost_reflect_acknowledgements">Acknowledgements</a></li>
-</ul>
-<h3><a class="anchor" id="boost_reflect_implementation_detail">
-Implementation Details</a></h3>
-<p>TBD</p>
-<h3><a class="anchor" id="boost_reflect_adapting_an_interface">
-Adapting an Interface</a></h3>
-<p>TBD</p>
-<h2><a class="anchor" id="boost_reflect_rationale">
-Design Rationale</a></h2>
-<p>There has been discussion on the Boost mailing list regarding how the type erasure should be implemented. The obvious, "ideal", would be something where the 'weight' of the any_ptr&lt;&gt; is no more than boost::any. This approach would 'convert' any type passed into the constructor into a polymorphic type implementing the interface. Then the cost of a call is one virtual method invocation (assuming proper inlining).</p>
-<p>This solution has already been implemented via <a href="http://www.cdiggins.com/bil.html">Boost.Interfaces</a>.</p>
-<p>The interface declaration used by Boost.Interfaces is:</p>
-<div class="fragment"><pre class="fragment">        BOOST_INTERFACE_BEGIN(IShape)
-            BOOST_INTERFACE_CONST_FUNCTION0(GetX, <span class="keywordtype">int</span>)
-            BOOST_INTERFACE_CONST_FUNCTION0(GetY, <span class="keywordtype">int</span>)
-            BOOST_INTERFACE_CONST_FUNCTION0(GetArea, <span class="keywordtype">double</span>)
-            BOOST_INTERFACE_FUNCTION2(SetXY, <span class="keywordtype">void</span>, (<span class="keywordtype">int</span>, x), (<span class="keywordtype">int</span>, y))
-            BOOST_INTERFACE_FUNCTION2(OffSetXY, <span class="keywordtype">void</span>, (<span class="keywordtype">int</span>, x), (<span class="keywordtype">int</span>, y))
-            BOOST_INTERFACE_CONST_FUNCTION0(GetName, const <span class="keywordtype">char</span>*)
-        BOOST_INTERFACE_END(IShape)
-</pre></div><p>Unfortunately, there is no clear way to define a macro based solution that achieves what Boost.Interfaces achieves without specifying your entire interface with the (relatively) messy syntax above. A downside to the approach above is that any types that happen to contain a ',' would require special handling. A benefit to the above approach is that there is potential for knowng the parameter names in addition to the types.</p>
-<p>I opted for a simpler syntax that can apply to pre-existing types along with the potential for more dynamic interface implementations rather than going for maximum possible performance or the minimum possible memory usage. With the proper "InterfaceDelegate", there is the potential that each method turns into a Don Clugston fast delegate. Thus you can get the 'fastest possible delegation' at the price of 16 bytes per method (on 64 bit machines) and a little extra one-time initialization cost.</p>
-<h2><a class="anchor" id="boost_reflect_future_dev">
-Future Development</a></h2>
-<p>TBD</p>
-<h2><a class="anchor" id="boost_reflect_acknowledgements">
-Acknowledgements</a></h2>
-<p>Ideas, inspiration, and code were borrowed from:</p>
-<ul>
-<li><a href="http://www.cdiggins.com/bil.html">Boost.Interfaces</a> - Jonathan Turkanis &amp; Christopher Diggins.</li>
-<li><a href="http://kifri.fri.uniza.sk/~chochlik/mirror-lib/html/">Boost.Mirror</a> - Matus Chochlik.</li>
-<li><a href="http://www.codeproject.com/cpp/fast_delegate.asp">Fast Delegate</a> - Don Clugston.</li>
-<li><a href="http://www.boostpro.com/mplbook/">C++ Template Metaprogramming</a> by Dave Abrahams &amp; Aleksy Curtovoy</li>
-<li><a href="http://www.artima.com/cppsource/type_erasure.html">On the Tension Between Object-Oriented and Generic Programming in C++ and What Type Erasure Can Do About It</a> by Thomas Becker </li>
+<li><a class="el" href="group__boost__reflect__vtable.html">Dynamic VTables</a></li>
+<li><a class="el" href="group__boost__reflect__rationale.html">Design Rationale</a></li>
+<li><a class="el" href="group__boost__reflect__acknowledgements.html">Acknowledgements</a> </li>
 </ul>
 </div>
 <hr/>

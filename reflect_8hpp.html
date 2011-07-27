@@ -12,6 +12,7 @@
   <div class="tabs">
     <ul>
       <li><a href="index.html"><span>Main&nbsp;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&nbsp;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -44,31 +45,21 @@
 <code>#include &lt;set&gt;</code><br/>
 <code>#include &lt;map&gt;</code><br/>
 <code>#include &lt;stdint.h&gt;</code><br/>
+<code>#include &lt;boost/fusion/container/vector.hpp&gt;</code><br/>
 <code>#include &lt;<a class="el" href="void_8hpp_source.html">boost/reflect/void.hpp</a>&gt;</code><br/>
 <code>#include &lt;<a class="el" href="vtable_8hpp_source.html">boost/reflect/vtable.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="reflect__function__signature_8hpp_source.html">boost/reflect/reflect_function_signature.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="typeinfo_8hpp_source.html">boost/reflect/typeinfo.hpp</a>&gt;</code><br/>
 
 <p><a href="reflect_8hpp_source.html">Go to the source code of this file.</a></p>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr><td colspan="2"><h2>Classes</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structboost_1_1reflect_1_1get__typeinfo.html">get_typeinfo&lt; T &gt;</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">provides compile time access to name of a type.  <a href="structboost_1_1reflect_1_1get__typeinfo.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structboost_1_1reflect_1_1reflector.html">reflector&lt; T &gt;</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">defines visit functions for T Unless this is specialized, visit() will not be defined for T.  <a href="structboost_1_1reflect_1_1reflector.html#_details">More...</a><br/></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">defines visit functions for T Unless this is specialized, <a class="el" href="structboost_1_1reflect_1_1reflector.html#ad7e2371eee574b5bbd1a0237204634d2">visit()</a> will not be defined for T.  <a href="structboost_1_1reflect_1_1reflector.html#_details">More...</a><br/></td></tr>
 <tr><td colspan="2"><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="reflect_8hpp.html#a28ba3dd540c332863ba827d6926a7b85">BOOST_REFLECT_TYPEINFO</a>(NAME)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Allows the typename to be accessed via get_typename&lt;T&gt;() in a cross-platform, demangled way that std::typeinfo cannot do.  <a href="#a28ba3dd540c332863ba827d6926a7b85"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="reflect_8hpp.html#a7760302a1d29f7869377b447544b9404">BOOST_REFLECT_TEMPLATE_TYPEINFO</a>(NAME)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Same as BOOST_REFLECT_TYPEINFO except works for templates with 1 paramater.  <a href="#a7760302a1d29f7869377b447544b9404"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="reflect_8hpp.html#a527556227b5a2910c47477037b1b6bb0">BOOST_REFLECT_TEMPLATE2_TYPEINFO</a>(NAME)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Same as BOOST_REFLECT_TYPEINFO except works for templates with 2 paramaters.  <a href="#a527556227b5a2910c47477037b1b6bb0"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="reflect_8hpp.html#ac349b37ce6abc17c2c5e556a6368acb2">BOOST_REFLECT</a>(TYPE, INHERITS, MEMBERS)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Specializes <a class="el" href="structboost_1_1reflect_1_1reflector.html" title="defines visit functions for T Unless this is specialized, visit() will not be defined...">boost::reflect::reflector</a> for TYPE.  <a href="#ac349b37ce6abc17c2c5e556a6368acb2"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="reflect_8hpp.html#a0f64ee296a829ad4e845f987506ec7de">BOOST_REFLECT_CUSTOM</a>(TYPE, INHERITS, MEMBERS)</td></tr>
-<tr><td colspan="2"><h2>Functions</h2></td></tr>
-<tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">const char *&nbsp;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceboost_1_1reflect.html#a6212dd043c419b83aee374ee443cf6d0">get_typename</a> ()</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Removes all decorations and returns the typename.  <a href="#a6212dd043c419b83aee374ee443cf6d0"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="reflect_8hpp.html#a89cb84ec0675047f18bdfde076821710">BOOST_REFLECT_DERIVED</a>(TYPE, INHERITS, MEMBERS)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Specializes <a class="el" href="structboost_1_1reflect_1_1reflector.html" title="defines visit functions for T Unless this is specialized, visit() will not be defined...">boost::reflect::reflector</a> for TYPE where type inherits other reflected classes.  <a href="#a89cb84ec0675047f18bdfde076821710"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="reflect_8hpp.html#a90309261db059f46860d655ed351013d">BOOST_REFLECT</a>(TYPE, MEMBERS)&nbsp;&nbsp;&nbsp;BOOST_REFLECT_DERIVED( TYPE, BOOST_PP_SEQ_NIL, MEMBERS )</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Specializes <a class="el" href="structboost_1_1reflect_1_1reflector.html" title="defines visit functions for T Unless this is specialized, visit() will not be defined...">boost::reflect::reflector</a> for TYPE.  <a href="#a90309261db059f46860d655ed351013d"></a><br/></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <p>Defines types and macros used to provide reflection. </p>
@@ -76,14 +67,24 @@
 
 <p>Definition in file <a class="el" href="reflect_8hpp_source.html">reflect.hpp</a>.</p>
 <hr/><h2>Define Documentation</h2>
-<a class="anchor" id="a28ba3dd540c332863ba827d6926a7b85"></a><!-- doxytag: member="reflect.hpp::BOOST_REFLECT_TYPEINFO" ref="a28ba3dd540c332863ba827d6926a7b85" args="(NAME)" -->
+<a class="anchor" id="a89cb84ec0675047f18bdfde076821710"></a><!-- doxytag: member="reflect.hpp::BOOST_REFLECT_DERIVED" ref="a89cb84ec0675047f18bdfde076821710" args="(TYPE, INHERITS, MEMBERS)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define BOOST_REFLECT_TYPEINFO</td>
+          <td class="memname">#define BOOST_REFLECT_DERIVED</td>
           <td>(</td>
-          <td class="paramtype">NAME&nbsp;</td>
+          <td class="paramtype">TYPE, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">INHERITS, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">MEMBERS&nbsp;</td>
           <td class="paramname"></td>
           <td>&nbsp;)&nbsp;</td>
           <td></td>
@@ -91,76 +92,28 @@
       </table>
 </div>
 <div class="memdoc">
-<b>Value:</b><div class="fragment"><pre class="fragment"><span class="keyword">namespace </span>boost { <span class="keyword">namespace </span>reflect { \
-<span class="keyword">template</span>&lt;&gt; \
-<span class="keyword">struct </span>get_typeinfo&lt;NAME&gt; { \
-    <span class="keyword">enum</span> is_defined_enum{ is_defined = 1 }; \
-    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* name() { <span class="keywordflow">return</span> BOOST_PP_STRINGIZE(NAME); } \
+<b>Value:</b><div class="fragment"><pre class="fragment"><a class="code" href="typeinfo_8hpp.html#a28ba3dd540c332863ba827d6926a7b85" title="Allows the typename to be accessed via get_typename&amp;lt;T&amp;gt;() in a cross-platform...">BOOST_REFLECT_TYPEINFO</a>(TYPE) \
+<span class="keyword">namespace </span>boost { <span class="keyword">namespace </span>reflect { \
+<span class="keyword">template</span>&lt;&gt; <span class="keyword">struct </span>reflector&lt;TYPE&gt; {\
+    <span class="keyword">typedef</span> TYPE type; \
+    <span class="keyword">enum</span> is_defined { defined = <span class="keyword">true</span> }; \
+    BOOST_REFLECT_IMPL( TYPE, INHERITS, MEMBERS ) \
 }; } }
 </pre></div>
-<p>Allows the typename to be accessed via get_typename&lt;T&gt;() in a cross-platform, demangled way that std::typeinfo cannot do. </p>
+<p>Specializes <a class="el" href="structboost_1_1reflect_1_1reflector.html" title="defines visit functions for T Unless this is specialized, visit() will not be defined...">boost::reflect::reflector</a> for TYPE where type inherits other reflected classes. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>INHERITS</em>&nbsp;</td><td>- a sequence of base class names (basea)(baseb)(basec) </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>MEMBERS</em>&nbsp;</td><td>- a sequence of member names. (field1)(field2)(field3) </td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p>Definition at line <a class="el" href="reflect_8hpp_source.html#l00077">77</a> of file <a class="el" href="reflect_8hpp_source.html">reflect.hpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a7760302a1d29f7869377b447544b9404"></a><!-- doxytag: member="reflect.hpp::BOOST_REFLECT_TEMPLATE_TYPEINFO" ref="a7760302a1d29f7869377b447544b9404" args="(NAME)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOOST_REFLECT_TEMPLATE_TYPEINFO</td>
-          <td>(</td>
-          <td class="paramtype">NAME&nbsp;</td>
-          <td class="paramname"></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<b>Value:</b><div class="fragment"><pre class="fragment"><span class="keyword">namespace </span>boost { <span class="keyword">namespace </span>reflect {\
-<span class="keyword">template</span>&lt;&gt;\
-<span class="keyword">struct </span>get_typeinfo&lt;NAME&lt;void_t&gt; &gt; { \
-    <span class="keyword">enum</span> is_defined_enum{ is_defined = 1 }; \
-    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* name() { <span class="keywordflow">return</span> BOOST_PP_STRINGIZE(NAME); } \
-}; } }
-</pre></div>
-<p>Same as BOOST_REFLECT_TYPEINFO except works for templates with 1 paramater. </p>
-
-<p>Definition at line <a class="el" href="reflect_8hpp_source.html#l00089">89</a> of file <a class="el" href="reflect_8hpp_source.html">reflect.hpp</a>.</p>
+<p>Definition at line <a class="el" href="reflect_8hpp_source.html#l00075">75</a> of file <a class="el" href="reflect_8hpp_source.html">reflect.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a527556227b5a2910c47477037b1b6bb0"></a><!-- doxytag: member="reflect.hpp::BOOST_REFLECT_TEMPLATE2_TYPEINFO" ref="a527556227b5a2910c47477037b1b6bb0" args="(NAME)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOOST_REFLECT_TEMPLATE2_TYPEINFO</td>
-          <td>(</td>
-          <td class="paramtype">NAME&nbsp;</td>
-          <td class="paramname"></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<b>Value:</b><div class="fragment"><pre class="fragment"><span class="keyword">namespace </span>boost { <span class="keyword">namespace </span>reflect {\
-<span class="keyword">template</span>&lt;&gt;\
-<span class="keyword">struct </span>get_typeinfo&lt;NAME&lt;void_t,void_t&gt; &gt; { \
-    <span class="keyword">enum</span> is_defined_enum{ is_defined = 1 }; \
-    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* name() { <span class="keywordflow">return</span> BOOST_PP_STRINGIZE(NAME); } \
-}; } }
-</pre></div>
-<p>Same as BOOST_REFLECT_TYPEINFO except works for templates with 2 paramaters. </p>
-
-<p>Definition at line <a class="el" href="reflect_8hpp_source.html#l00100">100</a> of file <a class="el" href="reflect_8hpp_source.html">reflect.hpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ac349b37ce6abc17c2c5e556a6368acb2"></a><!-- doxytag: member="reflect.hpp::BOOST_REFLECT" ref="ac349b37ce6abc17c2c5e556a6368acb2" args="(TYPE, INHERITS, MEMBERS)" -->
+<a class="anchor" id="a90309261db059f46860d655ed351013d"></a><!-- doxytag: member="reflect.hpp::BOOST_REFLECT" ref="a90309261db059f46860d655ed351013d" args="(TYPE, MEMBERS)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -172,85 +125,25 @@
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">INHERITS, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype">MEMBERS&nbsp;</td>
           <td class="paramname"></td>
           <td>&nbsp;)&nbsp;</td>
-          <td></td>
+          <td>&nbsp;&nbsp;&nbsp;BOOST_REFLECT_DERIVED( TYPE, BOOST_PP_SEQ_NIL, MEMBERS )</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
-<b>Value:</b><div class="fragment"><pre class="fragment"><a class="code" href="reflect_8hpp.html#a28ba3dd540c332863ba827d6926a7b85" title="Allows the typename to be accessed via get_typename&amp;lt;T&amp;gt;() in a cross-platform...">BOOST_REFLECT_TYPEINFO</a>(TYPE) \
-<span class="keyword">namespace </span>boost { <span class="keyword">namespace </span>reflect { \
-<span class="keyword">template</span>&lt;&gt; <span class="keyword">struct </span>reflector&lt;TYPE&gt; {\
-    BOOST_REFLECT_IMPL( <span class="keyword">const</span>, TYPE, INHERITS, MEMBERS ) \
-    BOOST_REFLECT_IMPL( BOOST_REFLECT_EMPTY, TYPE, INHERITS, MEMBERS ) \
-\
-    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> InterfaceDelegate&gt; \
-    <span class="keyword">static</span> <span class="keywordtype">void</span> visit( <a class="code" href="classboost_1_1reflect_1_1vtable.html" title="Contains functors defined by InterfaceDelegate for each reflected member of T.">boost::reflect::vtable&lt;TYPE,InterfaceDelegate&gt;</a>&amp; a, T&amp; t ) { \
-        BOOST_PP_SEQ_FOR_EACH( VISIT_BASE, t, INHERITS ) \
-        BOOST_PP_SEQ_FOR_EACH( VISIT_MEMBER, TYPE, MEMBERS ) \
-    } \
-}; } }
-</pre></div>
+
 <p>Specializes <a class="el" href="structboost_1_1reflect_1_1reflector.html" title="defines visit functions for T Unless this is specialized, visit() will not be defined...">boost::reflect::reflector</a> for TYPE. </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>INHERITS</em>&nbsp;</td><td>- a sequence of base class names (basea)(baseb)(basec) </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>MEMBERS</em>&nbsp;</td><td>- a sequence of member names. (field1)(field2)(field3) </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>MEMBERS</em>&nbsp;</td><td>- a sequence of member names. (field1)(field2)(field3)</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="reflect_8hpp.html#a89cb84ec0675047f18bdfde076821710" title="Specializes boost::reflect::reflector for TYPE where type inherits other reflected...">BOOST_REFLECT_DERIVED</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="reflect_8hpp_source.html#l00175">175</a> of file <a class="el" href="reflect_8hpp_source.html">reflect.hpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a0f64ee296a829ad4e845f987506ec7de"></a><!-- doxytag: member="reflect.hpp::BOOST_REFLECT_CUSTOM" ref="a0f64ee296a829ad4e845f987506ec7de" args="(TYPE, INHERITS, MEMBERS)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOOST_REFLECT_CUSTOM</td>
-          <td>(</td>
-          <td class="paramtype">TYPE, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">INHERITS, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">MEMBERS&nbsp;</td>
-          <td class="paramname"></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<b>Value:</b><div class="fragment"><pre class="fragment"><a class="code" href="reflect_8hpp.html#a28ba3dd540c332863ba827d6926a7b85" title="Allows the typename to be accessed via get_typename&amp;lt;T&amp;gt;() in a cross-platform...">BOOST_REFLECT_TYPEINFO</a>(TYPE) \
-<span class="keyword">namespace </span>boost { <span class="keyword">namespace </span>reflect { \
-<span class="keyword">template</span>&lt;&gt; <span class="keyword">struct </span>reflector&lt;TYPE&gt; { \
-    BOOST_REFLECT_CUSTOM_IMPL( <span class="keyword">const</span>, TYPE, INHERITS, MEMBERS ) \
-    BOOST_REFLECT_CUSTOM_IMPL( BOOST_REFLECT_EMPTY, TYPE, INHERITS, MEMBERS ) \
-} } }
-</pre></div><p>This macro is identical to BOOST_REFLECT, except that it gives you the ability to customize field numbers and flags.</p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>MEMBERS</em>&nbsp;</td><td>- a sequence of 3 param tuples. ((field_name, NUMBER, FLAGS))((field_name1, NUMBER, FLAGS)) </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="reflect_8hpp_source.html#l00198">198</a> of file <a class="el" href="reflect_8hpp_source.html">reflect.hpp</a>.</p>
+<p>Definition at line <a class="el" href="reflect_8hpp_source.html#l00093">93</a> of file <a class="el" href="reflect_8hpp_source.html">reflect.hpp</a>.</p>
 
 </div>
 </div>
