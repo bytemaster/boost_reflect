@@ -29,8 +29,8 @@
     struct xml_printer {
         xml_printer( const T& c ):self(c){}
 
-        template<typename Class, typename T>
-        void operator()( T (Class::*p), const char* name ) {
+        template<typename Class, typename Member>
+        void operator()( Member Class::*p, const char* name ) {
             std::cerr<<"<"<<name<<">"<<(self.*p)<<"</"<<name<<">\n";
         }
         const T& self;
@@ -70,12 +70,12 @@
       double result()const;
     };
 
-    BOOST_REFLECT_ANY( Service, BOOST_REFLECT_BASE, (name)(exit) )
-    BOOST_REFLECT_ANY( Calculator, (Service), (add)(sub)(mult)(div)(result) )
+    BOOST_REFLECT_ANY( Service,(name)(exit) )
+    BOOST_REFLECT_ANY_DERIVED( Calculator, (Service), (add)(sub)(mult)(div)(result) )
     @endcode
 
     @note When you define an interface, you need not provide implementations of the methods; however,
-        it you want you may also use an interace like any other class without limititations.  
+        if you want you may also use an interace like any other class without limititations.  
 
 
    @code
@@ -110,10 +110,12 @@
 
     The interface of any_ptr<Calculator> is 'identical' to the Calculator defined above.
 
-    Pointer semantics was chosen to discourage using reflect::anys as values where assignment and
+    Pointer semantics were chosen to discourage using reflect::anys as values where assignment and
     copy construction creates a new instance.  Initialization of @link boost::reflect::any_ptr 
     any_ptr @endlink with a new pointer is a relatively expensive operation and value semantics
     would create objects that are much bigger and more expensive to copy than traditional types
-    as each method is a functor that must be initialized at copy/construction time.
-    
+    as each method is a functor that must be initialized at copy/construction time. 
+
+    Generally speaking, any_ptr<> should be used to abstract long-lived objects and not for
+    temporaries. 
 */
