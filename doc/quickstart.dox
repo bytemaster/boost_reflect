@@ -29,8 +29,13 @@
     struct xml_printer {
         xml_printer( const T& c ):self(c){}
 
+        template<typename Type> 
+        static xml_printer<Type> make( const Type& t ) {
+            return xml_printer<Type>(t);
+        }
+
         template<typename Class, typename Member>
-        void operator()( Member Class::*p, const char* name ) {
+        void operator()( Member Class::*p, const char* name )const {
             std::cerr<<"<"<<name<<">"<<(self.*p)<<"</"<<name<<">\n";
         }
         const T& self;
@@ -40,7 +45,8 @@
     The visitor can then be applied like so:
     @code
         my_struct s;
-        boost::reflect::reflector<my_struct>::visit( xml_printer(s) );
+        boost::reflect::reflector<my_struct>::visit( xml_printer<my_struct>(s) );
+        boost::reflect::reflector<my_struct>::visit( xml_printer::make(s) );
     @endcode
 
 
