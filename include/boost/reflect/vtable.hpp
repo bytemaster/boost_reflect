@@ -43,7 +43,7 @@ namespace boost { namespace reflect {
   template<typename InterfaceType> 
   struct vtable_reflector {
     template<typename Visitor, typename InterfaceDelegate>
-    static void visit( const boost::reflect::vtable<Visitor,InterfaceDelegate>* vtbl, const Visitor& v ) {}
+    static void visit( const boost::reflect::vtable<InterfaceType,InterfaceDelegate>* vtbl, const Visitor& v ) {}
   };
 
 #ifndef DOXYGEN
