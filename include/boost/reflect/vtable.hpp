@@ -39,7 +39,7 @@ namespace boost { namespace reflect {
   template<typename T> 
   struct vtable_reflector {
     template<typename Visitor, typename InterfaceDelegate>
-    static void visit( const boost::reflect::vtable<T,InterfaceDelegate>* vtbl, const Visitor& v ) {}
+    static void visit( const boost::reflect::vtable<Visitor,InterfaceDelegate>* vtbl, const Visitor& v ) {}
   };
 } } // namespace boost::reflect
 

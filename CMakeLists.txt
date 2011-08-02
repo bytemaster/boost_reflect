@@ -4,4 +4,4 @@ if( ENABLE_EXAMPLES )
         add_subdirectory(examples)
     endif( ENABLE_REFLECT_EXAMPLES )
 endif( ENABLE_EXAMPLES )
-
+install( DIRECTORY include/boost/reflect DESTINATION include/boost )
