@@ -24,25 +24,36 @@
 namespace boost { namespace reflect {
 
   struct mirror_interface;
-  template<typename t>
-  class vtable_base{};
+  
 
   /**
-   *  @brief Contains functors defined by InterfaceDelegate for each reflected member of T
+   *  @brief Contains functors defined by InterfaceDelegate for each reflected member of InterfaceType
    *
-   *  Use the @ref BOOST_REFLECT_ANY(NAME,INHERITS,MEMBERS) to define the vtable for your
+   *  Use the @ref BOOST_REFLECT_ANY(NAME,MEMBERS) or BOOST_REFLECT_ANY_DERIVED(NAME,BASES,MEMBERS) to define the vtable for your
    *  type.
    */
-  template<typename T = void, typename InterfaceDelegate = boost::reflect::mirror_interface>
+  template<typename InterfaceType = void, typename InterfaceDelegate = boost::reflect::mirror_interface>
   class vtable {};
-
-  template<typename T> 
+  
+  /**
+   *  @brief Enables specialization of visit for InterfaceType
+   *
+   *  This class is specialized by BOOST_REFLECT_ANY and BOOST_REFLECT_ANY_DERIVED
+   */
+  template<typename InterfaceType> 
   struct vtable_reflector {
     template<typename Visitor, typename InterfaceDelegate>
     static void visit( const boost::reflect::vtable<Visitor,InterfaceDelegate>* vtbl, const Visitor& v ) {}
   };
+
+#ifndef DOXYGEN
+  template<typename t>
+  class vtable_base{};
+#endif
+
 } } // namespace boost::reflect
 
+#ifndef DOXYGEN
 #define BOOST_REFLECT_VTABLE_PUBLIC_BASE( r, data, elem )  boost::reflect::vtable<elem,data>,
 
 #define BOOST_REFLECT_VTABLE_DEFINE_MEMBER( r, data, elem ) \
@@ -63,6 +74,7 @@ namespace boost { namespace reflect {
 #define BOOST_REFLECT_VTABLE_VISIT_MEMBER( r, visitor, elem ) \
   visitor( &vtable_type::elem, BOOST_PP_STRINGIZE(elem) );
 
+// example of how to convert enumerate any BOOST_PP_SEQ, including BOOST_PP_SEQ_NIL
 #define BOOST_REFLECT_SEQ_ENUM(X) \
 BOOST_PP_LIST_ENUM( \
   BOOST_PP_LIST_REST( \
@@ -71,7 +83,8 @@ BOOST_PP_LIST_ENUM( \
   ) \
 )
 
-#define BOOST_REFLECT_BASE BOOST_PP_SEQ_NIL
+#endif
+
 #define BOOST_REFLECT_ANY_DERIVED( NAME, INHERITS, MEMBERS ) \
 BOOST_REFLECT_DERIVED( NAME, INHERITS, MEMBERS ) \
 namespace boost { namespace reflect { \

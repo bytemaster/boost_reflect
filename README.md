@@ -36,27 +36,25 @@ of how to create a command line calculator can be found in the examples director
 
     BOOST_REFLECT_ANY( calculator, BOOST_PP_NIL, (add)(sub)(result) )
 
-    int main( int argc, char** argv )
-    {
-        boost::reflect::any<calculator> calc = calculator();
+    int main( int argc, char** argv ) {
+      boost::reflect::any_ptr<Calculator> s( new CalculatorService() );
+      printf( "Result: %f\n", s->result() );
 
-        cli  m_cli;
-        m_cli.start_visit(calc);
+      cli  m_cli(s);
 
-        std::string line;
-        std::string cmd;
-        std::string args;
+      std::string line;
+      std::string cmd;
+      std::string args;
 
-        while( true )
-        {
-            std::cerr << "Enter Method: ";
-            std::getline( std::cin, line );
-            cmd = line.substr( 0, line.find('(') );
-            args = line.substr( cmd.size(), line.size() );
-            std::cerr << m_cli[cmd](args) << std::endl;
-        }
+      while( true ) {
+          std::cerr << "Enter Method: ";
+          std::getline( std::cin, line );
+          cmd = line.substr( 0, line.find('(') );
+          args = line.substr( cmd.size(), line.size() );
+          std::cerr << m_cli[cmd](args) << std::endl;
+      }
 
-        return 0;
+      return 0;
     }
 
 ### Output ###
@@ -72,3 +70,15 @@ of how to create a command line calculator can be found in the examples director
     Enter Method: result()
     2
 
+Boost.CMT can be built by checking out my development repository: https://github.com/bytemaster/dev
+
+### Installation ## 
+
+    git clone https://github.com/bytemaster/dev
+    cd dev
+    git submodule init
+    git submodule update
+    cmake .
+    make
+    make install
+    @endcode

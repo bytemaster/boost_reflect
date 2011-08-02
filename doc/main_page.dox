@@ -58,10 +58,6 @@
 
             - <a href="http://www.boostpro.com/mplbook/">C++ Template Metaprogramming</a> by Dave Abrahams & Aleksy Curtovoy
 
-        More than that, you can adapt interfaces, morph inheritance based interfaces
-        into value semantics, or perform other transformations on an interface in the
-        process of 'erasing' its type.
-
         Common uses of type erasure include boost::any and boost::function.  Boost.Any 
         erases all type information except its name and copy semantics.  Boost.Function
         erases everything about a type except the calling signature.  Algorithms written
@@ -121,21 +117,15 @@
         - @ref boost_reflect_quickstart
             - @ref boost_reflect_basic
             - @ref boost_reflect_erasures
-        - @ref boost_reflect_implementation_detail  
-        - @ref boost_reflect_adapting_an_interface
+        - @ref boost_reflect_vtable  
         - @ref boost_reflect_rationale
-        - @ref boost_reflect_future_dev
         - @ref boost_reflect_acknowledgements
 
-    @subsection boost_reflect_implementation_detail  Implementation Details
+*/
 
-    TBD
-
-    @subsection boost_reflect_adapting_an_interface Adapting an Interface
-    
-    TBD
-
-    @section boost_reflect_rationale Design Rationale
+/**
+    @defgroup boost_reflect_rationale Design Rationale
+    @ingroup boost_reflect
 
     There has been discussion on the Boost mailing list regarding how 
     the type erasure should be implemented.  The obvious, "ideal", 
@@ -175,11 +165,11 @@
     the 'fastest possible delegation' at the price of 16 bytes per method 
     (on 64 bit machines) and a little extra one-time initialization cost.  
 
-    @section boost_reflect_future_dev Future Development
+*/
 
-    TBD
-
-    @section boost_reflect_acknowledgements Acknowledgements
+/**
+    @defgroup boost_reflect_acknowledgements Acknowledgements
+    @ingroup boost_reflect
     
         Ideas, inspiration, and code were borrowed from:
          - <a href="http://www.cdiggins.com/bil.html">Boost.Interfaces</a> - Jonathan Turkanis & Christopher Diggins.

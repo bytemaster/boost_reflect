@@ -8,7 +8,7 @@
   #include <boost/fusion/container/vector.hpp>
   #include <boost/fusion/container/generation/make_vector.hpp>
   #include <boost/fusion/functional/generation/make_fused_function_object.hpp>
-  #include <boost/fusion/include/make_unfused.hpp>
+  #include <boost/fusion/functional/generation/make_unfused.hpp>
   #include <boost/reflect/void.hpp>
   #include <boost/signals.hpp>
   #include <boost/reflect/vtable.hpp>
