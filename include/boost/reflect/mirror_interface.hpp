@@ -19,7 +19,7 @@
      *         variable/method pointed to by MemberPtr
      */
     template<typename MemberPtr>
-    struct mirror_member{};
+    struct mirror_member;
     
     /**
      *  @brief Interface Delegate that mirrors the 
