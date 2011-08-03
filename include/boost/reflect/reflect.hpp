@@ -81,7 +81,6 @@ template<> struct reflector<TYPE> {\
     BOOST_REFLECT_IMPL( TYPE, INHERITS, MEMBERS ) \
 }; } }
 
-    //typedef boost::fusion::vector<BOOST_PP_SEQ_ENUM(INHERITS)> base_class_types; \
 
 /**
  *  @brief Specializes boost::reflect::reflector for TYPE
