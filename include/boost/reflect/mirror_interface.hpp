@@ -188,7 +188,7 @@ struct mirror_member<R(Class::*)(PARAM_TYPES)>
                                                                                        
   typedef mirror_member                                      self_type;
   typedef boost::fusion::vector<PARAM_TYPES>                 fused_params;
-  typedef boost::function_traits<R(PARAM_TYPES)>             traits;
+  typedef boost::function_traits<result_type(PARAM_TYPES)>   traits;
   typedef boost::function<result_type(const fused_params&)>  delegate_type;
   static const bool                                          is_const  = false;
   static const bool                                          is_signal = false;

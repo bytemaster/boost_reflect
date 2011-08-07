@@ -1,0 +1,92 @@
+/**
+    @defgroup boost_reflect_cli_example Command Line Interpreter Example
+    @ingroup boost_reflect
+
+    This example demonstrates how Boost.Reflect can be used to create a generic
+    command line interpreter that can interpret <code>std::cin</code> commands like:
+
+    @code
+    add( 1 )
+    add2( 1,2.4 )
+    @endcode
+
+    And call the proper method with the proper arguments and then print the result.
+
+
+    @code
+    class cli 
+    {
+      public:
+        template<typename T>
+        cli( T aptr) { 
+           boost::reflect::visit( aptr, visitor<typename T::vtable_type>( *this, *aptr) ); 
+        }
+
+        boost::function<std::string(const std::string&)>& operator[]( const std::string& name ) 
+        { return methods[name]; }
+
+      private:
+        template<typename VTableType> struct visitor {
+            visitor( cli& c, VTableType& vtbl ):m_cli(c),m_vtbl(vtbl){}
+            template<typename M, typename InterfaceName>
+            void operator()( M InterfaceName::* m, const char* name ) const {
+                 std::cerr << std::setw(10) << std::setiosflags(std::ios::left) << name 
+                           << " " << boost::reflect::get_typename<typename M::signature>()
+                           << (M::is_const ? "const" : "") <<std::endl;
+                 m_cli.methods[name] = cli_functor<typename M::fused_params, M&>(m_vtbl.*m);
+            }
+            VTableType&   m_vtbl;
+            cli&          m_cli;
+        };
+
+        template<typename Seq, typename Functor>
+        struct cli_functor
+        {
+            cli_functor( Functor f )
+            :m_func(f){}
+
+            typedef typename boost::remove_reference<Functor>::type functor_type;
+
+            std::string operator()( const std::string& cli )
+            {
+                 std::stringstream ss(cli);
+                 Seq s; ss >> boost::fusion::tuple_delimiter(',') >> s;
+                 std::stringstream rtn;
+                 rtn << m_func(s);
+                 return rtn.str();
+            }
+            Functor m_func;
+        };
+        std::map<std::string, boost::function<std::string(const std::string&)> > methods;
+    };
+
+    @endcode
+
+    This class can then be used like so:
+
+
+    @code
+    int main( int argc, char** argv )
+    {
+        boost::reflect::any_ptr<Calculator> s( new CalculatorService() );
+        printf( "Result: %f\n", s->result() );
+
+        cli  m_cli(s);
+
+        std::string line;
+        std::string cmd;
+        std::string args;
+
+        while( true ) {
+            std::cerr << "Enter Method: ";
+            std::getline( std::cin, line );
+            cmd = line.substr( 0, line.find('(') );
+            args = line.substr( cmd.size(), line.size() );
+            std::cerr << m_cli[cmd](args) << std::endl;
+        }
+
+        return 0;
+    }
+    @endcode
+
+*/

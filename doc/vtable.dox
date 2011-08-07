@@ -1,0 +1,242 @@
+/**
+    @defgroup boost_reflect_vtable Dynamic VTables
+    @ingroup boost_reflect
+
+    In C++ vtables enable virtual methods and runtime polymorphism.  Boost.Reflect implements
+    a much more powerful and dynamic version of vtables with boost::reflect::vtable.  Unlike normal
+    vtables, which are statically populated at compile time, boost::reflect::vtable can change 
+    dynamically at runtime and can be populated from any type that implements its interface.
+
+    Traditional C++ vtables provide one global instance and all objects of a particular type
+    point to that single instance.   Boost.Reflect's vtable provides a unique copy per instance
+    as each instance is dynamically bound.
+
+    Furthermore, boost::reflect::vtable allows any Functor to be assigned.
+
+    @section boost_reflect_vtable_definition Creating a new Dynamic VTable
+
+    Like regular C++ vtables, you must define the signature of your methods.
+
+    @code
+    struct Service {
+      std::string name()const;
+    };
+    struct Calculator : Service {
+      double add( double v );           
+    };
+
+    BOOST_REFLECT_ANY( Service,(name) )
+    BOOST_REFLECT_ANY_DERIVED( Calculator, (Service), (add) )
+    @endcode
+
+    These macros expand into something morally equal to:
+
+    @code
+    namespace boost { namespace reflect {
+        template<typename InterfaceDelegate > 
+        struct vtable<Service,InterfaceDelegate>  {
+            typedef Service interface_type;
+            boost::function<std::string()> name;
+        };
+        template<typename InterfaceDelegate > 
+        struct vtable<Calculator,InterfaceDelegate> : vtable<Service,InterfaceDelegate> {
+            typedef Calculator interface_type;
+            boost::function<double(double)> add;
+        };
+    } } 
+    @endcode
+
+    The result is that you can use a vtable<Calculator> like so:
+
+    @code
+    std::string get_name()       { return "hello world"; }
+    double      do_add(double v) { return v+3.1415;      }
+
+    vtable<Calculator> calc;
+    calc.name = get_name;
+    calc.add  = do_add;
+
+    BOOST_ASSERT( calc.name() == "hello world" );
+    BOOST_ASSERT( calc.add(5) == 8.1415 );
+    @endcode
+
+    That by itself is useful, but not all that special.  The power of boost::vtable is
+    that it supports an InterfaceDelegate to define how member pointers are mapped to
+    function objects, and they support reflection allowing you to visit each member.
+
+    The default InterfaceDelegate is boost::reflect::mirror_interface which attempts to
+    mirror the interface of Service and Calculator without modifying return types, parameters,
+    constness, or adding other operations.
+
+    @section boost_reflect_interface_delegate VTable Interface Delegates
+    
+    An interface delegate takes the form of a template meta-function that calculates the
+    functor type for a given member pointer and provides a visitor that can be used to 
+    initialize your calculated types from a reference to an instance of any type that
+    provides the same interface.
+
+    @code
+    struct your_delegate {
+        template<typename MemberPointer>
+        struct calculate_type {
+          typedef your_member_functor_type<MemberPointer>  type; 
+        };
+
+        template<typename AssignType, typename VTableType>
+        struct set_visitor {
+          set_visitor( VTableType& vt, AssignType& self );
+
+          template<typename VTable, typename MemberFunctor>
+          void operator()( MemberFunctor VTable::* m, const char* name )const;
+        };
+    };
+    @endcode
+
+    In the case of boost::reflect::mirror_interface you end up with:
+
+    @code
+    struct mirror_interface 
+    {
+      template<typename MemberPointer>
+      struct calculate_type {
+        typedef mirror_member<MemberPointer>  type; 
+      };
+      // set_visitor omited... for now
+    };
+    @endcode
+
+    Which, for every mirrored member defines a type of mirror_member<> which is implemented as:
+
+    @code
+    template<typename R, typename Class BOOST_PP_COMMA_IF(n) PARAM_TYPE_NAMES>
+    struct mirror_member<R(Class::*)(PARAM_TYPES)const> 
+    {
+      // boost::result_of
+      typedef typename adapt_void<R>::result_type                    result_type;
+      typedef mirror_member                                          self_type;
+      typedef boost::fusion::vector<PARAM_TYPES>                     fused_params;
+      typedef boost::function_traits<result_type(PARAM_TYPES)>       traits;
+      static const bool                                              is_const = true;
+      static const bool                                              is_signal = false;
+
+      typedef typename boost::remove_pointer<result_type(*)(PARAM_TYPES)>::type   signature;
+
+      result_type operator()( PARAM_ARGS )const {
+        return m_delegate( boost::fusion::make_vector(PARAM_NAMES) );
+      }
+      result_type operator() ( const fused_params& fp )const {
+        return m_delegate( fp );
+      }
+      mirror_member& operator=( const mirror_member& d )  {
+        m_delegate = d.m_delegate;
+        return *this;
+      }
+      template<typename T>
+      mirror_member& operator=( const T& d )  {
+        m_delegate = adapt_void<R,T>(d);
+        return *this;
+      }
+      template<typename C, typename M>
+      void set_delegate(  C* s, M m ) {
+        m_delegate = adapt_void<R, boost::function<R(const fused_params&)> >(
+                        boost::fusion::make_fused_function_object( 
+                                        boost::bind(m,s PARAM_PLACE_HOLDERS ) ));
+      }
+      private:
+        boost::function<result_type(const fused_params&)> m_delegate; 
+    };
+    @endcode
+
+    First thing you will realize is that each functor provides a lot of typedefs that
+    are useful for meta-programming.  The second thing you will notice is that the mirrored
+    interface is actually a bit more that simply mirroring the interface, it also supports boost::fusion's
+    fused parameters interface.  This greatly simplifies writing generic code for a particular interface.
+
+    @todo Should boost::reflect::mirror_interface be true to its name and not add other operations
+          such as fused parameter lists and instead create a boost::reflect::fused_interface?  Unless it
+          is found to cause conflicts, the extra function of mirror_interface is probably better than the
+          extra complications of switching between fused/unfused interfaces.
+
+
+    In addition to providing fused parameters, the mirror_interface also adapts <code>void</code> return types
+    into <code>void_t</code> return types.  This greatly simplifies meta programming.
+
+
+    @section boost_reflect_vtable_delegate_set_visitor VTable Delegate set_visitors.
+
+    The purpose of the InterfaceDelegate::set_visitor struct is to assign your calculated functor from
+    an arbitrary type's member function with the same name and signature.  The set_visitor is called with
+    a member pointer on a boost::reflect::vtable to your calculated functor type.  This visitor is templated
+    on the arbitrary type being assigned to the vtable and so now you must assign your functor from <code>T::name</code>
+    which is challenging because the visitor doesn't know the 'name' on T except as a const char*.  This is worked
+    around because the Functor defined by BOOST_REFLECT_ANY() provides a useful static method: 
+    
+    @code
+      template<typename Type, typename AssignType> \
+      static void get_member_ptr( AssignType v ) {  v = &Type::elem; } \
+    @endcode
+
+    This can then be used like so:
+
+    @code
+      template<typename T, typename VTableType>
+      class set_visitor {
+        public:
+          set_visitor( VTableType& vt, T& self )
+          :m_self(self),vtable(vt){}
+
+          template<typename InterfaceName, typename M>
+          void operator()( M InterfaceName::* m, const char* name )const {
+            assign<M> a(m_self,vtable.*m);
+            M::template get_member_ptr<T>( a );
+          }
+        private:
+          template<typename Member>
+          struct assign {
+            assign( T& _v, Member& _m ):v(_v),m(_m){}
+
+            template<typename MemberPtr>
+            void operator=( const MemberPtr& p ) {
+              m.set_delegate( &v, p );
+            }
+            private:
+              T&      v;
+              Member& m;
+          };
+          T&          m_self;
+          VTableType& vtable;
+      };
+    @endcode
+
+    Using this method you can create arbitrary helper structs that can assign your
+    delegate functors from an arbitrary member ptr.  
+
+    But wait, if you were observant you would realize that we never defined <code>get_member_ptr()</code> for our
+    <code>mirror_member<></code> type.  This is where the BOOST_REFLECT_ANY() macro brings it all together.
+
+    BOOST_REFLECT_ANY( interface_type, (method_name) ), boost::reflect::vtable is actually defined as:
+
+    @code
+    struct vtable<interface_type,InterfaceDelegate> {
+        struct  __reflect__method_name
+          public InterfaceDelegate::calculate_type<BOOST_TYPEOF(&interface_type::elem)>::type  
+        {  
+            static const char* name() { return "method_name"; } 
+            template<typename Type, typename AssignType> 
+            static void get_member_ptr( AssignType v ) {  v = &Type::elem; } 
+        } method_name;
+    };
+    @endcode
+
+    So your calculated functor type is uniquely derived from for each name and thus provides the required 
+    <code>get_member_ptr()</code> function.  <code>get_member_ptr()</code> does not return &Type::elem because
+    of the complex issues around knowing that the return type *should be*.  By passing in an arbitrary type which
+    is then assigned the result of &Type::elem you are given the benefit of argument deduction and matching.
+
+    As a consequence of this design you can actualy use boost::reflect::any_ptr<interface_type> to do some nifty things like:
+
+    @code
+        boost::reflect::vtable<T>::method_name::name();
+        boost::reflect::vtable<T>::method_name::get_member_ptr<OtherType>(...)
+    @endcode
+*/
