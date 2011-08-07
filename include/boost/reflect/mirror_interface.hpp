@@ -8,7 +8,7 @@
   #include <boost/fusion/container/vector.hpp>
   #include <boost/fusion/container/generation/make_vector.hpp>
   #include <boost/fusion/functional/generation/make_fused_function_object.hpp>
-  #include <boost/fusion/include/make_unfused.hpp>
+  #include <boost/fusion/functional/generation/make_unfused.hpp>
   #include <boost/reflect/void.hpp>
   #include <boost/signals.hpp>
   #include <boost/reflect/vtable.hpp>
@@ -19,7 +19,74 @@
      *         variable/method pointed to by MemberPtr
      */
     template<typename MemberPtr>
-    struct mirror_member{};
+    struct mirror_member;
+
+    namespace detail {
+        namespace mirror_interface {
+          #ifndef DOXYGEN
+          /**
+           *  Assigns VTableType's functors with values from T
+           */
+          template<typename T, typename VTableType>
+          class set_visitor {
+            public:
+              set_visitor( VTableType& vt, T& self )
+              :m_self(self),vtbl(vt){}
+
+              template<typename InterfaceName, typename M>
+              void operator()( M InterfaceName::* m, const char* name )const {
+                assign<M> a(m_self,vtbl.*m);
+                M::template get_member_ptr<T>( a );
+              }
+            private:
+              template<typename Member>
+              struct assign {
+                assign( T& _v, Member& _m ):v(_v),m(_m){}
+
+                template<typename MemberPtr>
+                void operator=( const MemberPtr& p ) {
+                  m.set_delegate( &v, p );
+                }
+                private:
+                  T&      v;
+                  Member& m;
+              };
+              T&          m_self;
+              VTableType& vtbl;
+          };
+          template<typename Interface, typename Delegate, typename VTableType>
+          class set_visitor<vtable<Interface,Delegate>, VTableType> {
+            public:
+              typedef boost::reflect::vtable<Interface,Delegate> T;
+
+              set_visitor( VTableType& vt, T& self )
+              :m_self(self),vtbl(vt){}
+
+              template<typename InterfaceName, typename M>
+              void operator()( M InterfaceName::* m, const char* name )const {
+                assign<M> a(m_self,vtbl.*m);
+                M::template get_member_ptr<T>( a );
+              }
+            private:
+              template<typename Member>
+              struct assign {
+                assign( T& _v, Member& _m ):v(_v),m(_m){}
+
+                template<typename MemberPtr>
+                void operator=( MemberPtr p ) {
+                    m = boost::bind(boost::ref(v.*p), _1 );
+                }
+                private:
+                  T&      v;
+                  Member& m;
+              };
+              T&    m_self;
+              VTableType& vtbl;
+          };
+         
+          #endif 
+        }
+    }
     
     /**
      *  @brief Interface Delegate that mirrors the 
@@ -45,44 +112,15 @@
         typedef mirror_member<MemberPointer>  type; 
       };
 
-      #ifndef DOXYGEN
-      template<typename T, typename VTableType>
-      class set_visitor {
-        public:
-          set_visitor( VTableType& vt, T& self )
-          :m_self(self),vtable(vt){}
-
-          template<typename InterfaceName, typename M>
-          void operator()( M InterfaceName::* m, const char* name )const {
-            assign<M> a(m_self,vtable.*m);
-            M::template get_member_ptr<T>( a );
-          }
-        private:
-          template<typename Member>
-          struct assign {
-            assign( T& _v, Member& _m ):v(_v),m(_m){}
-
-            template<typename MemberPtr>
-            void operator=( const MemberPtr& p ) {
-              m.set_delegate( &v, p );
-            }
-            private:
-              T&      v;
-              Member& m;
-          };
-          T&          m_self;
-          VTableType& vtable;
-      };
-      #endif 
       template<typename T, typename VTableType>
       static void set_vtable( VTableType& vtable, T& value ) {
         vtable_reflector<typename VTableType::interface_type>::visit( &vtable,
-                    set_visitor<T,VTableType>(vtable,value) );
+                    detail::mirror_interface::set_visitor<T,VTableType>(vtable,value) );
       }
       template<typename T, typename VTableType>
       static void set_vtable( VTableType& vtable, const T& value ) {
         vtable_reflector<typename VTableType::interface_type>::visit( &vtable,
-                    set_visitor<T,VTableType>(vtable,value) );
+                    detail::mirror_interface::set_visitor<T,VTableType>(vtable,value) );
       }
     };
 

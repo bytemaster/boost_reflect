@@ -8,6 +8,7 @@
 #ifndef _BOOST_REFLECT_VTABLE_HPP_
 #define _BOOST_REFLECT_VTABLE_HPP_
 #include <boost/preprocessor/arithmetic/inc.hpp>
+#include <boost/typeof/typeof.hpp>
 #include <boost/preprocessor/seq/push_front.hpp>
 #include <boost/preprocessor/seq/seq.hpp>
 #include <boost/preprocessor/seq/enum.hpp>

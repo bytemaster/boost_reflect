@@ -1,5 +1,6 @@
 #include <boost/reflect/any_ptr.hpp>
 #include "cli.hpp"
+#include <stdio.h>
 
 struct Service
 {
