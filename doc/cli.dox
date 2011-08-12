@@ -28,8 +28,8 @@
       private:
         template<typename VTableType> struct visitor {
             visitor( cli& c, VTableType& vtbl ):m_cli(c),m_vtbl(vtbl){}
-            template<typename M, typename InterfaceName>
-            void operator()( M InterfaceName::* m, const char* name ) const {
+            template<typename M, typename InterfaceName, M InterfaceName::* m>
+            void operator()( const char* name ) const {
                  std::cerr << std::setw(10) << std::setiosflags(std::ios::left) << name 
                            << " " << boost::reflect::get_typename<typename M::signature>()
                            << (M::is_const ? "const" : "") <<std::endl;
@@ -47,8 +47,7 @@
 
             typedef typename boost::remove_reference<Functor>::type functor_type;
 
-            std::string operator()( const std::string& cli )
-            {
+            std::string operator()( const std::string& cli ) {
                  std::stringstream ss(cli);
                  Seq s; ss >> boost::fusion::tuple_delimiter(',') >> s;
                  std::stringstream rtn;

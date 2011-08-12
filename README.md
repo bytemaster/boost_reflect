@@ -34,7 +34,7 @@ of how to create a command line calculator can be found in the examples director
             double result_;
     };
 
-    BOOST_REFLECT_ANY( calculator, BOOST_PP_NIL, (add)(sub)(result) )
+    BOOST_REFLECT_ANY( calculator, (add)(sub)(result) )
 
     int main( int argc, char** argv ) {
       boost::reflect::any_ptr<Calculator> s( new CalculatorService() );
