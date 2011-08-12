@@ -15,7 +15,7 @@ class cli
     public:
        template<typename T>
        cli( T aptr) { 
-            boost::reflect::visit( aptr, visitor<typename T::vtable_type>( *this, *aptr) ); 
+          boost::reflect::visit( aptr, visitor<typename T::vtable_type>( *this, *aptr) ); 
        }
 
        boost::function<std::string(const std::string&)>& operator[]( const std::string& name ) 
@@ -24,8 +24,8 @@ class cli
    private:
        template<typename VTableType> struct visitor {
            visitor( cli& c, VTableType& vtbl ):m_cli(c),m_vtbl(vtbl){}
-           template<typename M, typename InterfaceName>
-           void operator()( M InterfaceName::* m, const char* name ) const {
+           template<typename M, typename InterfaceName, M InterfaceName::*m>
+           void operator()( const char* name ) const {
                 std::cerr << std::setw(10) << std::setiosflags(std::ios::left) << name 
                           << " " << boost::reflect::get_typename<typename M::signature>()
                           << (M::is_const ? "const" : "") <<std::endl;
