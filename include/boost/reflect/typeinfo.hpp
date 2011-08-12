@@ -21,27 +21,32 @@ inline const char* get_typename()  {
                       typename boost::remove_pointer<T>::type>::type>::type>::name();
 }
 #ifndef DOXYGEN
-template<typename TP, template<typename> class C> 
-struct get_typeinfo< C<TP> > { 
-  // used to specify template get_typeinfo
-
+template<typename TP> 
+struct get_typeinfo< std::vector<TP> > { 
   enum is_defined_enum{ is_defined = get_typeinfo<TP>::is_defined }; 
   static const char* name() 
   {  
-    static std::string n = std::string( get_typename<C<void_t> >() ) + 
-                               "<" + std::string(get_typename<TP>()) +  ">"; 
+    static std::string n = "std::vector<" + std::string(get_typename<TP>()) +  ">"; 
+    return n.c_str(); 
+  } 
+}; 
+template<typename TP> 
+struct get_typeinfo< std::list<TP> > { 
+  enum is_defined_enum{ is_defined = get_typeinfo<TP>::is_defined }; 
+  static const char* name() 
+  {  
+    static std::string n = "std::list<" + std::string(get_typename<TP>()) +  ">"; 
     return n.c_str(); 
   } 
 }; 
 
-template<typename TP, typename TP2, template<typename, typename> class C> 
-struct get_typeinfo< C<TP,TP2> > { 
+template<typename TP, typename TP2>
+struct get_typeinfo< std::map<TP,TP2> > { 
   enum is_defined_enum{ is_defined = get_typeinfo<TP>::is_defined && get_typeinfo<TP2>::is_defined }; 
   static const char* name() 
   {  
-    static std::string n = std::string( get_typename< C<void_t,void_t> >() ) + 
-                                "<" + std::string(get_typename<TP>()) +  "," + 
-                                      std::string( get_typename<TP>() ) + ">"; 
+    static std::string n = "std::map<" + std::string(get_typename<TP>()) +  "," + 
+                                      std::string(get_typename<TP2>() ) + ">"; 
     return n.c_str(); 
   } 
 };
@@ -53,8 +58,7 @@ struct get_typeinfo< C<TP,TP2> > {
  */
 #define BOOST_REFLECT_TYPEINFO( NAME ) \
 namespace boost { namespace reflect { \
-template<> \
-struct get_typeinfo<NAME> { \
+template<> struct get_typeinfo<NAME> { \
     enum is_defined_enum{ is_defined = 1 }; \
     static const char* name() { return BOOST_PP_STRINGIZE(NAME); } \
 }; } }
@@ -65,8 +69,7 @@ struct get_typeinfo<NAME> { \
  */
 #define BOOST_REFLECT_TEMPLATE_TYPEINFO( NAME ) \
 namespace boost { namespace reflect {\
-template<>\
-struct get_typeinfo<NAME<void_t> > { \
+template<> struct get_typeinfo<NAME<void_t> > { \
     enum is_defined_enum{ is_defined = 1 }; \
     static const char* name() { return BOOST_PP_STRINGIZE(NAME); } \
 }; } }
@@ -76,8 +79,7 @@ struct get_typeinfo<NAME<void_t> > { \
  */
 #define BOOST_REFLECT_TEMPLATE2_TYPEINFO( NAME ) \
 namespace boost { namespace reflect {\
-template<>\
-struct get_typeinfo<NAME<void_t,void_t> > { \
+template<> struct get_typeinfo<NAME<void_t,void_t> > { \
     enum is_defined_enum{ is_defined = 1 }; \
     static const char* name() { return BOOST_PP_STRINGIZE(NAME); } \
 }; } }

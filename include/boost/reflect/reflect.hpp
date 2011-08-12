@@ -41,7 +41,7 @@ template<typename T>
 struct reflector{
     typedef T type;
     typedef boost::fusion::vector<> base_class_types;
-    enum is_defined { defined = false };
+    typedef boost::false_type is_defined;
     template<typename Visitor>
     static inline void visit( const Visitor&  ){}; 
 };
@@ -54,7 +54,7 @@ struct reflector{
   boost::reflect::reflector<base>::visit( visitor );
 
 #define BOOST_REFLECT_VISIT_MEMBER( r, visitor, elem ) \
-  visitor( &type::elem, BOOST_PP_STRINGIZE(elem) );
+  visitor.template operator()<BOOST_TYPEOF(type::elem),type,&type::elem>( BOOST_PP_STRINGIZE(elem) );
 
 #define BOOST_REFLECT_IMPL( TYPE, INHERITS, MEMBERS ) \
 template<typename Visitor>\
@@ -77,7 +77,7 @@ BOOST_REFLECT_TYPEINFO(TYPE) \
 namespace boost { namespace reflect { \
 template<> struct reflector<TYPE> {\
     typedef TYPE type; \
-    enum is_defined { defined = true }; \
+    typedef boost::true_type is_defined; \
     BOOST_REFLECT_IMPL( TYPE, INHERITS, MEMBERS ) \
 }; } }
 

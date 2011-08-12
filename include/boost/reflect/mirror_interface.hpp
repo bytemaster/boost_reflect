@@ -33,8 +33,8 @@
               set_visitor( VTableType& vt, T& self )
               :m_self(self),vtbl(vt){}
 
-              template<typename InterfaceName, typename M>
-              void operator()( M InterfaceName::* m, const char* name )const {
+              template<typename M, typename InterfaceName, M (InterfaceName::*m)>
+              void operator()( const char* name )const {
                 assign<M> a(m_self,vtbl.*m);
                 M::template get_member_ptr<T>( a );
               }
@@ -62,8 +62,8 @@
               set_visitor( VTableType& vt, T& self )
               :m_self(self),vtbl(vt){}
 
-              template<typename InterfaceName, typename M>
-              void operator()( M InterfaceName::* m, const char* name )const {
+              template<typename M, typename InterfaceName, M (InterfaceName::*m)>
+              void operator()( const char* name )const {
                 assign<M> a(m_self,vtbl.*m);
                 M::template get_member_ptr<T>( a );
               }

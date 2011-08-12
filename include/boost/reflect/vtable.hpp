@@ -73,7 +73,7 @@ namespace boost { namespace reflect {
   vtable_reflector<name>::visit( (const boost::reflect::vtable<name,InterfaceDelegate>*)vtbl, visitor );
 
 #define BOOST_REFLECT_VTABLE_VISIT_MEMBER( r, visitor, elem ) \
-  visitor( &vtable_type::elem, BOOST_PP_STRINGIZE(elem) );
+  visitor.template operator()<BOOST_TYPEOF(vtable_type::elem),vtable_type,&vtable_type::elem>( BOOST_PP_STRINGIZE(elem) );
 
 // example of how to convert enumerate any BOOST_PP_SEQ, including BOOST_PP_SEQ_NIL
 #define BOOST_REFLECT_SEQ_ENUM(X) \
@@ -87,7 +87,7 @@ BOOST_PP_LIST_ENUM( \
 #endif
 
 #define BOOST_REFLECT_ANY_DERIVED( NAME, INHERITS, MEMBERS ) \
-BOOST_REFLECT_DERIVED( NAME, INHERITS, MEMBERS ) \
+BOOST_REFLECT_TYPEINFO(NAME) \
 namespace boost { namespace reflect { \
 template<typename InterfaceDelegate > \
 struct vtable<NAME,InterfaceDelegate> : BOOST_PP_SEQ_FOR_EACH( BOOST_REFLECT_VTABLE_PUBLIC_BASE, InterfaceDelegate, INHERITS ) private vtable_base<NAME> { \
