@@ -34,8 +34,8 @@
             return xml_printer<Type>(t);
         }
 
-        template<typename Class, typename Member>
-        void operator()( Member Class::*p, const char* name )const {
+        template<typename Member, typename Class, Member Class::*p>
+        void operator()( const char* name )const {
             std::cerr<<"<"<<name<<">"<<(self.*p)<<"</"<<name<<">\n";
         }
         const T& self;
