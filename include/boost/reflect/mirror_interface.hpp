@@ -155,6 +155,7 @@
   #define PARAM_TYPE_NAME(z,n,type)   BOOST_PP_CAT(typename A,n)
   #define PARAM_TYPE(z,n,type)   BOOST_PP_CAT(A,n)
   #define PARAM_ARG(z,n,type)     PARAM_TYPE(z,n,type) PARAM_NAME(z,n,type)
+  #define DEDUCE_PARAM_TYPE(z,in,Type)  typename boost::remove_const<typename boost::remove_reference<BOOST_PP_CAT(A,in)>::type >::type
 
 #        ifndef BOOST_REFLECT_MIRROR_IMPL_SIZE
 #           define BOOST_REFLECT_MIRROR_IMPL_SIZE 8
@@ -168,6 +169,7 @@
   #undef PARAM_NAME
   #undef PARAM_TYPE
   #undef PARAM_ARG
+  #undef DEDUCE_PARAM_TYPE
 
   } } // namespace boost::reflect
   #endif // BOOST_REFLECT_MIRROR_INTERFACE_HPP
@@ -180,6 +182,7 @@
 #define PARAM_ARGS           BOOST_PP_ENUM(n,PARAM_ARG,A) // TYPE_N name_N
 #define PARAM_TYPE_NAMES     BOOST_PP_ENUM(n,PARAM_TYPE_NAME,A) // typename TYPE_N
 #define PARAM_TYPES          BOOST_PP_ENUM(n,PARAM_TYPE,A) // TYPE_N
+#define DEDUCED_PARAM_TYPES  BOOST_PP_ENUM(n,DEDUCE_PARAM_TYPE,A) // TYPE_N
 
 template<typename R, typename Class BOOST_PP_COMMA_IF(n) PARAM_TYPE_NAMES>
 struct mirror_member<R(Class::*)(PARAM_TYPES)const> 
@@ -188,6 +191,7 @@ struct mirror_member<R(Class::*)(PARAM_TYPES)const>
   typedef typename adapt_void<R>::result_type                    result_type;
   typedef mirror_member                                          self_type;
   typedef boost::fusion::vector<PARAM_TYPES>                     fused_params;
+  typedef boost::fusion::vector<DEDUCED_PARAM_TYPES>             deduced_params;
   typedef boost::function_traits<result_type(PARAM_TYPES)>       traits;
   static const bool                                              is_const = true;
   static const bool                                              is_signal = false;
@@ -226,6 +230,7 @@ struct mirror_member<R(Class::*)(PARAM_TYPES)>
                                                                                        
   typedef mirror_member                                      self_type;
   typedef boost::fusion::vector<PARAM_TYPES>                 fused_params;
+  typedef boost::fusion::vector<DEDUCED_PARAM_TYPES>         deduced_params;
   typedef boost::function_traits<result_type(PARAM_TYPES)>   traits;
   typedef boost::function<result_type(const fused_params&)>  delegate_type;
   static const bool                                          is_const  = false;
