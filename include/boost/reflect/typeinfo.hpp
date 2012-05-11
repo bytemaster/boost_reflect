@@ -63,6 +63,13 @@ template<> struct get_typeinfo<NAME> { \
     static const char* name() { return BOOST_PP_STRINGIZE(NAME); } \
 }; } }
 
+#define BOOST_REFLECT_TYPEINFO_ALIAS( NAME, STR_NAME ) \
+namespace boost { namespace reflect { \
+template<> struct get_typeinfo<NAME> { \
+    enum is_defined_enum{ is_defined = 1 }; \
+    static const char* name() { return STR_NAME; } \
+}; } }
+
 
 /**
  *  @brief Same as BOOST_REFLECT_TYPEINFO except works for templates with 1 paramater.

@@ -1,3 +1,4 @@
+
 /**
  * @file boost/reflect/reflect.hpp
  *
@@ -56,9 +57,16 @@ struct reflector{
 #define BOOST_REFLECT_VISIT_MEMBER( r, visitor, elem ) \
   visitor.template operator()<BOOST_TYPEOF(type::elem),type,&type::elem>( BOOST_PP_STRINGIZE(elem) );
 
-#define BOOST_REFLECT_IMPL( TYPE, INHERITS, MEMBERS ) \
+#define BOOST_REFLECT_DERIVED_IMPL_INLINE( TYPE, INHERITS, MEMBERS ) \
 template<typename Visitor>\
 static inline void visit( const Visitor& v ) { \
+    BOOST_PP_SEQ_FOR_EACH( BOOST_REFLECT_VISIT_BASE, v, INHERITS ) \
+    BOOST_PP_SEQ_FOR_EACH( BOOST_REFLECT_VISIT_MEMBER, v, MEMBERS ) \
+} 
+
+#define BOOST_REFLECT_DERIVED_IMPL_EXT( TYPE, INHERITS, MEMBERS ) \
+template<typename Visitor>\
+void boost::reflect::reflector<TYPE>::visit( const Visitor& v ) { \
     BOOST_PP_SEQ_FOR_EACH( BOOST_REFLECT_VISIT_BASE, v, INHERITS ) \
     BOOST_PP_SEQ_FOR_EACH( BOOST_REFLECT_VISIT_MEMBER, v, MEMBERS ) \
 } 
@@ -78,7 +86,7 @@ namespace boost { namespace reflect { \
 template<> struct reflector<TYPE> {\
     typedef TYPE type; \
     typedef boost::true_type is_defined; \
-    BOOST_REFLECT_IMPL( TYPE, INHERITS, MEMBERS ) \
+    BOOST_REFLECT_DERIVED_IMPL_INLINE( TYPE, INHERITS, MEMBERS ) \
 }; } }
 
 
@@ -92,7 +100,21 @@ template<> struct reflector<TYPE> {\
 #define BOOST_REFLECT( TYPE, MEMBERS ) \
     BOOST_REFLECT_DERIVED( TYPE, BOOST_PP_SEQ_NIL, MEMBERS )
 
+#define BOOST_REFLECT_FWD( TYPE ) \
+BOOST_REFLECT_TYPEINFO(TYPE) \
+namespace boost { namespace reflect { \
+template<> struct reflector<TYPE> {\
+    typedef TYPE type; \
+    typedef boost::true_type is_defined; \
+    template<typename Visitor> static void visit( const Visitor& v ); \
+}; } }
 
+
+#define BOOST_REFLECT_DERIVED_IMPL( TYPE, MEMBERS ) \
+    BOOST_REFLECT_IMPL_DERIVED_EXT( TYPE, BOOST_PP_SEQ_NIL, MEMBERS )
+
+#define BOOST_REFLECT_IMPL( TYPE, MEMBERS ) \
+    BOOST_REFLECT_DERIVED_IMPL_EXT( TYPE, BOOST_PP_SEQ_NIL, MEMBERS )
 
 
 
