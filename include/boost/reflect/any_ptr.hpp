@@ -24,19 +24,19 @@ namespace boost { namespace reflect {
       typedef InterfaceDelegate                                       delegate_type;
 
       any_ptr()
-      :m_vtable(new vtable_type()) {}
+      :m_vtable(boost::make_shared<vtable_type>()) {}
 
       operator bool()const  { return m_vtable; }
       bool operator!()const { return !m_vtable; }
 
       template<typename T>
       any_ptr( T* v )
-      :m_ptr(v),m_vtable(new vtable_type()) {
+      :m_ptr( boost::make_shared<boost::any>(v) ),m_vtable(boost::make_shared<vtable_type>()) {
         InterfaceDelegate::set_vtable(*m_vtable,*v);
       }
       template<typename T>
       any_ptr( const boost::shared_ptr<T>& v )
-      :m_ptr(v),m_vtable(new vtable_type()) {
+      :m_ptr(boost::make_shared<boost::any>(v)),m_vtable(boost::make_shared<vtable_type>()) {
         InterfaceDelegate::set_vtable(*m_vtable,*v);
       }
 
@@ -45,7 +45,7 @@ namespace boost { namespace reflect {
        */
       template<typename OtherInterface,typename OtherDelegate>
       any_ptr( const any_ptr<OtherInterface,OtherDelegate>& p )
-      :m_ptr(p),m_vtable(new vtable_type()) {
+      :m_ptr(p),m_vtable(boost::make_shared<vtable_type>()) {
         InterfaceDelegate::set_vtable( *m_vtable, *boost::any_cast<any_ptr<OtherInterface,OtherDelegate>&>(m_ptr) );
       }
 
@@ -56,8 +56,7 @@ namespace boost { namespace reflect {
       vtable_type*       operator->()      { return m_vtable.get(); } 
        
     protected:
-
-      boost::any                          m_ptr;
+      boost::shared_ptr<boost::any>       m_ptr;
       boost::shared_ptr<vtable_type>      m_vtable;
   };
   /**
