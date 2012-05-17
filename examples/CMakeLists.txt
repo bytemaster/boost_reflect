@@ -1,4 +1,7 @@
 include_directories( ../include )
+include_directories( ../../atomic/include )
+include_directories( ../../cmt/include )
+include_directories( ../../move/include )
 SET( libraries 
     #/usr/local/lib/tcmalloc/libtcmalloc.a
     boost_cmt
@@ -8,7 +11,7 @@ SET( libraries
     ${Boost_SYSTEM_LIBRARY} 
     ${Boost_SIGNALS_LIBRARY})
 
-add_executable( reflect_simple  simple.cpp  )
-target_link_libraries( reflect_simple ${libraries} )
+add_executable( value_test  value_test.cpp  )
+target_link_libraries( value_test ${libraries} )
 add_executable( reflect_signal  signal.cpp  )
 target_link_libraries( reflect_signal ${libraries} )
