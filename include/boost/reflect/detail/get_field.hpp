@@ -18,10 +18,9 @@ template<typename T>
 value_ref get_field( const std::string& n, T& v  );
 
 template<typename T>
-value_cref get_const_field( const std::string& n, const T& v  );
+value_cref get_field( const std::string& n, const T& v  );
 
 namespace detail {
-
       struct get_field_method {
         public:
             get_field_method(  const char* n ):m_name(n){}
@@ -71,178 +70,6 @@ namespace detail {
         delete fm.exchange(n,boost::memory_order_consume);
         return fm;
       }
-
-        /**
-         *  Base class for all place_holder types.
-         */
-        struct place_holder {
-            virtual ~place_holder(){}
-            virtual void* clone( char* l )const { return new(l)place_holder(); }
-            virtual const std::type_info & type() const { 
-                return typeid(place_holder); 
-            }
-            virtual value_ref get_field( const std::string& f )const {
-                boost::throw_exception(bad_value_cast());
-            }
-            virtual value_cref get_const_field( const std::string& f )const {
-                boost::throw_exception(bad_value_cast());
-            }
-            virtual value_cref get_cref()const { return value_cref(); }
-        };
-
-        /**
-         *  Place holders have different implementations based upon
-         *  whether they are storing:
-         *  
-         *  1) const lvalue reference
-         *  2) const rvalue reference (temporary object required )
-         *  3) lvalue reference
-         *  4) small value <= sizeof(void*) stored internally 
-         *  5) large value > sizeof(void*)  allocated on heap
-         *
-         *  Regard
-         */
-        template<typename T>
-        struct place_holder_const : virtual public place_holder {
-            value_cref get_const_field( const std::string& f )const  {
-             // slog( "place_holder_ref::get_const_field %1%", f );
-              return reflect::get_const_field(f,cref()); 
-            }
-        
-            virtual const T& cref()const  = 0;
-            virtual value_cref get_cref()const { return value_cref(cref()); }
-
-            virtual const std::type_info & type() const {
-                return typeid(const T&);
-            }
-        };
-        template<typename T>
-        struct place_holder_ref : virtual public place_holder {
-            virtual T& ref()const  = 0;
-            virtual value_cref get_cref()const { return value_cref(ref()); }
-            virtual const std::type_info & type() const {
-                return typeid(T&);
-            }
-            virtual value_ref get_field( const std::string& f )const {
-              //slog( "place_holder_ref::get_field %1%", f );
-              return reflect::get_field(f,ref()); 
-            }
-        };
-
-        template<typename T>
-        struct place_holder_const_lvalue : public place_holder_const<T> {
-            explicit place_holder_const_lvalue( const T& v )
-            :m_cref(v){}
-
-            virtual const T& cref()const { return m_cref; }
-            virtual void* clone( char* l )const { return new(l)place_holder_const_lvalue(m_cref); }
-
-            private:
-                const T& m_cref;
-        };
-
-
-        template<typename T, bool SizeLessThanOrEqualToVoidPtr = false>
-        struct place_holder_const_rvalue_impl : public place_holder_const<T> {
-            place_holder_const_rvalue_impl( const T&& v )
-            :m_rval( new T( std::forward<const T>(v) ) ){}
-
-            place_holder_const_rvalue_impl( const place_holder_const_rvalue_impl& v )
-            :m_rval( new T( *v.m_rval) ){}
-
-            ~place_holder_const_rvalue_impl() { delete m_rval; }
-
-            virtual const T& cref()const { return *m_rval; }
-            virtual void* clone( char* l )const { return new(l)place_holder_const_rvalue_impl(*this); }
-            private: 
-                const T* m_rval;
-        };
-
-        template<typename T>
-        struct place_holder_const_rvalue_impl<T,true> : public place_holder_const<T> {
-            place_holder_const_rvalue_impl( const T&& v )
-            :m_rval( std::forward<const T>(v) ){}
-            virtual const T& cref()const { return m_rval; }
-            virtual void* clone( char* l )const { return new(l)place_holder_const_rvalue_impl(T(m_rval)); }
-            private: 
-                const T m_rval;
-        };
-
-        template<typename T>
-        struct place_holder_const_rvalue : public place_holder_const_rvalue_impl<T,sizeof(T)<=sizeof(void*)> {
-            place_holder_const_rvalue( const T&& v )
-            :place_holder_const_rvalue_impl<T,sizeof(T)<=sizeof(void*)>( std::forward<const T>(v) ){}
-        };
-
-        template<typename T>
-        struct place_holder_lvalue : public place_holder_const<T>, public place_holder_ref<T> {
-            place_holder_lvalue( T& v )
-            :m_ref(v){ }
-
-            virtual const T& cref()const { return m_ref; }
-            virtual T&        ref()const { return m_ref; }
-            virtual void* clone( char* l )const { return new(l)place_holder_lvalue(m_ref); }
-
-            virtual value_cref get_cref()const { return value_cref(cref()); }
-            virtual const std::type_info & type() const {
-                return typeid(T&);
-            }
-
-            T& m_ref;
-        };
-
-
-        template<typename T, bool SizeLessThanOrEqualToVoidPtr = false>
-        struct place_holder_value_impl : public place_holder_const<T>, public place_holder_ref<T> {
-            place_holder_value_impl( T&& v )
-            :m_rval( new T( std::forward<T>(v) ) ){}
-
-            place_holder_value_impl( const T& v )
-            :m_rval( new T(v) ){}
-
-            place_holder_value_impl( const place_holder_value_impl& v )
-            :m_rval( new T( *v.m_rval) ){}
-
-            ~place_holder_value_impl() { delete m_rval; }
-
-            virtual const T& cref()const { return *m_rval; }
-            virtual T& ref()const        { return *m_rval; }
-            virtual void* clone( char* l )const { return new(l)place_holder_value_impl(*this); }
-
-            virtual value_cref get_cref()const { return cref(); }
-            virtual const std::type_info & type() const {
-                return typeid(T);
-            }
-            private: 
-                T* m_rval;
-        };
-
-
-        template<typename T>
-        struct place_holder_value_impl<T,true> : public place_holder_const<T>, public place_holder_ref<T> {
-            place_holder_value_impl( const T& v )
-            :m_rval( v ){}
-            place_holder_value_impl( T&& v )
-            :m_rval( std::forward<T>(v) ){}
-            virtual const T& cref()const { return m_rval; }
-            virtual T&       ref()const  { return m_rval; }
-            virtual void* clone( char* l )const { return new(l)place_holder_value_impl(m_rval); }
-            virtual value_cref get_cref()const { return cref(); }
-            virtual const std::type_info & type() const {
-                return typeid(T);
-            }
-            private: 
-                mutable T m_rval;
-        };
-
-        template<typename T>
-        struct place_holder_value : public place_holder_value_impl<T,sizeof(T)<=sizeof(void*)> {
-            place_holder_value( const T&& v )
-            :place_holder_value_impl<T,sizeof(T)<=sizeof(void*)>( std::forward<const T>(v) ){}
-        };
-
-
-
  } // namespace detail
 
 
@@ -251,23 +78,28 @@ namespace detail {
   */
 template<typename T>
 const field_map_type& get_field_map() {
-    static field_map_type* fm = detail::create_field_map<T>();
-    return *fm;
+  static field_map_type* fm = detail::create_field_map<T>();
+  return *fm;
 }
 
 template<typename T>
-value_ref get_field( const std::string& n, T& v  ) {
-    field_map_type::const_iterator itr = get_field_map<T>().find(n);
-    if( itr != get_field_map<T>().end() )
-      return (*itr->second)(&v);
-    return value_ref();
+bool has_field( const std::string& n ) {
+  field_map_type::const_iterator itr = get_field_map<T>().find(n);
+  return itr != get_field_map<T>().end();
 }
 template<typename T>
-value_cref get_const_field( const std::string& n, const T& v  ) {
-    field_map_type::const_iterator itr = get_field_map<T>().find(n);
-    if( itr != get_field_map<T>().end() )
-      return (*itr->second)(&v);
-    return value_cref();
+value_ref get_field( const std::string& n, T& v  ) {
+  field_map_type::const_iterator itr = get_field_map<T>().find(n);
+  if( itr != get_field_map<T>().end() )
+    return (*itr->second)(&v);
+  BOOST_THROW_EXCEPTION( unknown_field() << err_msg(n) );
+}
+template<typename T>
+value_cref get_field( const std::string& n, const T& v  ) {
+  field_map_type::const_iterator itr = get_field_map<T>().find(n);
+  if( itr != get_field_map<T>().end() )
+    return (*itr->second)(&v);
+  BOOST_THROW_EXCEPTION( unknown_field() << err_msg(n) );
 }
 
 } } // boost::reflect

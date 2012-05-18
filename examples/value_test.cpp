@@ -1,25 +1,19 @@
 //#include <boost/reflect/value_ref.hpp>
 #include <boost/reflect/value_cref.hpp>
 #include <boost/cmt/log/log.hpp>
-#include <boost/reflect/detail/value_cref.ipp>
-#include <boost/reflect/detail/value_ref.ipp>
-#include <boost/reflect/detail/value.ipp>
 #include <boost/exception/all.hpp>
 #include <boost/exception/diagnostic_information.hpp>
+#include <boost/reflect/value.hpp>
 
 struct test {
   test( int _a, std::string _b )
-  :a(_a),b(_b){
-    slog( "this: %1%", this );
-  }
-  test():a(0),b("default"){ slog( "default: %1%", this); }
+  :a(_a),b(_b){ }
+  test():a(0),b("default"){ }
 
   test( const test& c )
-  :a(c.a),b(c.b){ slog( "%1% copy tesT from %2%", this, &c ); }
+  :a(c.a),b(c.b){  }
 
-  ~test() {
-    slog("%1%",this);
-  }
+  ~test() { }
 
   int a;
   std::string b;
@@ -39,6 +33,38 @@ void test_rv( const boost::reflect::value_cref& v ) {
 
 using namespace boost::reflect;
 
+
+void test_visitor( value_ref& v ) {
+  std::cout<<"as str: "<<v["a"].as<std::string>()<<std::endl;
+  try {
+  std::cout<<"as str: "<<v["b"].as<int>()<<std::endl;
+    elog( "didn't catch bad cast!\n" );
+  }catch(std::bad_cast& ){
+    slog( "caught expected bad cast\n" );
+  }
+  slog( "try set as int" );
+  v["b"].set_as<int>(55); // does not compile as expected, generates assert
+  try {
+    std::cout<<"as str: 55  ?= "<<v["b"].as<std::string>()<<std::endl;
+    std::cout<<"as int: 55  ?= "<<v["b"].as<int>()<<std::endl;
+    slog( "cast worked this time!\n");
+  }catch(std::bad_cast& ){
+    elog( "caught expected bad cast when it should have worked\n" );
+  }
+}
+
+void test_const_visitor( const value_cref& v ) {
+  std::cout<<"as str: "<<v["a"].as<std::string>()<<std::endl;
+  try {
+  std::cout<<"as str: "<<v["b"].as<int>()<<std::endl;
+    elog( "didn't catch bad cast!\n" );
+  }catch(std::bad_cast& ){
+    slog( "caught expected bad cast\n" );
+  }
+  slog( "try set as int" );
+  //v["b"].set_as<int>(5); // does not compile as expected, generates assert
+}
+
 void test_ref_passed_to_cref( const value_cref& v ) {
   slog( "ref passed to cref..." );
   BOOST_ASSERT( v["a"] == int(6) ); 
@@ -48,6 +74,8 @@ void test_ref_passed_to_cref( const value_cref& v ) {
   value_cref v2;
 
   v2 = v;
+
+  test_const_visitor(v2);
 }
 
 void test_value_ref() {
@@ -55,6 +83,8 @@ void test_value_ref() {
   t.a = 5;
   t.b = "hello world";
   boost::reflect::value_ref  r(t);
+  test_const_visitor(r);
+  test_visitor(r);
   slog("passed ");
   BOOST_ASSERT( r["a"] == int(5) ); 
   BOOST_ASSERT( r["b"] == std::string("hello world") ); 
