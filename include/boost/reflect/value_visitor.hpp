@@ -5,12 +5,15 @@
 #include <boost/reflect/error.hpp>
 
 namespace boost { namespace reflect {
+  class value_cref;
+  class value_ref;
   struct read_value_visitor {
       virtual ~read_value_visitor(){}
       template<typename T>
-      void operator()( const T& s ){ BOOST_THROW_EXCEPTION( bad_value_cast() ); }
+      void operator()( const T& s ){ (*this)(value_cref(s)); }
 
       virtual void operator()(){}
+      virtual void operator()( const value_cref& s ){}
       virtual void operator()( const std::string& s ){}
       virtual void operator()( const uint64_t& s ){}
       virtual void operator()( const int64_t& s ){}
@@ -28,9 +31,10 @@ namespace boost { namespace reflect {
   struct write_value_visitor {
       virtual ~write_value_visitor(){}
       template<typename T>
-      void operator()( T& s ){ BOOST_THROW_EXCEPTION( bad_value_cast() ); }
+      void operator()( T& s ){ value_ref vr(s); (*this)(vr); }
 
       virtual void operator()(){}
+      virtual void operator()( value_ref& v ){}
       virtual void operator()( std::string& s ){}
       virtual void operator()( uint64_t& s ){}
       virtual void operator()( int64_t& s ){}

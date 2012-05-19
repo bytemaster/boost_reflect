@@ -5,8 +5,29 @@
 namespace boost { namespace reflect {
 
 /**
- *  value ref has reference semantics, therefore it may only be
- *  assigned to reference types at construction
+ *  A value may hold any type and provides polymorphic
+ *  access to its members by name.  In general a value
+ *  may hold a struct, array, map, number, string, null,
+ *  bool, or function.  
+ *
+ *  @code
+ *    struct test {
+ *      int num;
+ *      std::string str;
+ *      int print( std::string& );
+ *    };
+ *    value v(test());
+ *    v["num"].as<int>();
+ *    v["num"].as<std::string>();
+ *    v["str"].as<std::string>();
+ *    v["str"].as<int>();
+ *    v["print"]( "hello world" );
+ *
+ *  @endcode
+ *
+ *  Given a value you can iterate over its members and 
+ *  perform actions.
+ *  
 */
 class value : public value_base {
   public:
@@ -43,6 +64,8 @@ class value : public value_base {
 
     value_cref operator[]( const std::string& field )const;
     value_ref  operator[]( const std::string& field );
+    value_cref operator[]( uint64_t idx )const;
+    value_ref  operator[]( uint64_t idx );
 };
 
 
@@ -52,5 +75,6 @@ class value : public value_base {
 #include <boost/reflect/detail/value_ref.ipp>
 #include <boost/reflect/detail/value.ipp>
 #include <boost/reflect/detail/value_base.ipp>
+#include <boost/reflect/detail/iterator.ipp>
 
 #endif

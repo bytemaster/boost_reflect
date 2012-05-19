@@ -14,12 +14,12 @@ namespace boost { namespace reflect {
 
     template<typename T>
     value::value( const T& v ) {
-      new(held) detail::place_holder_value<T>(v);
+      new(held) typename detail::select_holder<T>::type(v);
     }
 
     template<typename T>
     value::value( typename boost::remove_reference<T>::type&& v ) {
-      new(held) detail::place_holder_value<T>(std::forward<T>(v));
+      new(held) typename detail::select_holder<T>::type(std::forward<T>(v));
     }
 
     value::value( value&& v ) {
@@ -32,7 +32,7 @@ namespace boost { namespace reflect {
        if( ptr<T>() ) { *ptr<T>() = v; return *this; }
        get_holder()->~place_holder();
 
-       new(held) detail::place_holder_value<T>(v);
+       new(held) typename detail::select_holder<T>::type(v);
        return *this;
     }
     
@@ -40,7 +40,7 @@ namespace boost { namespace reflect {
     value& value::operator=( T&& v ) {
        if( ptr<T>() ) { *ptr<T>() = std::forward<T>(v); }
        else {
-           new(held)detail::place_holder_value<T>(std::forward<T>(v));
+           new(held)typename detail::select_holder<T>::type(std::forward<T>(v));
        }
         return *this;
      }

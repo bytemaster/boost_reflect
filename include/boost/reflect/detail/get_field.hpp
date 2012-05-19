@@ -7,6 +7,8 @@
 #include <boost/reflect/error.hpp>
 #include <boost/reflect/value_ref.hpp>
 #include <boost/reflect/value_cref.hpp>
+#include <boost/reflect/iterator.hpp>
+#include <boost/reflect/detail/iterator_impl.hpp>
 
 namespace boost { namespace reflect { 
 
@@ -92,15 +94,79 @@ value_ref get_field( const std::string& n, T& v  ) {
   field_map_type::const_iterator itr = get_field_map<T>().find(n);
   if( itr != get_field_map<T>().end() )
     return (*itr->second)(&v);
-  BOOST_THROW_EXCEPTION( unknown_field() << err_msg(n) );
+  BOOST_THROW_EXCEPTION( unknown_field() << err_msg(n+": '"+n+"'") );
 }
 template<typename T>
 value_cref get_field( const std::string& n, const T& v  ) {
   field_map_type::const_iterator itr = get_field_map<T>().find(n);
   if( itr != get_field_map<T>().end() )
     return (*itr->second)(&v);
-  BOOST_THROW_EXCEPTION( unknown_field() << err_msg(n) );
+  BOOST_THROW_EXCEPTION( unknown_field() << err_msg(n+": '"+n+"'") );
 }
+
+template<typename T>
+class iterator_impl;
+
+template<typename T>
+class const_iterator_impl : public detail::const_iterator_impl_base {
+  public:
+    const T&                       val;
+    field_map_type::const_iterator itr;
+
+    const_iterator_impl( const T& _val, const field_map_type::const_iterator& i )
+    :val(_val),itr(i){}
+
+    const_iterator_impl( const const_iterator_impl& c )
+    :val(c.val),itr(c.itr){}
+
+    virtual std::string               key()const         { return itr->first;                        }
+    virtual value_ref                 value()const       { BOOST_THROW_EXCEPTION( bad_value_cast() );}
+    virtual value_cref                const_value()const { return (*itr->second)(&val);              }
+    virtual const_iterator_impl_base* const_clone()const { return new const_iterator_impl(val,itr);  }
+    virtual const char*               type()const        { return get_typename<iterator_impl<T> >(); }
+
+    virtual void next() { ++itr; }
+    virtual bool equals( const const_iterator_impl_base* other )const {
+      if( other == 0 )
+         return itr == get_field_map<T>().end();
+
+      if( type() == other->type() ) {
+          return itr == static_cast<const const_iterator_impl<T>*>(other)->itr;
+                &val == &static_cast<const const_iterator_impl<T>*>(other)->val;
+      }
+    }
+};
+template<typename T>
+class iterator_impl : public detail::iterator_impl_base {
+  public:
+    T&                             val;
+    field_map_type::const_iterator itr;
+
+    iterator_impl( T& _val, const field_map_type::const_iterator& i )
+    :val(_val),itr(i){}
+
+    iterator_impl( const iterator_impl& c )
+    :val(c.val),itr(c.itr){}
+
+    virtual std::string          key()const { return itr->first; }
+    virtual value_ref            value()const       { return (*itr->second)(&val);      }
+    virtual value_cref           const_value()const { return (*itr->second)(&val);      }
+    virtual iterator_impl_base* clone()const { return new iterator_impl(val,itr);       }
+    virtual const_iterator_impl_base* const_clone()const { return new const_iterator_impl<T>(val,itr);  }
+    virtual const char*          type()const { return get_typename<iterator_impl<T> >(); }
+
+    virtual void next() { ++itr; }
+    virtual bool equals( const const_iterator_impl_base* other )const {
+      if( other == 0 )
+         return itr == get_field_map<T>().end();
+
+      if( type() == other->type() ) {
+          return itr == static_cast<const iterator_impl<T>*>(other)->itr;
+                &val == &static_cast<const iterator_impl<T>*>(other)->val;
+      }
+    }
+};
+
 
 } } // boost::reflect
 

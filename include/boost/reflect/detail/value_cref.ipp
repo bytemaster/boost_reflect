@@ -8,14 +8,14 @@ namespace boost { namespace reflect {
 
     template<typename T>
     value_cref::value_cref( const T&& t ) {
-      BOOST_STATIC_ASSERT( sizeof(held) >= sizeof( detail::place_holder_const_reference<T> ) );
-      new (held) detail::place_holder_const_reference<T>( std::forward<const T>(t) );
+      BOOST_STATIC_ASSERT( sizeof(held) >= sizeof( typename detail::select_holder<const T&>::type ) );
+      new (held) typename detail::select_holder<const T&>::type( std::forward<const T>(t) );
     }
 
     template<typename T>
     value_cref::value_cref( const T& v ) { 
-      BOOST_STATIC_ASSERT( sizeof(held) >= sizeof( detail::place_holder_const_reference<T> ) );
-      new (held) detail::place_holder_const_reference<T>(v);
+      BOOST_STATIC_ASSERT( sizeof(held) >= sizeof( typename detail::select_holder<const T&>::type ) );
+      new (held) typename detail::select_holder<const T&>::type(v);
     }
 
     value_cref::value_cref( const value& v ) {

@@ -45,6 +45,7 @@ struct get_typeinfo< std::map<TP,TP2> > {
   enum is_defined_enum{ is_defined = get_typeinfo<TP>::is_defined && get_typeinfo<TP2>::is_defined }; 
   static const char* name() 
   {  
+    // TODO: make thread safe... 
     static std::string n = "std::map<" + std::string(get_typename<TP>()) +  "," + 
                                       std::string(get_typename<TP2>() ) + ">"; 
     return n.c_str(); 

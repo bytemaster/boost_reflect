@@ -10,6 +10,31 @@ namespace boost { namespace reflect {
     value_base::value_base(const value_base& copy) 
     { copy.get_holder()->clone( held ); }
 
+    bool           value_base::is_array()const {
+      return get_holder()->is_array();
+    }
+    size_t         value_base::size()const {
+      return get_holder()->size();
+    }
+
+    /**
+     *  If a struct, iterates over fields
+     *  If a map, over keys
+     *  if an array, over indexes
+     */
+    iterator       value_base::begin() {
+      return get_holder()->begin();
+    }
+    const_iterator value_base::begin()const {
+      return get_holder()->begin();
+    }
+    iterator       value_base::end() {
+      return iterator();
+    }
+    const_iterator value_base::end()const  {
+      return const_iterator();
+    }
+
     inline const detail::place_holder* value_base::get_holder()const {
       return reinterpret_cast<detail::place_holder*>(const_cast<char*>(held));
     }

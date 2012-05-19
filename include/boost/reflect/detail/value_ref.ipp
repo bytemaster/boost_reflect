@@ -17,8 +17,8 @@ namespace boost { namespace reflect {
 
      template<typename T>
      value_ref::value_ref( T& v ) { 
-      BOOST_STATIC_ASSERT( sizeof(detail::place_holder_reference<T>(v)) <= sizeof(held) );
-      new (held) detail::place_holder_reference<T>(v); 
+      BOOST_STATIC_ASSERT( sizeof(typename detail::select_holder<T&>::type(v)) <= sizeof(held) );
+      new (held) typename detail::select_holder<T&>::type(v); 
      }
 
      template<typename T>
