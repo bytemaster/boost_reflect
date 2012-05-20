@@ -71,7 +71,7 @@ class const_iterator;
       inline const detail::place_holder* get_holder()const;
       inline       detail::place_holder* get_holder();
 
-      char held[2*sizeof(void*)];
+      char held[3*sizeof(void*)];
   };
 
 } }

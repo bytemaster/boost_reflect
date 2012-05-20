@@ -14,11 +14,13 @@ namespace boost { namespace reflect {
 
     template<typename T>
     value::value( const T& v ) {
+      BOOST_STATIC_ASSERT( sizeof(held) >= sizeof(typename detail::select_holder<T>::type) );
       new(held) typename detail::select_holder<T>::type(v);
     }
 
     template<typename T>
     value::value( typename boost::remove_reference<T>::type&& v ) {
+      BOOST_STATIC_ASSERT( sizeof(held) >= sizeof(typename detail::select_holder<T>::type) );
       new(held) typename detail::select_holder<T>::type(std::forward<T>(v));
     }
 
