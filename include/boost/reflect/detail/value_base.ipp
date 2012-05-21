@@ -100,5 +100,34 @@ namespace boost { namespace reflect {
     }
 
 
+      template<typename P1>
+      value value_base::operator()(P1 p1)const {
+        std::vector<value> params(1); params[0] = p1;
+        return get_holder()->call( params );
+      }
+      template<typename P1>
+      value value_base::operator()(P1 p1){
+        std::vector<value> params(1); params[0] = p1;
+        return get_holder()->call( params );
+      }
+
+      template<typename P1, typename P2>
+      value value_base::operator()(P1 p1,P2 p2)const{
+        std::vector<value> params(2); 
+        params[0] = p1;
+        params[1] = p2;
+        return get_holder()->call( params );
+      }
+
+      template<typename P1,typename P2>
+      value value_base::operator()(P1 p1,P2 p2){
+        std::vector<value> params(2); 
+        params[0] = p1;
+        params[1] = p2;
+        return get_holder()->call( params );
+      }
+
+
+
 } } // boost::reflect
 #endif // _BOOST_REFLECT_DETAIL_VALUE_BASE_IPP_

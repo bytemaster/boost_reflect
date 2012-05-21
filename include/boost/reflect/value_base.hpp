@@ -9,6 +9,7 @@ namespace boost { namespace reflect {
   };
 
 class iterator;
+class value;
 class const_iterator;
 
   class value_base {
@@ -18,6 +19,7 @@ class const_iterator;
       ~value_base();
 
     bool           is_array()const;
+    bool           is_function()const;
     size_t         size()const;
 
     /**
@@ -30,11 +32,21 @@ class const_iterator;
     iterator       end();
     const_iterator end()const;
 
-    /**
-     *  If a function, calls it...
-     */
-    //value operator()(...)
+      /**
+       *  If a function, calls it...
+       */
+      value operator()()const;
+      value operator()();
 
+      template<typename P1>
+      value operator()(P1)const;
+      template<typename P1>
+      value operator()(P1);
+
+      template<typename P1, typename P2>
+      value operator()(P1,P2)const;
+      template<typename P1,typename P2>
+      value operator()(P1,P2);
 
 
       const char* type()const;

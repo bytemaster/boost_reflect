@@ -9,6 +9,7 @@
 #include <boost/reflect/value_cref.hpp>
 #include <boost/reflect/iterator.hpp>
 #include <boost/reflect/detail/iterator_impl.hpp>
+#include <boost/function_types/components.hpp>
 
 namespace boost { namespace reflect { 
 
@@ -33,14 +34,16 @@ namespace detail {
             const char* m_name;
       };
 
-      template<typename T,typename C, T(C::*p)>
+      template<typename P, P p >
       struct get_field_method_impl : get_field_method {
         get_field_method_impl( const char* n ):get_field_method(n){}
         virtual value_ref operator()( void* f )const {
+            typedef typename mpl::at_c< function_types::components<P,mpl::identity<mpl::_> >,1 >::type C;
            return value_ref((((C*)f)->*p));
         }
         virtual value_cref  operator()( const void* f )const {
-           return value_cref(((const C*)f)->*p);
+            typedef typename mpl::at_c< function_types::components<P,mpl::identity<mpl::_> >,1 >::type C;
+            return value_cref((((const C*)f)->*p));
         }
       };
 
@@ -48,15 +51,12 @@ namespace detail {
         public:
           get_field_visitor( field_map_type& _field_map )
           :field_map(_field_map){}
-     
-          template<typename T,typename C, T(C::*p)>
+
+          template<typename MemberPointerType,  MemberPointerType p >
           inline void operator()( const char* name )const {
-            static get_field_method_impl<T,C,p> gfm(name);
+            static get_field_method_impl<MemberPointerType,p> gfm(name);
             field_map[name] = &gfm;
           }
-
-          //TODO: visit member methods
-          
           field_map_type& field_map;
       };
       

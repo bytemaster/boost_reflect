@@ -33,10 +33,12 @@
               set_visitor( VTableType& vt, T& self )
               :m_self(self),vtbl(vt){}
 
-              template<typename M, typename InterfaceName, M (InterfaceName::*m)>
+              template<typename MemberPtr, MemberPtr m>
               void operator()( const char* name )const {
-                assign<M> a(m_self,vtbl.*m);
-                M::template get_member_ptr<T>( a );
+                typedef typename boost::function_types::result_type<MemberPtr>::type member_ref;
+                typedef typename boost::remove_reference<member_ref>::type member;
+                assign<member> a(m_self,vtbl.*m);
+                member::template get_member_ptr<T>( a );
               }
             private:
               template<typename Member>
@@ -62,10 +64,12 @@
               set_visitor( VTableType& vt, T& self )
               :m_self(self),vtbl(vt){}
 
-              template<typename M, typename InterfaceName, M (InterfaceName::*m)>
+              template<typename MemberPtr, MemberPtr m> // M (InterfaceName::*m
               void operator()( const char* name )const {
-                assign<M> a(m_self,vtbl.*m);
-                M::template get_member_ptr<T>( a );
+                typedef typename boost::function_types::result_type<MemberPtr>::type member_ref;
+                typedef typename boost::remove_reference<member_ref>::type member;
+                assign<member> a(m_self,vtbl.*m);
+                member::template get_member_ptr<T>( a );
               }
             private:
               template<typename Member>

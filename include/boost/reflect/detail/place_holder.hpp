@@ -8,8 +8,10 @@
 #include <boost/fusion/include/deduce.hpp>
 #include <boost/fusion/include/for_each.hpp>
 #include <boost/mpl/if.hpp>
+#include <boost/reflect/value.hpp>
 
 namespace boost { namespace reflect { namespace detail {
+
 
   struct place_holder {
       virtual ~place_holder(){}
@@ -20,6 +22,8 @@ namespace boost { namespace reflect { namespace detail {
         if( place ) return new(place)place_holder();
         return new place_holder();
       }
+      virtual value call( const std::vector<value>& params )const { return value(); }
+      virtual value call( const std::vector<value>& params )      { return value(); }
 
       virtual void visit( read_value_visitor&& v )const { v(); }
       virtual void visit( write_value_visitor&& v )     { v(); }

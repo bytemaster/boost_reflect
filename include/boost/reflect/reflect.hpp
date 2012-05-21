@@ -28,6 +28,7 @@
 #include <boost/reflect/void.hpp>
 #include <boost/reflect/vtable.hpp>
 #include <boost/reflect/typeinfo.hpp>
+#include <boost/function_types/result_type.hpp>
 
 namespace boost { namespace reflect {
 
@@ -55,7 +56,7 @@ struct reflector{
   boost::reflect::reflector<base>::visit( visitor );
 
 #define BOOST_REFLECT_VISIT_MEMBER( r, visitor, elem ) \
-  visitor.template operator()<BOOST_TYPEOF(type::elem),type,&type::elem>( BOOST_PP_STRINGIZE(elem) );
+  visitor.template operator()<BOOST_TYPEOF(&type::elem), &type::elem>( BOOST_PP_STRINGIZE(elem) );
 
 #define BOOST_REFLECT_DERIVED_IMPL_INLINE( TYPE, INHERITS, MEMBERS ) \
 template<typename Visitor>\

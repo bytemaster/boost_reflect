@@ -11,5 +11,5 @@ SET( libraries
     ${Boost_SYSTEM_LIBRARY} 
     ${Boost_SIGNALS_LIBRARY})
 
-add_executable( reflect_signal  signal.cpp  )
-target_link_libraries( reflect_signal ${libraries} )
+#add_executable( reflect_signal  signal.cpp  )
+#target_link_libraries( reflect_signal ${libraries} )

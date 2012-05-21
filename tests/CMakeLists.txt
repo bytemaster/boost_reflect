@@ -13,3 +13,5 @@ SET( libraries
 
 add_executable( value_test  value_test.cpp  )
 target_link_libraries( value_test ${libraries} )
+add_executable( value_function  value_function.cpp  )
+target_link_libraries( value_test ${libraries} )
