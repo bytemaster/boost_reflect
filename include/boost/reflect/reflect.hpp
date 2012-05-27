@@ -10,6 +10,7 @@
 
 #include <boost/static_assert.hpp>
 #include <boost/preprocessor/seq/for_each_i.hpp>
+#include <boost/preprocessor/seq/enum.hpp>
 #include <boost/preprocessor/seq/seq.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/preprocessor/tuple/elem.hpp>
@@ -58,6 +59,9 @@ struct reflector{
 #define BOOST_REFLECT_VISIT_MEMBER( r, visitor, elem ) \
   visitor.template operator()<BOOST_TYPEOF(&type::elem), &type::elem>( BOOST_PP_STRINGIZE(elem) );
 
+#define BOOST_REFLECT_BASE_MEMBER_COUNT( r, OP, elem ) \
+  OP boost::reflect::reflector<elem>::member_count
+
 #define BOOST_REFLECT_DERIVED_IMPL_INLINE( TYPE, INHERITS, MEMBERS ) \
 template<typename Visitor>\
 static inline void visit( const Visitor& v ) { \
@@ -87,6 +91,10 @@ namespace boost { namespace reflect { \
 template<> struct reflector<TYPE> {\
     typedef TYPE type; \
     typedef boost::true_type is_defined; \
+    enum  member_count_enum {  \
+      local_member_count = BOOST_PP_SEQ_SIZE(MEMBERS), \
+      total_member_count = local_member_count BOOST_PP_SEQ_FOR_EACH( BOOST_REFLECT_BASE_MEMBER_COUNT, +, INHERITS )\
+    }; \
     BOOST_REFLECT_DERIVED_IMPL_INLINE( TYPE, INHERITS, MEMBERS ) \
 }; } }
 
@@ -107,6 +115,11 @@ namespace boost { namespace reflect { \
 template<> struct reflector<TYPE> {\
     typedef TYPE type; \
     typedef boost::true_type is_defined; \
+    enum  member_count_enum {  \
+      local_member_count = BOOST_PP_SEQ_SIZE(MEMBERS), \
+      total_member_count = local_member_count BOOST_PP_SEQ_FOR_EACH( BOOST_REFLECT_BASE_MEMBER_COUNT, +, INHERITS )\
+    }; \
+    typedef boost::fusion::vector<BOOST_PP_SEQ_ENUM(INHERITS)> base_class_types; \
     template<typename Visitor> static void visit( const Visitor& v ); \
 }; } }
 

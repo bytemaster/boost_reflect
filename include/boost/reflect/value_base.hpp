@@ -12,6 +12,34 @@ class iterator;
 class value;
 class const_iterator;
 
+/**
+ *  @class value_base
+ *  @brief Provides runtime access to class members.
+ *
+ *  This class serves as the base for value_ref, value_cref, and
+ *  value which handle the copy and ownership semantics while value_base
+ *  deals with the interface semantics.
+ *
+ *  @code
+ *    struct test {
+ *      int num;
+ *      std::string str;
+ *      int print( std::string& );
+ *    };
+ *    BOOST_REFLECT( test, (num)(str)(print) )
+ *
+ *    value v(test());
+ *    v["num"].as<int>();
+ *    v["num"].as<std::string>();
+ *    v["str"].as<std::string>();
+ *    v["str"].as<int>();
+ *    v["print"]( "hello world" );
+ *
+ *  @endcode
+ *
+ *  Given a value you can iterate over its members and 
+ *  perform actions.
+ */
   class value_base {
     public:
       value_base();

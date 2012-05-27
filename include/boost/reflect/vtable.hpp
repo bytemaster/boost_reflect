@@ -48,6 +48,8 @@ namespace boost { namespace reflect {
   };
 
 #ifndef DOXYGEN
+  /** used because BOOST_REFLECT_SEQ_ENUM didn't quite work, and we need to
+   * swollow an extra comma... perhaps there is something we could put here later */
   template<typename t>
   class vtable_base{};
 #endif
@@ -74,8 +76,6 @@ namespace boost { namespace reflect {
 
 #define BOOST_REFLECT_VTABLE_VISIT_MEMBER( r, visitor, elem ) \
   visitor.template operator()<BOOST_TYPEOF(&vtable_type::elem),&vtable_type::elem>( BOOST_PP_STRINGIZE(elem) );
-  
-  //visitor.template operator()<BOOST_TYPEOF(vtable_type::elem),vtable_type,&vtable_type::elem>( BOOST_PP_STRINGIZE(elem) );
 
 // example of how to convert enumerate any BOOST_PP_SEQ, including BOOST_PP_SEQ_NIL
 #define BOOST_REFLECT_SEQ_ENUM(X) \
