@@ -1,8 +1,8 @@
-#ifndef _BOOST_REFLECT_VALUE_REF_HPP_
-#define _BOOST_REFLECT_VALUE_REF_HPP_
-#include <boost/reflect/value_cref.hpp>
+#ifndef _MACE_REFLECT_VALUE_REF_HPP_
+#define _MACE_REFLECT_VALUE_REF_HPP_
+#include <mace/reflect/value_cref.hpp>
 
-namespace boost { namespace reflect {
+namespace mace { namespace reflect {
 
 /**
  *  value ref has reference semantics, therefore it may only be
@@ -41,7 +41,7 @@ class value_ref : public value_base  {
 };
 
 
-} } // namespace boost
+} } // namespace mace::reflect
 
 
 #endif

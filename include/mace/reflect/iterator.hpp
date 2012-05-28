@@ -1,8 +1,8 @@
-#ifndef _BOOST_REFLECT_ITERATOR_HPP_
-#define _BOOST_REFLECT_ITERATOR_HPP_
-#include <boost/reflect/value_ref.hpp>
+#ifndef _MACE_REFLECT_ITERATOR_HPP_
+#define _MACE_REFLECT_ITERATOR_HPP_
+#include <mace/reflect/value_ref.hpp>
 
-namespace boost { namespace reflect {
+namespace mace { namespace reflect {
 
 namespace detail { 
   class const_iterator_impl_base;
@@ -57,6 +57,6 @@ class const_iterator {
     detail::const_iterator_impl_base* itr;
 };
 
-} }//boost::reflect
+} } //mace::reflect
 
 #endif

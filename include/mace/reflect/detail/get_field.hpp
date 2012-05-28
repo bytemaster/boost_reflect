@@ -1,17 +1,19 @@
-#ifndef _BOOST_REFLECT_DETAIL_GET_FIELD_HPP
-#define _BOOST_REFLECT_DETAIL_GET_FIELD_HPP
+#ifndef _MACE_REFLECT_DETAIL_GET_FIELD_HPP
+#define _MACE_REFLECT_DETAIL_GET_FIELD_HPP
 #include <boost/throw_exception.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/atomic.hpp>
-#include <boost/reflect/reflect.hpp>
-#include <boost/reflect/error.hpp>
-#include <boost/reflect/value_ref.hpp>
-#include <boost/reflect/value_cref.hpp>
-#include <boost/reflect/iterator.hpp>
-#include <boost/reflect/detail/iterator_impl.hpp>
+
 #include <boost/function_types/components.hpp>
 
-namespace boost { namespace reflect { 
+#include <mace/reflect/reflect.hpp>
+#include <mace/reflect/error.hpp>
+#include <mace/reflect/value_ref.hpp>
+#include <mace/reflect/value_cref.hpp>
+#include <mace/reflect/iterator.hpp>
+#include <mace/reflect/detail/iterator_impl.hpp>
+
+namespace mace { namespace reflect { 
 
 namespace detail { struct get_field_method; }
 
@@ -24,6 +26,9 @@ template<typename T>
 value_cref get_field( const std::string& n, const T& v  );
 
 namespace detail {
+      namespace mpl = boost::mpl;
+      namespace ft = boost::function_types;
+
       struct get_field_method {
         public:
             get_field_method(  const char* n ):m_name(n){}
@@ -38,11 +43,11 @@ namespace detail {
       struct get_field_method_impl : get_field_method {
         get_field_method_impl( const char* n ):get_field_method(n){}
         virtual value_ref operator()( void* f )const {
-            typedef typename mpl::at_c< function_types::components<P,mpl::identity<mpl::_> >,1 >::type C;
+            typedef typename mpl::at_c< ft::components<P,mpl::identity<mpl::_> >,1 >::type C;
            return value_ref((((C*)f)->*p));
         }
         virtual value_cref  operator()( const void* f )const {
-            typedef typename mpl::at_c< function_types::components<P,mpl::identity<mpl::_> >,1 >::type C;
+            typedef typename mpl::at_c< ft::components<P,mpl::identity<mpl::_> >,1 >::type C;
             return value_cref((((const C*)f)->*p));
         }
       };
@@ -68,7 +73,7 @@ namespace detail {
       static field_map_type* create_field_map() {
         static boost::atomic<field_map_type*> fm(0);
         field_map_type* n = new field_map_type();
-        boost::reflect::reflector<T>::visit( get_field_visitor(*n) );
+        mace::reflect::reflector<T>::visit( get_field_visitor(*n) );
         delete fm.exchange(n,boost::memory_order_consume);
         return fm;
       }
@@ -168,6 +173,6 @@ class iterator_impl : public detail::iterator_impl_base {
 };
 
 
-} } // boost::reflect
+} } // mace::reflect
 
 #endif

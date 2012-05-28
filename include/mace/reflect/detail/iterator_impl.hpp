@@ -1,10 +1,10 @@
-#ifndef __BOOST_REFLECT_DETAIL_ITERATOR_IMPL_HPP_
-#define __BOOST_REFLECT_DETAIL_ITERATOR_IMPL_HPP_
+#ifndef __MACE_REFLECT_DETAIL_ITERATOR_IMPL_HPP_
+#define __MACE_REFLECT_DETAIL_ITERATOR_IMPL_HPP_
 
-#include <boost/reflect/value_ref.hpp>
+#include <mace/reflect/value_ref.hpp>
 #include <vector>
 
-namespace boost { namespace reflect { namespace detail {
+namespace mace { namespace reflect { namespace detail {
 
     class const_iterator_impl_base {
       public:

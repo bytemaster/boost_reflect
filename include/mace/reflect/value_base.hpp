@@ -1,9 +1,9 @@
-#ifndef _BOOST_REFLECT_VALUE_BASE_HPP_
-#define _BOOST_REFLECT_VALUE_BASE_HPP_
+#ifndef _MACE_REFLECT_VALUE_BASE_HPP_
+#define _MACE_REFLECT_VALUE_BASE_HPP_
 #include <typeinfo>
-#include <boost/reflect/value_visitor.hpp>
+#include <mace/reflect/value_visitor.hpp>
 
-namespace boost { namespace reflect {
+namespace mace { namespace reflect {
   namespace detail {
     class place_holder;
   };

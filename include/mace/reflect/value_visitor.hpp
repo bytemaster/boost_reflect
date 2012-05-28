@@ -1,10 +1,10 @@
-#ifndef _BOOST_REFLECT_VALUE_VISITOR_HPP_
-#define _BOOST_REFLECT_VALUE_VISITOR_HPP_
+#ifndef _MACE_REFLECT_VALUE_VISITOR_HPP_
+#define _MACE_REFLECT_VALUE_VISITOR_HPP_
 #include <string>
 #include <boost/lexical_cast.hpp>
-#include <boost/reflect/error.hpp>
+#include <mace/reflect/error.hpp>
 
-namespace boost { namespace reflect {
+namespace mace { namespace reflect {
   class value_cref;
   class value_ref;
   struct read_value_visitor {
@@ -86,7 +86,6 @@ namespace boost { namespace reflect {
       virtual void operator()( bool& s )        { s = boost::lexical_cast<bool>(m_val);        }
   };
 
-
-} }
+} } // mace::reflect
 
 #endif 

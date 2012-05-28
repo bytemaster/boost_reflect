@@ -1,18 +1,19 @@
 #include <boost/cmt/log/log.hpp>
 #include <boost/exception/all.hpp>
 #include <boost/exception/diagnostic_information.hpp>
-#include <boost/reflect/value.hpp>
+#include <mace/reflect/value.hpp>
+#include <mace/reflect/reflect.hpp>
 #include <utility>
 #include <boost/fusion/include/make_vector.hpp>
 
-  struct to_json_visitor : public boost::reflect::read_value_visitor {
+  struct to_json_visitor : public mace::reflect::read_value_visitor {
     std::ostream& os;
     to_json_visitor( const to_json_visitor& v ):os(v.os){}
     to_json_visitor( std::ostream& v ):os(v){}
-      virtual void operator()( const boost::reflect::value_cref& s )  { 
+      virtual void operator()( const mace::reflect::value_cref& s )  { 
         if( s.is_array() ) {
            os<<'[';
-             boost::reflect::const_iterator itr = s.begin();
+             mace::reflect::const_iterator itr = s.begin();
              if( itr != s.end() )
                  while( true ) {
                    itr.value().visit(to_json_visitor(os));
@@ -24,7 +25,7 @@
            os<<']';
         } else {
            os<<'{';
-          boost::reflect::const_iterator itr = s.begin();
+          mace::reflect::const_iterator itr = s.begin();
              if( itr != s.end() )
                  while( true ) {
                    os << '"'<< itr.key() <<"\":";
@@ -59,7 +60,7 @@ struct sub_val {
   std::string happy;
   double      day;
 };
-BOOST_REFLECT( sub_val, (happy)(day) );
+MACE_REFLECT( sub_val, (happy)(day) );
 struct test {
   test( int _a, std::string _b )
   :a(_a),b(_b){ slog("test(%1%,%2%)",_a,_b); ++test_count;  }
@@ -80,9 +81,9 @@ struct test {
   sub_val     sub;
   std::vector<sub_val> data;
 };
-BOOST_REFLECT( test, (a)(b)(sub)(data) )
+MACE_REFLECT( test, (a)(b)(sub)(data) )
 
-using namespace boost::reflect;
+using namespace mace::reflect;
 
 
 template<typename ValueType>
@@ -90,7 +91,7 @@ void print_fields( const ValueType& t ) {
   t.visit( to_json_visitor(std::cout) );
 /*
   slog( "printing fields: %1%", t.size() );
-  boost::reflect::const_iterator itr = t.begin();
+  mace::reflect::const_iterator itr = t.begin();
   while( itr != t.end() ) {
     slog( "%3% %1% = %2%", itr.key(), itr.value().as<std::string>(), itr.value().type() );
     ++itr;

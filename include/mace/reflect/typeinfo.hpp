@@ -1,6 +1,6 @@
-#ifndef _BOOST_REFLECT_TYPEINFO_HPP
-#define _BOOST_REFLECT_TYPEINFO_HPP
-namespace boost { namespace reflect {
+#ifndef _MACE_REFLECT_TYPEINFO_HPP
+#define _MACE_REFLECT_TYPEINFO_HPP
+namespace mace { namespace reflect {
 
 /**
  *  @brief provides compile time access to name of a type.
@@ -57,15 +57,15 @@ struct get_typeinfo< std::map<TP,TP2> > {
  *  @brief Allows the typename to be accessed via get_typename<T>() in a 
  *  cross-platform, demangled way that std::typeinfo cannot do.
  */
-#define BOOST_REFLECT_TYPEINFO( NAME ) \
-namespace boost { namespace reflect { \
+#define MACE_REFLECT_TYPEINFO( NAME ) \
+namespace mace { namespace reflect { \
 template<> struct get_typeinfo<NAME> { \
     enum is_defined_enum{ is_defined = 1 }; \
     static const char* name() { return BOOST_PP_STRINGIZE(NAME); } \
 }; } }
 
-#define BOOST_REFLECT_TYPEINFO_ALIAS( NAME, STR_NAME ) \
-namespace boost { namespace reflect { \
+#define MACE_REFLECT_TYPEINFO_ALIAS( NAME, STR_NAME ) \
+namespace mace { namespace reflect { \
 template<> struct get_typeinfo<NAME> { \
     enum is_defined_enum{ is_defined = 1 }; \
     static const char* name() { return STR_NAME; } \
@@ -73,49 +73,49 @@ template<> struct get_typeinfo<NAME> { \
 
 
 /**
- *  @brief Same as BOOST_REFLECT_TYPEINFO except works for templates with 1 paramater.
+ *  @brief Same as MACE_REFLECT_TYPEINFO except works for templates with 1 paramater.
  */
-#define BOOST_REFLECT_TEMPLATE_TYPEINFO( NAME ) \
-namespace boost { namespace reflect {\
+#define MACE_REFLECT_TEMPLATE_TYPEINFO( NAME ) \
+namespace mace { namespace reflect {\
 template<> struct get_typeinfo<NAME<void_t> > { \
     enum is_defined_enum{ is_defined = 1 }; \
     static const char* name() { return BOOST_PP_STRINGIZE(NAME); } \
 }; } }
 
 /**
- *  @brief Same as BOOST_REFLECT_TYPEINFO except works for templates with 2 paramaters.
+ *  @brief Same as MACE_REFLECT_TYPEINFO except works for templates with 2 paramaters.
  */
-#define BOOST_REFLECT_TEMPLATE2_TYPEINFO( NAME ) \
-namespace boost { namespace reflect {\
+#define MACE_REFLECT_TEMPLATE2_TYPEINFO( NAME ) \
+namespace mace { namespace reflect {\
 template<> struct get_typeinfo<NAME<void_t,void_t> > { \
     enum is_defined_enum{ is_defined = 1 }; \
     static const char* name() { return BOOST_PP_STRINGIZE(NAME); } \
 }; } }
 
-} } // boost::reflect
+} } // mace::reflect
 
 
-// these macros specify namespace boost::reflect 
-BOOST_REFLECT_TYPEINFO( void )
-BOOST_REFLECT_TYPEINFO( bool )
-BOOST_REFLECT_TYPEINFO( uint8_t )
-BOOST_REFLECT_TYPEINFO( uint16_t )
-BOOST_REFLECT_TYPEINFO( uint32_t )
-BOOST_REFLECT_TYPEINFO( uint64_t )
-BOOST_REFLECT_TYPEINFO( int8_t )
-BOOST_REFLECT_TYPEINFO( int16_t )
-BOOST_REFLECT_TYPEINFO( int32_t )
-BOOST_REFLECT_TYPEINFO( int64_t )
-BOOST_REFLECT_TYPEINFO( double )
-BOOST_REFLECT_TYPEINFO( float )
-BOOST_REFLECT_TYPEINFO( void_t )
-BOOST_REFLECT_TYPEINFO( std::string )
-BOOST_REFLECT_TEMPLATE_TYPEINFO( std::vector )
-BOOST_REFLECT_TEMPLATE_TYPEINFO( std::set )
-BOOST_REFLECT_TEMPLATE_TYPEINFO( std::list )
-BOOST_REFLECT_TEMPLATE2_TYPEINFO( std::map )
-BOOST_REFLECT_TEMPLATE2_TYPEINFO( std::pair )
+// these macros specify namespace mace::reflect 
+MACE_REFLECT_TYPEINFO( void )
+MACE_REFLECT_TYPEINFO( bool )
+MACE_REFLECT_TYPEINFO( uint8_t )
+MACE_REFLECT_TYPEINFO( uint16_t )
+MACE_REFLECT_TYPEINFO( uint32_t )
+MACE_REFLECT_TYPEINFO( uint64_t )
+MACE_REFLECT_TYPEINFO( int8_t )
+MACE_REFLECT_TYPEINFO( int16_t )
+MACE_REFLECT_TYPEINFO( int32_t )
+MACE_REFLECT_TYPEINFO( int64_t )
+MACE_REFLECT_TYPEINFO( double )
+MACE_REFLECT_TYPEINFO( float )
+MACE_REFLECT_TYPEINFO( void_t )
+MACE_REFLECT_TYPEINFO( std::string )
+MACE_REFLECT_TEMPLATE_TYPEINFO( std::vector )
+MACE_REFLECT_TEMPLATE_TYPEINFO( std::set )
+MACE_REFLECT_TEMPLATE_TYPEINFO( std::list )
+MACE_REFLECT_TEMPLATE2_TYPEINFO( std::map )
+MACE_REFLECT_TEMPLATE2_TYPEINFO( std::pair )
 
-#include <boost/reflect/reflect_function_signature.hpp>
+#include <mace/reflect/reflect_function_signature.hpp>
 
 #endif

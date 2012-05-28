@@ -1,10 +1,10 @@
-#ifndef _BOOST_REFLECT_DETAIL_VALUE_CREF_IPP_
-#define _BOOST_REFLECT_DETAIL_VALUE_CREF_IPP_
-#include <boost/reflect/value_cref.hpp>
-#include <boost/reflect/detail/place_holder.hpp>
-#include <boost/reflect/detail/get_field.hpp>
+#ifndef _MACE_REFLECT_DETAIL_VALUE_CREF_IPP_
+#define _MACE_REFLECT_DETAIL_VALUE_CREF_IPP_
+#include <mace/reflect/value_cref.hpp>
+#include <mace/reflect/detail/place_holder.hpp>
+#include <mace/reflect/detail/get_field.hpp>
 
-namespace boost { namespace reflect {
+namespace mace { namespace reflect {
 
     template<typename T>
     value_cref::value_cref( const T&& t ) {
@@ -49,6 +49,6 @@ namespace boost { namespace reflect {
     }
 
 
-} } // namespace boost::reflect
+} } // namespace mace::reflect
 
-#endif // _BOOST_REFLECT_DETAIL_VALUE_CREF_IPP_
+#endif // _MACE_REFLECT_DETAIL_VALUE_CREF_IPP_

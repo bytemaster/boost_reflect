@@ -1,8 +1,8 @@
-#ifndef _BOOST_REFLECT_VALUE_HPP_
-#define _BOOST_REFLECT_VALUE_HPP_
-#include <boost/reflect/value_ref.hpp>
+#ifndef _MACE_REFLECT_VALUE_HPP_
+#define _MACE_REFLECT_VALUE_HPP_
+#include <mace/reflect/value_ref.hpp>
 
-namespace boost { namespace reflect {
+namespace mace { namespace reflect {
 
 /**
  *  A value may hold any type and provides polymorphic
@@ -69,12 +69,12 @@ class value : public value_base {
 };
 
 
-} } // namespace boost
+} } // namespace mace::reflect
 
-#include <boost/reflect/detail/value_cref.ipp>
-#include <boost/reflect/detail/value_ref.ipp>
-#include <boost/reflect/detail/value.ipp>
-#include <boost/reflect/detail/value_base.ipp>
-#include <boost/reflect/detail/iterator.ipp>
+#include <mace/reflect/detail/value_cref.ipp>
+#include <mace/reflect/detail/value_ref.ipp>
+#include <mace/reflect/detail/value.ipp>
+#include <mace/reflect/detail/value_base.ipp>
+#include <mace/reflect/detail/iterator.ipp>
 
 #endif

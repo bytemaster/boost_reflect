@@ -1,16 +1,16 @@
-#ifndef _BOOST_REFLECT_DETAIL_PLACE_HOLDER_HPP_
-#define _BOOST_REFLECT_DETAIL_PLACE_HOLDER_HPP_
-#include <boost/reflect/detail/get_field.hpp>
-#include <boost/reflect/value_visitor.hpp>
-#include <boost/reflect/detail/iterator_impl.hpp>
+#ifndef _MACE_REFLECT_DETAIL_PLACE_HOLDER_HPP_
+#define _MACE_REFLECT_DETAIL_PLACE_HOLDER_HPP_
+#include <mace/reflect/detail/get_field.hpp>
+#include <mace/reflect/value_visitor.hpp>
+#include <mace/reflect/detail/iterator_impl.hpp>
 #include <map>
 #include <boost/fusion/include/is_sequence.hpp>
 #include <boost/fusion/include/deduce.hpp>
 #include <boost/fusion/include/for_each.hpp>
 #include <boost/mpl/if.hpp>
-#include <boost/reflect/value.hpp>
+#include <mace/reflect/value.hpp>
 
-namespace boost { namespace reflect { namespace detail {
+namespace mace { namespace reflect { namespace detail {
 
 
   struct place_holder {
@@ -500,6 +500,6 @@ namespace boost { namespace reflect { namespace detail {
   };
 
 
-} } } // boost::reflect::detail
+} } } // mace::reflect::detail
 
 #endif

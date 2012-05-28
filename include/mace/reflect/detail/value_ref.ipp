@@ -1,9 +1,9 @@
-#ifndef _BOOST_REFLECT_DETAIL_VALUE_REF_IPP_
-#define _BOOST_REFLECT_DETAIL_VALUE_REF_IPP_
-#include <boost/reflect/value_ref.hpp>
-#include <boost/reflect/detail/get_field.hpp>
+#ifndef _MACE_REFLECT_DETAIL_VALUE_REF_IPP_
+#define _MACE_REFLECT_DETAIL_VALUE_REF_IPP_
+#include <mace/reflect/value_ref.hpp>
+#include <mace/reflect/detail/get_field.hpp>
 
-namespace boost { namespace reflect {
+namespace mace { namespace reflect {
      value_ref::value_ref( const value_ref& r ):value_base(r){}
 
      value_ref::value_ref( value_ref&& v ) {
@@ -35,6 +35,6 @@ namespace boost { namespace reflect {
      }
 
 
-} } // namespace boost::reflect
+} } // namespace mace::reflect
 
-#endif // _BOOST_REFLECT_DETAIL_VALUE_REF_IPP_
+#endif // _MACE_REFLECT_DETAIL_VALUE_REF_IPP_

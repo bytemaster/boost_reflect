@@ -1,9 +1,9 @@
-#ifndef _BOOST_REFLECT_ITERATOR_IPP_
-#define _BOOST_REFLECT_ITERATOR_IPP_
-#include <boost/reflect/iterator.hpp>
-#include <boost/reflect/detail/iterator_impl.hpp>
+#ifndef _MACE_REFLECT_ITERATOR_IPP_
+#define _MACE_REFLECT_ITERATOR_IPP_
+#include <mace/reflect/iterator.hpp>
+#include <mace/reflect/detail/iterator_impl.hpp>
 
-namespace boost { namespace reflect {
+namespace mace { namespace reflect {
 
     std::string iterator::key()const  { return itr->key();  }
     value_ref   iterator::value()const { return itr->value(); }
@@ -72,4 +72,4 @@ namespace boost { namespace reflect {
     }
 
 } }
-#endif // _BOOST_REFLECT_ITERATOR_IPP_
+#endif // _MACE_REFLECT_ITERATOR_IPP_

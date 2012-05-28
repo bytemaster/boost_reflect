@@ -1,7 +1,7 @@
 #ifndef BOOST_PP_IS_ITERATING
 
-#   ifndef BOOST_REFLECT_FUNCTION_SIGNATURE_HPP
-#       define BOOST_REFLECT_FUNCTION_SIGNATURE_HPP
+#   ifndef MACE_REFLECT_FUNCTION_SIGNATURE_HPP
+#       define MACE_REFLECT_FUNCTION_SIGNATURE_HPP
 
 #       include <boost/preprocessor/repetition.hpp>
 #       include <boost/type_traits/remove_const.hpp>
@@ -17,7 +17,7 @@
 #        endif
 
 
-namespace boost { namespace reflect {
+namespace mace { namespace reflect {
 
 #ifndef RCR
 #define RCR(X) typename boost::remove_const<typename boost::remove_reference<X>::type>::type
@@ -28,7 +28,7 @@ namespace boost { namespace reflect {
 
 #       include <boost/preprocessor/iteration/iterate.hpp>
 #       define BOOST_PP_ITERATION_LIMITS (0, GET_REFLECT_PARAMETER_SIZE )
-#       define BOOST_PP_FILENAME_1 <boost/reflect/reflect_function_signature.hpp>
+#       define BOOST_PP_FILENAME_1 <mace/reflect/reflect_function_signature.hpp>
 #       include BOOST_PP_ITERATE()
 
         #undef PARAM_TYPE
@@ -36,7 +36,7 @@ namespace boost { namespace reflect {
         #undef PARAM_ARG
         #undef ADD_PARAM
         #undef RCR
-} } // boost::reflect
+} } // mace::reflect
 
 #   endif // BOOST_REFLECT_FUNCTION_SIGNATURE_HPP
 
@@ -45,10 +45,8 @@ namespace boost { namespace reflect {
 #   define n BOOST_PP_ITERATION()
 
 template<typename Rtn BOOST_PP_ENUM_TRAILING_PARAMS(n, typename A)>
-struct get_typeinfo<Rtn (BOOST_PP_ENUM_PARAMS(n, A))>
-{
-    static const char* name()
-    {
+struct get_typeinfo<Rtn (BOOST_PP_ENUM_PARAMS(n, A))> {
+    static const char* name() {
         static std::string* sig = NULL;
         if( !sig )
         {

@@ -1,9 +1,9 @@
-#ifndef _BOOST_REFLECT_DETAIL_VALUE_BASE_IPP_
-#define _BOOST_REFLECT_DETAIL_VALUE_BASE_IPP_
-#include <boost/reflect/value_base.hpp>
-#include <boost/reflect/detail/get_field.hpp>
-#include <boost/cmt/log/log.hpp>
-namespace boost { namespace reflect {
+#ifndef _MACE_REFLECT_DETAIL_VALUE_BASE_IPP_
+#define _MACE_REFLECT_DETAIL_VALUE_BASE_IPP_
+#include <mace/reflect/value_base.hpp>
+#include <mace/reflect/detail/get_field.hpp>
+
+namespace mace { namespace reflect {
 
     value_base::value_base()  { new (held) detail::place_holder(); }
     value_base::~value_base() { get_holder()->~place_holder(); }
@@ -129,5 +129,5 @@ namespace boost { namespace reflect {
 
 
 
-} } // boost::reflect
+} } // mace::reflect
 #endif // _BOOST_REFLECT_DETAIL_VALUE_BASE_IPP_

@@ -1,9 +1,8 @@
-#ifndef _BOOST_REFLECT_DETAIL_VALUE_IPP_
-#define _BOOST_REFLECT_DETAIL_VALUE_IPP_
-#include <boost/reflect/value.hpp>
-#include <boost/cmt/log/log.hpp>
+#ifndef _MACE_REFLECT_DETAIL_VALUE_IPP_
+#define _MACE_REFLECT_DETAIL_VALUE_IPP_
+#include <mace/reflect/value.hpp>
 
-namespace boost { namespace reflect {
+namespace mace { namespace reflect {
 
     value::value( const value_cref& c) {
        *this =  c.get_holder()->copy();
@@ -80,6 +79,6 @@ namespace boost { namespace reflect {
        return get_holder()->get_field(field);            
      }
 
-} } // boost::reflect
+} } // mace::reflect
 
 #endif 
