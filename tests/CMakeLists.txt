@@ -7,7 +7,7 @@ SET( libraries
     mace_cmt
     boost_context 
     pthread
-    rt
+    ${rt_library}
     ${Boost_THREAD_LIBRARY} 
     ${Boost_ASIO_LIBRARY} 
     ${Boost_SYSTEM_LIBRARY} 
