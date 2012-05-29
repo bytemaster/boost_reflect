@@ -34,13 +34,19 @@
 #include <mace/reflect/void.hpp>
 #include <mace/reflect/typeinfo.hpp>
 
-namespace mace { namespace reflect {
+namespace mace { 
+/**
+ *  @brief types, methods associated with the MACE.Reflect Library
+ */
+namespace reflect {
 
 /**
  *  @brief defines visit functions for T
  *  Unless this is specialized, visit() will not be defined for T.
  *
- *  The @ref MACE_REFLECT(TYPE,INHERITS,MEMBERS) macro is used to specialize this
+ *  @tparam T - the type that will be visited.
+ *
+ *  The @ref MACE_REFLECT(TYPE,MEMBERS) or MACE_REFLECT_DERIVED(TYPE,BASES,MEMBERS) macro is used to specialize this
  *  class for your type.
  */
 template<typename T>
@@ -48,8 +54,22 @@ struct reflector{
     typedef T type;
     typedef boost::fusion::vector<> base_class_types;
     typedef boost::false_type is_defined;
+
+    /**
+     *  @tparam Visitor a function object of the form:
+     *
+     *    @code
+     *     struct functor {  
+     *        template<typename MemberPtr, MemberPtr m>
+     *        void operator()( const char* name )const;
+     *     };
+     *    @endcode
+     *  
+     *  @param v a functor that will be called for each member on T
+     *
+     */
     template<typename Visitor>
-    static inline void visit( const Visitor&  ){}; 
+    static inline void visit( const Visitor& v ){}; 
 };
 
 } } // namespace mace::reflect
@@ -82,6 +102,8 @@ void mace::reflect::reflector<TYPE>::visit( const Visitor& v ) { \
 #endif // DOXYGEN
 
 /**
+ *  @def MACE_REFLECT_DERIVED(TYPE,INHERITS,MEMBERS)
+ *
  *  @brief Specializes mace::reflect::reflector for TYPE where 
  *         type inherits other reflected classes
  *
@@ -103,6 +125,7 @@ template<> struct reflector<TYPE> {\
 
 
 /**
+ *  @def MACE_REFLECT(TYPE,MEMBERS)
  *  @brief Specializes mace::reflect::reflector for TYPE
  *
  *  @param MEMBERS - a sequence of member names.  (field1)(field2)(field3)
