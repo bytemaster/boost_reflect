@@ -4,8 +4,10 @@ include_directories( ../../cmt/include )
 include_directories( ../../move/include )
 SET( libraries 
     #/usr/local/lib/tcmalloc/libtcmalloc.a
-    boost_cmt
+    mace_cmt
     boost_context 
+    pthread
+    rt
     ${Boost_THREAD_LIBRARY} 
     ${Boost_ASIO_LIBRARY} 
     ${Boost_SYSTEM_LIBRARY} 
